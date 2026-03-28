@@ -4,27 +4,29 @@ namespace VSlices.Domain.Interfaces;
 
 public static class RepositoryExtensions
 {
-    extension<RT, TRoot>(IRepository<RT, TRoot> repository)
+    extension<M, TRoot>(IRepository<M, TRoot> repository)
+        where M : MonadIO<M>
         where TRoot : AggregateRoot<TRoot>
     {
-        public Eff<RT, TRoot> Add(TRoot root) =>
+        public K<M, TRoot> Add(TRoot root) =>
             repository.AddRange([root]).Map(r => r.First());
 
-        public Eff<RT, TRoot> Update(TRoot root) =>
+        public K<M, TRoot> Update(TRoot root) =>
             repository.UpdateRange([root]).Map(r => r.First());
 
-        public Eff<RT, TRoot> Delete(TRoot root) =>
+        public K<M, TRoot> Delete(TRoot root) =>
             repository.DeleteRange([root]).Map(r => r.First());
     }
 
-    extension<RT, TRoot, TId>(IRepository<RT, TRoot, TId> repository)
+    extension<M, TRoot, TId>(IRepository<M, TRoot, TId> repository)
+        where M : MonadIO<M>, Fallible<Error, M>
         where TRoot : AggregateRoot<TRoot, TId>
         where TId : Identifier<TId>
     {
-        public Eff<RT, TRoot> Read(TId id) =>
+        public K<M, TRoot> Read(TId id) =>
             repository.ReadOrOption(id)
-                      .Match(Some: Eff<RT, TRoot> (s) => Pure(s),
-                             None: () => notFound<TRoot>())
+                      .Match(Some: (TRoot s) => M.Pure(s),
+                             None: () => M.Fail<TRoot>(notFound<TRoot>().Value))
                       .Flatten();
     }
 }

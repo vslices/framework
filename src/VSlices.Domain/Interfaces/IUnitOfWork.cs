@@ -1,9 +1,12 @@
-﻿namespace VSlices.Domain.Interfaces;
+﻿using VSlices.Domain.Environments.Persistance;
 
-public interface IUnitOfWork<RT>
+namespace VSlices.Domain.Interfaces;
+
+public interface IUnitOfWork<M>
+    where M : MonadIO<M>
 {
-    Eff<RT, Unit> Commit();
+    K<M, Unit> Commit();
 
-    Eff<RT, T> GetRepository<T>()
+    K<M, T> GetRepository<T>()
         where T : IRepository;
 }

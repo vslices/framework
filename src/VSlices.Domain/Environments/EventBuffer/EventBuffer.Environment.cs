@@ -1,8 +1,8 @@
 ﻿using VSlices.Domain.Traits;
 
-namespace VSlices.Domain.Traits.EventBuffer;
+namespace VSlices.Domain.Environments.EventBuffer;
 
-public record EventBuffer<M, RT>
+public record EventBufferEnv<M, RT>
     where M : MonadIO<M>
     where RT : Has<M, EventBufferIO>
 {
@@ -15,12 +15,12 @@ public record EventBuffer<M, RT>
         eventBufferIO.Bind(io => io.Commit());
 }
 
-public record EventBuffer<RT>
+public record EventBufferEnv<RT>
     where RT : Has<Eff<RT>, EventBufferIO>
 {
     public static Eff<RT, Unit> track(UntypedAggregateRoot root) =>
-        EventBuffer<Eff<RT>, RT>.track(root).As();
+        EventBufferEnv<Eff<RT>, RT>.track(root).As();
 
     internal static Eff<RT, Unit> commit() =>
-        EventBuffer<Eff<RT>, RT>.commit().As();
+        EventBufferEnv<Eff<RT>, RT>.commit().As();
 }

@@ -8,20 +8,22 @@ public interface IRepository;
 
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public interface IRepository<RT, TRoot> : IRepository
+public interface IRepository<M, TRoot> : IRepository
+    where M : MonadIO<M>
     where TRoot : AggregateRoot<TRoot>
 {
-    Eff<RT, Seq<TRoot>> AddRange(Seq<TRoot> roots);
+    K<M, Seq<TRoot>> AddRange(Seq<TRoot> roots);
 
-    Eff<RT, Seq<TRoot>> UpdateRange(Seq<TRoot> aggregateRoot);
+    K<M, Seq<TRoot>> UpdateRange(Seq<TRoot> aggregateRoot);
 
-    Eff<RT, Seq<TRoot>> DeleteRange(Seq<TRoot> aggregateRoot);
+    K<M, Seq<TRoot>> DeleteRange(Seq<TRoot> aggregateRoot);
 
 }
 
-public interface IRepository<RT, TRoot, TId> : IRepository<RT, TRoot>
+public interface IRepository<M, TRoot, TId> : IRepository<M, TRoot>
+    where M : MonadIO<M>
     where TRoot : AggregateRoot<TRoot, TId>
     where TId : Identifier<TId>
 {
-    OptionT<Eff<RT>, TRoot> ReadOrOption(TId id);
+    OptionT<M, TRoot> ReadOrOption(TId id);
 }
