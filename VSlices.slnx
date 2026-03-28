@@ -1,7 +1,8 @@
 <Solution>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
-    <Project Path="VSlices.Domain/VSlices.Domain.csproj" Id="8f60a5f2-aba0-4991-b4f8-2daf77e927bd" />
+    <Project Path="src/VSlices.Domain/VSlices.Domain.csproj" />
+    <Project Path="src/VSlices.Infrastructure/VSlices.Infrastructure.csproj" Id="aabbb6eb-6bcb-4070-a584-9e9ed3d34d62" />
   </Folder>
   <Folder Name="/tests/" />
 </Solution>
