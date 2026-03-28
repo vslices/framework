@@ -2,7 +2,7 @@
 using VSlices.Domain.Traits;
 using VSlices.Infrastructure.Services;
 
-namespace VSlices.Infrastructure.Implementations.Events;
+namespace VSlices.Infrastructure.Implementations;
 
 public sealed class InMemoryEventBufferIO(InMemoryEventQueue queue) : EventBufferIO
 {
