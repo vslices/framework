@@ -3,6 +3,8 @@ using VSlices.Core.Errors;
 
 namespace LanguageExt;
 
+public readonly record struct FeatureResult<A>(Either<FeatureError, A> Value);
+
 public static class FeatureEffExtensions
 {
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Eff<A> ma) =>
@@ -41,11 +43,11 @@ public static class FeatureEffExtensions
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this K<Eff<RT>, K<Either<FeatureError>, A>> ma) =>
         ma.As().ToFeatureEff();
 
-    public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Either<FeatureError, A> ma) =>
+    public static FeatureResult<A> ToFeatureResult<A>(this Either<FeatureError, A> ma) =>
         new(ma);
 
-    public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this K<Either<FeatureError>, A> ma) =>
-        ma.As().ToFeatureEff<RT, A>();
+    public static FeatureResult<A> ToFeatureResult<RT, A>(this K<Either<FeatureError>, A> ma) =>
+        ma.As().ToFeatureResult();
 
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this EitherT<FeatureError, Eff<RT>, A> ma) =>
         new(ma);
@@ -68,6 +70,9 @@ public static class FeatureEffExtensions
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Pure<A> m) =>
         FeatureEff<RT, A>.Success(m.Value);
 
+    public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Fail<Error> m) =>
+        m.ToEff();
+
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Fail<Exceptional> m) =>
         FeatureEff<RT, A>.Fail(m.Value);
 
@@ -78,11 +83,11 @@ public static class FeatureEffExtensions
         FeatureEff<RT, A>.Lift(lift.Function);
 
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Lift<Task<A>> lift) =>
-        FeatureEff<RT, A>.Lift(lift.Function);
+        FeatureEff<RT, A>.LiftIO(lift.Function);
 
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Lift<RT, A> lift) =>
         FeatureEff<RT, A>.Lift(lift.Function);
 
     public static FeatureEff<RT, A> ToFeatureEff<RT, A>(this Lift<RT, Task<A>> lift) =>
-        FeatureEff<RT, A>.Lift(lift.Function);
+        FeatureEff<RT, A>.LiftIO(lift.Function);
 }
