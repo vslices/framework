@@ -1,13 +1,11 @@
 ﻿using VSlices.Domain.Environments.Clock;
 using VSlices.Domain.Environments.DataAccess;
-using VSlices.Domain.Environments.EventBuffer;
 using VSlices.Domain.Environments.Persistence;
 
 namespace VSlices.Domain;
 
 public interface DomainRuntime<TSelf> 
-    : HasEventBuffer<TSelf>, 
-      HasPersistence<TSelf>,
+    : HasPersistence<TSelf>,
       HasDataAccess<TSelf>,
       HasClockAccess<TSelf>
     where TSelf : DomainRuntime<TSelf>;
