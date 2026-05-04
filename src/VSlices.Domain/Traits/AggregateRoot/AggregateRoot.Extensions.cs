@@ -1,4 +1,6 @@
-﻿namespace VSlices.Domain.Traits;
+﻿using VSlices.Domain.Traits;
+
+namespace VSlices;
 
 public static class AggregateRootExtensions
 {

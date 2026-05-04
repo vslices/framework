@@ -1,6 +1,6 @@
 ﻿namespace VSlices.Domain.Environments.Clock;
 
-public interface ClockAccessIO
+public interface ClockIO
 {
     IO<DateTimeOffset> Now { get; }
 

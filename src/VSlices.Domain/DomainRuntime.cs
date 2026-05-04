@@ -7,5 +7,5 @@ namespace VSlices.Domain;
 public interface DomainRuntime<TSelf> 
     : HasPersistence<TSelf>,
       HasDataAccess<TSelf>,
-      HasClockAccess<TSelf>
+      HasClock<TSelf>
     where TSelf : DomainRuntime<TSelf>;

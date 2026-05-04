@@ -1,14 +1,12 @@
-﻿using VSlices.Domain.Interfaces;
+﻿namespace VSlices.Domain.Environments.Clock;
 
-namespace VSlices.Domain.Environments.Clock;
+public interface HasClock<RT> : Has<Eff<RT>, ClockIO>;
 
-public interface HasClockAccess<TSelf> : Has<Eff<TSelf>, ClockAccessIO>;
-
-public record ClockAccessEnv<RT>
-    where RT : HasClockAccess<RT>
+public record ClockEnv<RT>
+    where RT : HasClock<RT>
 {
-    protected static Eff<RT, ClockAccessIO> clockAccessIO =>
-        Has<Eff<RT>, RT, ClockAccessIO>.ask.As();
+    protected static Eff<RT, ClockIO> clockAccessIO =>
+        Has<Eff<RT>, RT, ClockIO>.ask.As();
 
     public static Eff<RT, DateTimeOffset> getNow =>
         clockAccessIO.Bind(io => io.Now);

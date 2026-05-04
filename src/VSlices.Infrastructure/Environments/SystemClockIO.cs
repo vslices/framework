@@ -3,7 +3,7 @@ using VSlices.Domain.Environments.Clock;
 
 namespace VSlices.Infrastructure.Environments;
 
-public sealed class SystemClockAccessIO(TimeProvider timeProvider) : ClockAccessIO
+public sealed class SystemClockIO(TimeProvider timeProvider) : ClockIO
 {
     public IO<DateTimeOffset> Now => IO.lift(timeProvider.GetLocalNow);
 
