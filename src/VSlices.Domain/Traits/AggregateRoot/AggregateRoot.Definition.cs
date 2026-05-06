@@ -3,14 +3,13 @@
 namespace VSlices.Domain.Traits;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial interface UntypedAggregateRoot
-{
-    Seq<DomainEvent> DequeueEvents();
-}
+public partial interface AggregateRoot<SELF>;
 
-[EditorBrowsable(EditorBrowsableState.Never)]
-public partial interface AggregateRoot<TSelf> : UntypedAggregateRoot;
+public partial interface AggregateRoot<SELF, ID> :
+    AggregateRoot<SELF>, DomainEntity<SELF, ID>
+    where SELF : AggregateRoot<SELF, ID>
 
-public partial interface AggregateRoot<TSelf, TId> : AggregateRoot<TSelf>, DomainEntity<TId>
-    where TSelf : AggregateRoot<TSelf, TId>
-    where TId : Identifier<TId>;
+public partial interface AggregateRoot<SELF, ID, REPR> : 
+    AggregateRoot<SELF>, DomainEntity<SELF, ID, REPR>
+    where SELF : AggregateRoot<SELF, ID, REPR>
+    where ID : Identifier<ID>;

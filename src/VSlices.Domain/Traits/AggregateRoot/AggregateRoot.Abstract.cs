@@ -2,13 +2,14 @@
 
 public static class AggregateRoot
 {
-    public abstract record Base<TSelf, TId>(TId Id) : AggregateRoot<TSelf, TId>
-        where TSelf : Base<TSelf, TId>
-        where TId : Identifier<TId>
+    public abstract record Base<SELF, ID, REPR>(ID Id) : 
+        AggregateRoot<SELF, ID, REPR>
+        where SELF : Base<SELF, ID, REPR>
+        where ID : Identifier<ID>
     {
         private Seq<DomainEvent> _events = Empty;
 
-        public virtual bool Equals(TSelf? obj) =>
+        public virtual bool Equals(SELF? obj) =>
             obj is not null &&             Id == obj.Id;
 
         public override int GetHashCode() =>
@@ -29,5 +30,7 @@ public static class AggregateRoot
 
             return events;
         }
+
+        public abstract REPR To();
     }
 }

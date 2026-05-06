@@ -8,20 +8,20 @@ public interface IRepository;
 
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public interface IRepository<RT, TRoot> : IRepository
-    where TRoot : AggregateRoot<TRoot>
+public interface IRepository<RT, A> : IRepository
+    where A : AggregateRoot<A>
 {
-    Eff<RT, Seq<TRoot>> AddRange(Seq<TRoot> roots);
+    Eff<RT, Seq<A>> AddRange(Seq<A> roots);
 
-    Eff<RT, Seq<TRoot>> UpdateRange(Seq<TRoot> aggregateRoot);
+    Eff<RT, Seq<A>> UpdateRange(Seq<A> aggregateRoot);
 
-    Eff<RT, Seq<TRoot>> DeleteRange(Seq<TRoot> aggregateRoot);
+    Eff<RT, Seq<A>> DeleteRange(Seq<A> aggregateRoot);
 
 }
 
-public interface IRepository<RT, TRoot, TId> : IRepository<RT, TRoot>
-    where TRoot : AggregateRoot<TRoot, TId>
-    where TId : Identifier<TId>
+public interface IRepository<RT, ROOT, ID> : IRepository<RT, ROOT>
+    where ROOT : AggregateRoot<ROOT, ID>
+    where ID : Identifier<ID>
 {
-    OptionT<Eff<RT>, TRoot> ReadOrOption(TId id);
+    OptionT<Eff<RT>, ROOT> ReadOrOption(ID id);
 }

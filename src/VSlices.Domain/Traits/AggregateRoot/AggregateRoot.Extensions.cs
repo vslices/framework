@@ -4,11 +4,11 @@ namespace VSlices;
 
 public static class AggregateRootExtensions
 {
-    extension<TSelf, TId>(TSelf instance)
-        where TSelf : AggregateRoot<TSelf, TId>
-        where TId : Identifier<TId>
+    extension<SELF, ID>(SELF instance)
+        where SELF : AggregateRoot<SELF, ID>
+        where ID : Identifier<ID>
     {
-        public bool SameIdentityAs(TSelf other) =>
+        public bool SameIdentityAs(SELF other) =>
             instance.Id == other.Id;
     }
 }

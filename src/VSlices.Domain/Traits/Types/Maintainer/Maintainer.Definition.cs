@@ -1,0 +1,28 @@
+﻿
+
+namespace VSlices.Domain.Traits;
+
+/// <summary>
+/// Represents a maintained domain set with a finite, known collection of values.
+/// </summary>
+/// <typeparam name="SELF">Self type.</typeparam>
+public interface Maintainer<SELF> :
+    DomainType<SELF>,
+    DiscreteSpace<SELF>
+    where SELF : Maintainer<SELF>
+{
+    /// <summary>
+    /// All maintained values for this domain set.
+    /// </summary>
+    static abstract Seq<SELF> All { get; }
+}
+
+/// <summary>
+/// Represents a maintained domain set whose values can be projected to a canonical representation.
+/// </summary>
+/// <typeparam name="SELF">Self type.</typeparam>
+/// <typeparam name="REPR">Canonical representation type.</typeparam>
+public interface MaintainerType<SELF, REPR> :
+    Maintainer<SELF>,
+    DomainType<SELF, REPR> 
+    where SELF : MaintainerType<SELF, REPR>;

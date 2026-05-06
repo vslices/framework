@@ -1,0 +1,198 @@
+﻿namespace VSlices.Domain.ValueObjects;
+
+/// <summary>
+/// Numeric velocity value
+/// Handles unit conversions automatically
+/// Internally all speeds are stored as metres per second
+/// All standard arithmetic operators work on the Velocity
+/// type.  So keep all velocities wrapped until you need the
+/// value, then extract using various unit-of-measure
+/// accessors (MetresPerSecond, etc.) or divide by 1.MetrePerSecond()
+/// </summary>
+public readonly struct Velocity :
+    MagnitudeType<Velocity, double>
+{
+    readonly double Value;
+
+    internal Velocity(double value) =>
+        Value = value;
+
+    public override string ToString() =>
+        $"{Value} m/s";
+
+    public bool Equals(Velocity other) =>
+        Value.Equals(other.Value);
+
+    public bool Equals(Velocity other, double epsilon) =>
+        Math.Abs(other.Value - Value) < epsilon;
+
+    public double To() => Value;
+
+    public override bool Equals(object? obj) =>
+        obj is Velocity velocity && Equals(velocity);
+
+    public override int GetHashCode() =>
+        Value.GetHashCode();
+
+    public int CompareTo(object? obj) =>
+        obj switch
+        {
+            null           => 1,
+            Velocity other => CompareTo(other),
+            _              => throw new ArgumentException($"must be of type {nameof(Velocity)}")
+        };
+
+    public int CompareTo(Velocity other) =>
+        Value.CompareTo(other.Value);
+
+    public Velocity Add(Velocity rhs) =>
+        new (Value + rhs.Value);
+
+    public Velocity Subtract(Velocity rhs) =>
+        new (Value - rhs.Value);
+
+    public Velocity Multiply(double rhs) =>
+        new (Value * rhs);
+
+    public Velocity Divide(double rhs) =>
+        new (Value / rhs);
+
+    public static Velocity operator *(Velocity lhs, double rhs) =>
+        lhs.Multiply(rhs);
+
+    public static Velocity operator *(double lhs, Velocity rhs) =>
+        rhs.Multiply(lhs);
+
+    public static Length operator *(Velocity lhs, Time rhs) =>
+        new (lhs.Value * rhs.Seconds);
+
+    public static Length operator *(Time lhs, Velocity rhs) =>
+        new (lhs.Seconds * rhs.Value);
+
+    public static VelocitySq operator *(Velocity lhs, Velocity rhs) =>
+        new (lhs.Value * rhs.Value);
+
+    public static VelocitySq operator ^(Velocity lhs, int power) =>
+        power == 2
+            ? new VelocitySq(lhs.Value * lhs.Value)
+            : raise<VelocitySq>(new NotSupportedException("Velocity can only be raised to the power of 2"));
+
+    public static Velocity operator +(Velocity lhs, Velocity rhs) =>
+        lhs.Add(rhs);
+
+    public static Velocity operator -(Velocity lhs, Velocity rhs) =>
+        lhs.Subtract(rhs);
+
+    public static Velocity operator /(Velocity lhs, double rhs) =>
+        lhs.Divide(rhs);
+
+    public static double operator /(Velocity lhs, Velocity rhs) =>
+        lhs.Value / rhs.Value;
+
+    public static Accel operator /(Velocity lhs, Time rhs) =>
+        new (lhs.Value / rhs.Seconds);
+
+    public static Time operator /(Velocity lhs, Accel rhs) =>
+        new (lhs.Value / rhs.MetresPerSecond2);
+
+    public static bool operator ==(Velocity lhs, Velocity rhs) =>
+        lhs.Equals(rhs);
+
+    public static bool operator !=(Velocity lhs, Velocity rhs) =>
+        !lhs.Equals(rhs);
+
+    public static bool operator >(Velocity lhs, Velocity rhs) =>
+        lhs.Value > rhs.Value;
+
+    public static bool operator <(Velocity lhs, Velocity rhs) =>
+        lhs.Value < rhs.Value;
+
+    public static bool operator >=(Velocity lhs, Velocity rhs) =>
+        lhs.Value >= rhs.Value;
+
+    public static bool operator <=(Velocity lhs, Velocity rhs) =>
+        lhs.Value <= rhs.Value;
+
+    public Velocity Round() =>
+        new (Math.Round(Value));
+
+    public Velocity Abs() =>
+        new (Math.Abs(Value));
+
+    public Velocity Min(Velocity rhs) =>
+        new (Math.Min(Value, rhs.Value));
+
+    public Velocity Max(Velocity rhs) =>
+        new (Math.Max(Value, rhs.Value));
+
+    public double MetresPerSecond     => Value;
+    public double KilometresPerSecond => Value                                    / 1000.0;
+    public double KilometresPerHour   => Value / 1000.0                           * 3600.0;
+    public double MilesPerSecond      => Value                                    / 1609.344000006437376000025749504;
+    public double MilesPerHour        => Value / 1609.344000006437376000025749504 * 3600.0;
+    public double Knots               => Value                                    / 0.51444444444444;
+    public static Velocity operator -(Velocity value) => 
+        new(-value.Value);
+
+
+    public static Velocity From(double repr) =>
+        new(repr);
+    public static Velocity AdditiveIdentity { get; } = new(0);
+}
+
+public static class UnitsVelocityExtensions
+{
+    public static Velocity MetresPerSecond(this int self) =>
+        new (self);
+
+    public static Velocity MetresPerSecond(this float self) =>
+        new (self);
+
+    public static Velocity MetresPerSecond(this double self) =>
+        new (self);
+
+    public static Velocity KilometresPerSecond(this int self) =>
+        new (self * 1000.0);
+
+    public static Velocity KilometresPerSecond(this float self) =>
+        new (self * 1000.0);
+
+    public static Velocity KilometresPerSecond(this double self) =>
+        new (self * 1000.0);
+
+    public static Velocity KilometresPerHour(this int self) =>
+        new (self * 1000.0 / 3600.0);
+
+    public static Velocity KilometresPerHour(this float self) =>
+        new (self * 1000.0 / 3600.0);
+
+    public static Velocity KilometresPerHour(this double self) =>
+        new (self * 1000.0 / 3600.0);
+
+    public static Velocity MilesPerSecond(this int self) =>
+        new (self * 1609.344000006437376000025749504);
+
+    public static Velocity MilesPerSecond(this float self) =>
+        new (self * 1609.344000006437376000025749504);
+
+    public static Velocity MilesPerSecond(this double self) =>
+        new (self * 1609.344000006437376000025749504);
+
+    public static Velocity MilesPerHour(this int self) =>
+        new (self * 1609.344000006437376000025749504 / 3600.0);
+
+    public static Velocity MilesPerHour(this float self) =>
+        new (self * 1609.344000006437376000025749504 / 3600.0);
+
+    public static Velocity MilesPerHour(this double self) =>
+        new (self * 1609.344000006437376000025749504 / 3600.0);
+
+    public static Velocity Knots(this int self) =>
+        new (self * 0.51444444444444);
+
+    public static Velocity Knots(this float self) =>
+        new(self * 0.51444444444444);
+
+    public static Velocity Knots(this double self) =>
+        new(self * 0.51444444444444);
+}
