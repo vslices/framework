@@ -4,8 +4,9 @@ using VSlices.Domain.Environments.Persistence;
 
 namespace VSlices.Domain;
 
-public interface DomainRuntime<TSelf> 
-    : HasPersistence<TSelf>,
-      HasDataAccess<TSelf>,
-      HasClock<TSelf>
-    where TSelf : DomainRuntime<TSelf>;
+public interface DomainRuntime<SELF>
+    : CoreRuntime<SELF>,
+      HasPersistence<SELF>,
+      HasDataAccess<SELF>,
+      HasClock<SELF>
+    where SELF : DomainRuntime<SELF>;

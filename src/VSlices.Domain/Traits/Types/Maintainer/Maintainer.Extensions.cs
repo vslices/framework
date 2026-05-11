@@ -15,13 +15,13 @@ public static class MaintainerExtensions
         /// Finds the first maintained value that satisfies the predicate.
         /// </summary>
         public static Option<A> FindM(Func<A, bool> fa) =>
-            Prelude.findM(fa);
+            VSlicesPrelude.findM(fa);
 
         /// <summary>
         /// Finds the first maintained value that satisfies the predicate.
         /// </summary>
         public static A Find(Func<A, bool> fa) =>
-            Prelude.find(fa);
+            VSlicesPrelude.find(fa);
     }
 
     extension<A>(A a)

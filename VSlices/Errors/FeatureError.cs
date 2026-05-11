@@ -11,7 +11,7 @@ public sealed record NotAuthenticated(
     string Message = "Authentication is required.")
     : FeatureError(Message, 401);
 
-public sealed record NotAuthorizated(
+public sealed record NotAuthorized(
     string Message = "You are not authorized to perform this action.")
     : FeatureError(Message, 403);
 

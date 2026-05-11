@@ -1,4 +1,4 @@
-﻿namespace VSlices.Domain.Environments.Persistence;
+﻿namespace VSlices.Domain.Environments;
 
 public interface PersistenceIO
 {
