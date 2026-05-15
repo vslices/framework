@@ -5,13 +5,13 @@ namespace VSlices.Traits;
 public partial interface FloatingSuffixes<WSelf, WType>
 {
     public class D<Tenths> : D<Tenths, N0>
-        where Tenths : WholeConst<int>;
+        where Tenths : Const<int>;
 
     public class F<Tenths> : F<Tenths, N0>
-        where Tenths : WholeConst<int>;
+        where Tenths : Const<int>;
 
     public class M<Tenths> : M<Tenths, N0>
-        where Tenths : WholeConst<int>;
+        where Tenths : Const<int>;
 
     public sealed class D1 : D<N1>;
     public sealed class D2 : D<N2>;
