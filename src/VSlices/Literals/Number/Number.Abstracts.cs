@@ -1,78 +1,92 @@
 ﻿using System.Numerics;
 
-namespace VSlices.Literals;
+namespace VSlices.Literals.Abstracts;
 
-public class N0<TYPE> : Num<TYPE>
-    where TYPE : INumber<TYPE>
+public class N0<T> : Num<T>
+    where T : INumber<T>
 {
-    public static TYPE Value => TYPE.Zero;
+    public static T Value => T.Zero;
 }
 
-public class N1<TYPE> : Num<TYPE>
-    where TYPE : INumber<TYPE>
+public class N1<T> : Num<T>
+    where T : INumber<T>
 {
-    public static TYPE Value => TYPE.One;
+    public static T Value => T.One;
 }
 
-public class N2<TYPE> : Num<TYPE>
-    where TYPE : INumber<TYPE>
+public class N2<T> : Num<T>
+    where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(2);
+    public static T Value => T.CreateChecked(2);
 }
 
-public class N3<TYPE> : Num<TYPE> where TYPE : INumber<TYPE>
+public class N3<T> : Num<T> where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(3);
+    public static T Value => T.CreateChecked(3);
 }
 
-public class N4<TYPE> : Num<TYPE> where TYPE : INumber<TYPE>
+public class N4<T> : Num<T> where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(4);
+    public static T Value => T.CreateChecked(4);
 }
 
-public class N5<TYPE> : Num<TYPE> where TYPE : INumber<TYPE>
+public class N5<T> : Num<T> where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(5);
+    public static T Value => T.CreateChecked(5);
 }
 
-public class N6<TYPE> : Num<TYPE> where TYPE : INumber<TYPE>
+public class N6<T> : Num<T> where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(6);
+    public static T Value => T.CreateChecked(6);
 }
 
-public class N7<TYPE> : Num<TYPE> where TYPE : INumber<TYPE>
+public class N7<T> : Num<T> where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(7);
+    public static T Value => T.CreateChecked(7);
 }
 
-public class N8<TYPE> : Num<TYPE> where TYPE : INumber<TYPE>
+public class N8<T> : Num<T> where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(8);
+    public static T Value => T.CreateChecked(8);
 }
 
-public class N9<TYPE> : Num<TYPE> where TYPE : INumber<TYPE>
+public class N9<T> : Num<T> where T : INumber<T>
 {
-    public static TYPE Value => TYPE.CreateChecked(9);
+    public static T Value => T.CreateChecked(9);
 }
 
-public class N<TYPE, UNITS, TENS> : Num<TYPE>
-    where TYPE : INumber<TYPE>
-    where UNITS : Num<TYPE>
-    where TENS : Num<TYPE>
+public class N<T, Tens, Units> : Num<T>
+    where T : INumber<T>
+    where Units : Num<T>
+    where Tens : Num<T>
 {
-    public static TYPE Value { get; } =
-        UNITS.Value +
-        TENS.Value * (TYPE.CreateChecked(10));
+    public static T Value { get; } =
+        Units.Value +
+        Tens.Value * (T.CreateChecked(10));
 }
 
-public class N<TYPE, UNITS, TENS, CENTS> : Num<TYPE>
-    where TYPE : INumber<TYPE>
-    where UNITS : Num<TYPE>
-    where TENS : Num<TYPE>
-    where CENTS : Num<TYPE>
+public class N<T, Hunds, Tens, Units> : Num<T>
+    where T : INumber<T>
+    where Hunds : Num<T>
+    where Tens : Num<T>
+    where Units : Num<T>
 {
-    public static TYPE Value { get; } =
-        UNITS.Value +
-        TENS.Value * (TYPE.CreateChecked(10)) +
-        CENTS.Value * (TYPE.CreateChecked(100));
+    public static T Value { get; } =
+        Units.Value +
+        Tens.Value * (T.CreateChecked(10)) +
+        Hunds.Value * (T.CreateChecked(100));
+}
+
+public class N<T, Thous, Hunds, Tens, Units> : Num<T>
+    where T : INumber<T>
+    where Thous : Num<T>
+    where Hunds : Num<T>
+    where Tens : Num<T>
+    where Units : Num<T>
+{
+    public static T Value { get; } =
+        Units.Value +
+        Tens.Value * (T.CreateChecked(10)) +
+        Hunds.Value * (T.CreateChecked(100)) +
+        Thous.Value * (T.CreateChecked(1000));
 }
