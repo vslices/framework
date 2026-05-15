@@ -5,7 +5,7 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
-    <Project Path="src/VSlices.Core/VSlices.Application.csproj" Id="acdc8c39-4446-4edb-a444-7f251577624a" />
+    <Project Path="src/VSlices.Application/VSlices.Application.csproj" />
     <Project Path="src/VSlices.Domain/VSlices.Domain.csproj" />
     <Project Path="src/VSlices.Infrastructure/VSlices.Infrastructure.csproj" Id="aabbb6eb-6bcb-4070-a584-9e9ed3d34d62" />
     <Project Path="src/VSlices/VSlices.csproj" />
