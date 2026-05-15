@@ -5,7 +5,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\VSlices.Core\VSlices.Application.csproj" />
+		<ProjectReference Include="..\VSlices.Application\VSlices.Application.csproj" />
 		<ProjectReference Include="..\VSlices.Domain\VSlices.Domain.csproj" />
 	</ItemGroup>
 
