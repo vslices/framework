@@ -25,15 +25,15 @@ namespace VSlices
 
 namespace VSlices.Monads
 {
-    public sealed partial class Flow<C, R, A>
+    public sealed partial class Flow<RT, REQ, RES>
     {
-        public Flow<C, R, B> Map<B>(Func<A, B> fb) =>
-            Flow<C, R>.Map(fb, this);
+        public Flow<RT, REQ, B> Map<B>(Func<RES, B> fb) =>
+            Flow<RT, REQ>.Map(fb, this);
 
-        public Flow<C, R, B> ConstMap<B>(B b) =>
-            Flow<C, R>.ConstMap(b, this);
+        public Flow<RT, REQ, B> ConstMap<B>(B b) =>
+            Flow<RT, REQ>.ConstMap(b, this);
 
-        public Flow<C, R, B> ConstMap<B>(Pure<B> pb) =>
+        public Flow<RT, REQ, B> ConstMap<B>(Pure<B> pb) =>
             ConstMap(pb.Value);
     }
 }

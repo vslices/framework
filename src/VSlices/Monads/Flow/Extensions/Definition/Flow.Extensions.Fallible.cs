@@ -2,18 +2,18 @@
 
 namespace VSlices.Monads
 {
-    public sealed partial class Flow<C, R, A>
+    public sealed partial class Flow<RT, REQ, RES>
     {
         // Catch(Func<Error, Error>);
         // Catch(Func<Error, Fail<Error>);
 
-        // Catch(Func<Error, IO<A>>);
-        // Catch(Func<Error, Eff<A>>);
-        // Catch(Func<Error, Eff<C, A>>);
-        // Catch(Func<Error, Fin<A>>);
-        // Catch(Func<Error, FinT<IO, A>>);
-        // Catch(Func<Error, FinT<Eff, A>>);
-        // Catch(Func<Error, FinT<Eff<C>, A>>);
+        // Catch(Func<Error, IO<RES>>);
+        // Catch(Func<Error, Eff<RES>>);
+        // Catch(Func<Error, Eff<RT, RES>>);
+        // Catch(Func<Error, Fin<RES>>);
+        // Catch(Func<Error, FinT<IO, RES>>);
+        // Catch(Func<Error, FinT<Eff, RES>>);
+        // Catch(Func<Error, FinT<Eff<RT>, RES>>);
     }
 }
 

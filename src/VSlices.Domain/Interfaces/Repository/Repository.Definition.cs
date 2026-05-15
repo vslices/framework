@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using VSlices.Domain.Traits;
 
-namespace VSlices.Domain.Interfaces;
+namespace VSlices.Domain;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public interface IRepository;

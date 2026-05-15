@@ -1,4 +1,4 @@
-﻿namespace VSlices.Domain.Environments.Clock;
+﻿namespace VSlices.Domain.Envs;
 
 public interface HasClock<RT> : Has<Eff<RT>, ClockIO>;
 

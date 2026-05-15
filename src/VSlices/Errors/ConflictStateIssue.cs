@@ -1,3 +1,3 @@
-﻿namespace VSlices.Core.Errors;
+﻿namespace VSlices.Errors;
 
 public sealed record ConflictStateIssue(string Detail);

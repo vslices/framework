@@ -1,5 +1,4 @@
-﻿using VSlices.Core;
-using VSlices.Domain.Environments.Persistence;
+﻿using VSlices.Domain.Envs;
 
 namespace VSlices;
 

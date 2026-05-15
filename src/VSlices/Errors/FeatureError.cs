@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VSlices.Core.Errors;
+﻿namespace VSlices.Errors;
 
 public abstract record FeatureError(string Message, int Code)
     : Expected(Message, Code, None);

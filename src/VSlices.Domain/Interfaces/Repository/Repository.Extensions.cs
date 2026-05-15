@@ -1,6 +1,6 @@
-﻿using VSlices.Domain.Traits;
+﻿using VSlices.Domain;
 
-namespace VSlices.Domain.Interfaces;
+namespace VSlices;
 
 public static class RepositoryExtensions
 {
@@ -23,8 +23,8 @@ public static class RepositoryExtensions
     {
         public Eff<RT, TRoot> Read(TId id) =>
             repository.ReadOrOption(id)
-                      .Match(Some: Eff<RT, TRoot> (TRoot s) => Pure(s),
-                             None: Eff<RT, TRoot> () => notFound<TRoot>())
+                      .Match(Some: Eff<RT, TRoot> (s) => Pure(s),
+                             None: Eff<RT, TRoot> () => Error.New(404, $"Entity {typeof(TRoot).Name} NotFound"))
                       .As()
                       .Flatten();
     }

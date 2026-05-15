@@ -1,6 +1,6 @@
 ﻿using VSlices.Domain.Interfaces;
 
-namespace VSlices.Domain.Environments.DataAccess;
+namespace VSlices.Domain.Envs;
 
 public interface DataAccessIO
 {

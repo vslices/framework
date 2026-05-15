@@ -5,21 +5,21 @@ namespace VSlices;
 
 public static partial class FlowExtensions
 {
-    extension<C, R, A>(K<Flow<C, R>, A> ma)
+    extension<RT, REQ, RES>(K<Flow<RT, REQ>, RES> ma)
     {
-        public IO<A> RunFlow(C state, R request) =>
+        public IO<RES> RunFlow(RT state, REQ request) =>
             ma.As().RunFlow(state, request);
 
-        public Fin<A> Run(C state, R input, EnvIO env) =>
+        public Fin<RES> Run(RT state, REQ input, EnvIO env) =>
             ma.RunFlow(state, input).RunSafe(env);
 
-        public async Task<Fin<A>> RunAsync(C state, R input, EnvIO env) =>
+        public async Task<Fin<RES>> RunAsync(RT state, REQ input, EnvIO env) =>
             await ma.RunFlow(state, input).RunSafeAsync(env);
 
-        public A RunUnsafe(C state, R input, EnvIO env) =>
+        public RES RunUnsafe(RT state, REQ input, EnvIO env) =>
             ma.RunFlow(state, input).Run(env);
 
-        public async Task<A> RunUnsafeAsync(C state, R input, EnvIO env) =>
+        public async Task<RES> RunUnsafeAsync(RT state, REQ input, EnvIO env) =>
             await ma.RunFlow(state, input).RunAsync(env);
     }
 }

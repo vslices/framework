@@ -1,20 +1,20 @@
 ﻿namespace VSlices.Monads;
 
-public sealed partial class Flow<C, R, A>(
-    Func<C, R, IO<A>> run)
-    : K<Flow<C, R>, A>
-    where A : notnull
+public sealed partial class Flow<RT, REQ, RES>(
+    Func<RT, REQ, IO<RES>> run)
+    : K<Flow<RT, REQ>, RES>
+    where RES : notnull
 {
-    public IO<A> RunFlow(C state, R request) =>
+    public IO<RES> RunFlow(RT state, REQ request) =>
         run(state, request);
 
-    public Eff<C, A> RunEff(R input) =>
-        Eff<C, A>.LiftIO(state => run(state, input));
+    public Eff<RT, RES> RunEff(REQ input) =>
+        Eff<RT, RES>.LiftIO(state => run(state, input));
 
-    public static implicit operator Flow<C, R, A>(Pure<A> a) =>
-        Flow<C, R>.Pure(a);
+    public static implicit operator Flow<RT, REQ, RES>(Pure<RES> a) =>
+        Flow<RT, REQ>.Pure(a);
 
-    public static implicit operator Flow<C, R, A>(Fail<Error> a) =>
-        Flow<C, R>.Fail<A>(a);
+    public static implicit operator Flow<RT, REQ, RES>(Fail<Error> a) =>
+        Flow<RT, REQ>.Fail<RES>(a);
 
 }

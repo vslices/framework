@@ -1,4 +1,4 @@
-﻿namespace VSlices.Application.Environments;
+﻿namespace VSlices.Application.Envs;
 
 public interface HasLog<RT> : Has<Eff<RT>, LogIO>;
 

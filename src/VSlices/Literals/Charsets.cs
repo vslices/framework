@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VSlices.Domain.Literals;
-
+﻿namespace VSlices.Literals;
 
 public sealed class Space : Const<string>
 {

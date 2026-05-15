@@ -36,111 +36,111 @@ namespace VSlices
 
 namespace VSlices.Monads
 {
-    public sealed partial class Flow<C, R, A>
+    public sealed partial class Flow<RT, REQ, RES>
     {
-        public Flow<C, R, O> Action<O>(K<Flow<C, R>, O> mo) =>
-            Flow<C, R>.Action(this, mo);
+        public Flow<RT, REQ, O> Action<O>(K<Flow<RT, REQ>, O> mo) =>
+            Flow<RT, REQ>.Action(this, mo);
         
-        public Flow<C, R, Seq<A>> Replicate(int count) =>
-            Flow<C, R>.Replicate(count, this);
+        public Flow<RT, REQ, Seq<RES>> Replicate(int count) =>
+            Flow<RT, REQ>.Replicate(count, this);
     }
 
-    public partial class Flow<C, R>
+    public partial class Flow<RT, REQ>
     {
-        public static Flow<C, R, A> BackAction<A, O>(K<Flow<C, R>, A> ma, K<Flow<C, R>, O> mo) =>
+        public static Flow<RT, REQ, A> BackAction<A, O>(K<Flow<RT, REQ>, A> ma, K<Flow<RT, REQ>, O> mo) =>
             Action(mo, ma);
 
-        public static Flow<C, R, Seq<A>> Replicate<A>(int count, K<Flow<C, R>, A> ma) =>
+        public static Flow<RT, REQ, Seq<A>> Replicate<A>(int count, K<Flow<RT, REQ>, A> ma) =>
             +Applicative.replicate(count, ma);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
-            K<Flow<C, R>, O> Then) =>
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
+            K<Flow<RT, REQ>, O> Then) =>
             ma.Bind(b => b ? Then.Bind(Some) : None<O>());
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
-            K<Flow<C, R>, Unit> Then) =>
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
+            K<Flow<RT, REQ>, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
             K<IO, O> Then) =>
             ma.Bind(b => b ? Then.As().Map(Prelude.Some) : IO.pure<Option<O>>(Option.None));
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
             K<IO, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
             K<Eff, O> Then) =>
             ma.Bind(b => b ? Then.As().Map(Prelude.Some) : Eff.Success<Option<O>>(Option.None));
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
             K<Eff, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
-            K<Eff<C>, O> Then) =>
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
+            K<Eff<RT>, O> Then) =>
             ma.Bind(b => b ? Then.As().Map(Prelude.Some) : Eff.Success<Option<O>>(Option.None));
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
-            K<Eff<C>, Unit> Then) =>
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
+            K<Eff<RT>, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
             K<Fin, O> Then) =>
-            ma.Bind(b => b ? Then.As().Map(Prelude.Some) : Eff.Success<C, Option<O>>(Option.None));
+            ma.Bind(b => b ? Then.As().Map(Prelude.Some) : Eff.Success<RT, Option<O>>(Option.None));
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
             K<Fin, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
             K<FinT<IO>, O> Then) =>
             ma.Bind(b => b ? Then.As().Map(Prelude.Some) : FinT.Succ<IO, Option<O>>(Option.None));
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
             K<FinT<IO>, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
             K<FinT<Eff>, O> Then) =>
             ma.Bind(b => b ? Then.As().Map(Prelude.Some) : FinT.Succ<Eff, Option<O>>(Option.None));
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
             K<FinT<Eff>, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> When<O>(
-            K<Flow<C, R>, bool> ma,
-            K<FinT<Eff<C>>, O> Then) =>
-            ma.Bind(b => b ? Then.As().Map(Prelude.Some) : FinT.Succ<Eff<C>, Option<O>>(Option.None));
+        public static Flow<RT, REQ, Option<O>> When<O>(
+            K<Flow<RT, REQ>, bool> ma,
+            K<FinT<Eff<RT>>, O> Then) =>
+            ma.Bind(b => b ? Then.As().Map(Prelude.Some) : FinT.Succ<Eff<RT>, Option<O>>(Option.None));
 
-        public static Flow<C, R, Unit> When(
-            K<Flow<C, R>, bool> m,
-            K<FinT<Eff<C>>, Unit> Then) =>
+        public static Flow<RT, REQ, Unit> When(
+            K<Flow<RT, REQ>, bool> m,
+            K<FinT<Eff<RT>>, Unit> Then) =>
             When<Unit>(m, Then).Map(_ => unit);
 
-        public static Flow<C, R, Option<O>> Unless<O>(
-            K<Flow<C, R>, bool> ma,
-            K<Flow<C, R>, O> Then) =>
+        public static Flow<RT, REQ, Option<O>> Unless<O>(
+            K<Flow<RT, REQ>, bool> ma,
+            K<Flow<RT, REQ>, O> Then) =>
             ma.Bind(a => a ? None<O>() : Then.Bind(Some));
 
-        public static Flow<C, R, Unit> Unless(
-            K<Flow<C, R>, bool> ma,
-            K<Flow<C, R>, Unit> Then) =>
+        public static Flow<RT, REQ, Unit> Unless(
+            K<Flow<RT, REQ>, bool> ma,
+            K<Flow<RT, REQ>, Unit> Then) =>
             Unless<Unit>(ma, Then).Map(_ => unit);
     }
 }

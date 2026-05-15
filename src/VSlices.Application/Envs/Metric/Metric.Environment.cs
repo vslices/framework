@@ -1,4 +1,4 @@
-﻿namespace VSlices.Application.Environments;
+﻿namespace VSlices.Application.Envs;
 
 public interface HasMetric<RT> : Has<Eff<RT>, MetricIO>;
 

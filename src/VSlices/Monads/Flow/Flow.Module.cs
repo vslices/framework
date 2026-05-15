@@ -9,6 +9,6 @@ public static partial class Flow
     
 }
 
-public static partial class Flow<C>
+public static partial class Flow<RT>
 {
 }

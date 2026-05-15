@@ -4,7 +4,7 @@ using System.Text;
 
 namespace VSlices.Monads
 {
-    public sealed partial class Flow<C, R, A>
+    public sealed partial class Flow<RT, REQ, RES>
     {
     }
 }

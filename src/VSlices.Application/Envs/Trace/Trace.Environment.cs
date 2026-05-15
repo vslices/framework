@@ -1,5 +1,5 @@
 ﻿
-namespace VSlices.Application.Environments;
+namespace VSlices.Application.Envs;
 
 public interface HasTrace<RT> : Has<Eff<RT>, TraceIO>;
 

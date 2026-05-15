@@ -5,10 +5,10 @@ using VSlices.Monads;
 
 namespace VSlices.Monads
 {
-    public sealed partial class Flow<C, R, A>
+    public sealed partial class Flow<RT, REQ, RES>
     {
-        public Flow<C, R, A> Finally<X>(K<Flow<C, R>, X> mx) =>
-            Flow<C, R>.Finally(this, mx);
+        public Flow<RT, REQ, RES> Finally<X>(K<Flow<RT, REQ>, X> mx) =>
+            Flow<RT, REQ>.Finally(this, mx);
     }
 }
 

@@ -1,4 +1,4 @@
-﻿namespace VSlices.Domain.Environments.Persistence;
+﻿namespace VSlices.Domain.Envs;
 
 public interface HasPersistence<RT> : Has<Eff<RT>, PersistenceIO>;
 

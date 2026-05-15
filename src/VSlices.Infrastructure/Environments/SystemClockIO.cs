@@ -1,5 +1,5 @@
 ﻿using LanguageExt;
-using VSlices.Domain.Environments.Clock;
+using VSlices.Domain.Envs.Clock;
 
 namespace VSlices.Infrastructure.Environments;
 

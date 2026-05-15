@@ -6,24 +6,24 @@ using VSlices.Monads;
 
 namespace VSlices.Monads
 {
-    public sealed partial class Flow<C, R, A>
+    public sealed partial class Flow<RT, REQ, RES>
     {
-        public Flow<C, R, B> Bind<B>(Func<A, K<Flow<C, R>, B>> fb) =>
-            Flow<C, R>.Bind(this, fb);
+        public Flow<RT, REQ, B> Bind<B>(Func<RES, K<Flow<RT, REQ>, B>> fb) =>
+            Flow<RT, REQ>.Bind(this, fb);
         
-        public Flow<C, R, B> Bind<B>(Func<A, Flow<C, R, B>> fb) =>
-            Flow<C, R>.Bind(this, fb);
+        public Flow<RT, REQ, B> Bind<B>(Func<RES, Flow<RT, REQ, B>> fb) =>
+            Flow<RT, REQ>.Bind(this, fb);
     }
     
-    public partial class Flow<C, R>
+    public partial class Flow<RT, REQ>
     {
-        public static Flow<C, R, O> Flatten<O>(K<Flow<C, R>, K<Flow<C, R>, O>> mma) =>
+        public static Flow<RT, REQ, O> Flatten<O>(K<Flow<RT, REQ>, K<Flow<RT, REQ>, O>> mma) =>
             +Monad.flatten(mma);
 
-        public static Flow<C, R, Next<A, B>> Done<A, B>(B value) =>
+        public static Flow<RT, REQ, Next<A, B>> Done<A, B>(B value) =>
             Pure(Next.Done<A, B>(value));
 
-        public static Flow<C, R, Next<A, B>> Loop<A, B>(A value) =>
+        public static Flow<RT, REQ, Next<A, B>> Loop<A, B>(A value) =>
             Pure(Next.Loop<A, B>(value));
     }
 }
