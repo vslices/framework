@@ -1,9 +1,10 @@
-﻿using System.Net.Http.Headers;
+﻿namespace VSlices.Monads;
 
-namespace VSlices.Monads;
-
-// Contiene la implementación privada de los traits de Flow.Trait.Implementation,
-// para mejorar la performance del monad, la base es trabajar acá
+/// <summary>
+/// Represents a monadic flow that encapsulates computations with a specific runtime and request context.
+/// </summary>
+/// <typeparam name="RT">The type of the runtime context used in the flow.</typeparam>
+/// <typeparam name="REQ">The type of the request context used in the flow.</typeparam>
 public partial class Flow<RT, REQ>
     : MonadUnliftIO<Flow<RT, REQ>>,
       Fallible<Error, Flow<RT, REQ>>,
