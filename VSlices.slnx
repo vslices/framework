@@ -3,6 +3,12 @@
   <Folder Name="/examples/simple-workflow/">
     <Project Path="examples/SampleWorkflow/SampleWorkflow.Core/SampleWorkflow.Core.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="AGENTS.md" />
+    <File Path="docs/architecture.md" />
+    <File Path="docs/capabilities.md" />
+    <File Path="docs/feature-model.md" />
+  </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
     <Project Path="src/VSlices.Application/VSlices.Application.csproj" />

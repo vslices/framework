@@ -165,17 +165,44 @@ Prefer small, honest capability requirements over broad opaque dependencies.
 
 Features are the main executable unit of application behavior.
 
-A feature should be modeled as a function from input to `FeatureEff<RT, A>` or the equivalent project-specific abstraction.
+A feature should be modeled as a function from an input request to a `Flow<RT, REQ, RES>`.
 
 Conceptually:
 
-`In -> FeatureEff<RT, Out>`
+```txt
+REQ -> Flow<RT, REQ, RES>
+````
 
-`FeatureEff<RT, A>` is the primary execution abstraction and should represent:
+`Flow<RT, REQ, RES>` is the primary execution abstraction of VSlices.
 
-- runtime dependency through `RT`
-- effectful execution
-- explicit failure handling
+A `Flow` represents an application behavior that:
+
+* receives an explicit input request through `REQ`;
+* depends on a runtime capability carrier through `RT`;
+* produces an explicit result through `RES`;
+* performs effectful execution in a controlled way;
+* models expected failures explicitly instead of using exceptions for control flow;
+* can be composed, adapted, tested, and executed by different presentation layers.
+
+In other words, a feature is not a service, handler, controller, or use-case class.
+
+A feature is a pure declaration of application behavior whose execution is delayed and interpreted through a runtime:
+
+```txt
+RT + REQ -> effectful result of RES
+```
+
+Presentation adapters such as Web APIs, workers, CLIs, event consumers, or UI integrations should not contain business behavior. They should only translate external input into `REQ`, execute the corresponding `Flow`, and translate the result back into the presentation-specific response.
+
+A feature should request only the minimum runtime capabilities it needs:
+
+```csharp
+where RT : HasClock<RT>, HasPersistence<RT>
+````
+
+Prefer minimal capability constraints over broad runtime bundles such as `ApplicationRuntime<RT>`, unless the feature truly depends on the full application runtime.
+
+Presentation adapters such as Web APIs, workers, CLIs, event consumers, or UI integrations should not contain business behavior. They should only translate external input into `REQ`, execute the corresponding `Flow`, and translate the result back into the presentation-specific response.
 
 ### Feature Rules
 
