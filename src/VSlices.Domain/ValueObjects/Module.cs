@@ -1,6 +1,6 @@
 ﻿namespace VSlices;
 
-public partial class VSlicesPrelude
+public partial class VSlicesDomainPrelude
 {
     /// <summary>
     /// Millimetre

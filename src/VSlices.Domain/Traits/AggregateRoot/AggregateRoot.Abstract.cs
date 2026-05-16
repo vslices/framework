@@ -1,5 +1,8 @@
 ﻿namespace VSlices.Domain.Traits;
 
+/// <summary>
+/// 
+/// </summary>
 public static class AggregateRoot
 {
     public abstract record Base<SELF, ID, REPR>(ID Id) : 

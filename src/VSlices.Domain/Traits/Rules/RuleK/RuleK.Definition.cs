@@ -40,6 +40,6 @@ public interface RuleK<SELF, F, A>
     /// <c>true</c> when the wrapped rule is not satisfied; otherwise, <c>false</c>.
     /// </returns>
     public static virtual Fin<K<F, A>> ValidateK(K<F, A> value, Func<SELF, K<F, A>, Error> Fail) =>
-        SELF.Check(value) ? VSlicesPrelude.Pure(value) : Fail(SELF.Instance, value);
+        SELF.Check(value) ? VSlicesDomainPrelude.Pure(value) : Fail(SELF.Instance, value);
 }
 

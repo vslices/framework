@@ -3,7 +3,7 @@ using VSlices.Domain.Traits;
 
 namespace VSlices;
 
-public static partial class VSlicesPrelude
+public static partial class VSlicesDomainPrelude
 {
     /// <summary>
     /// Gets all maintained values for a domain set.
