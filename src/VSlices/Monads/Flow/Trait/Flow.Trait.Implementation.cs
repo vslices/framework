@@ -46,9 +46,11 @@ public partial class Flow<RT, REQ>
         Func<A, K<Flow<RT, REQ>, Next<A, B>>> f) =>
         liftFlow<RT, REQ, B>(async (ctx, req, env) =>
         {
+            var current = value;
+            
             while (true)
             {
-                var mNext = await f(value).As().RunAsync(ctx, req, env);
+                var mNext = await f(current).As().RunAsync(ctx, req, env);
 
                 if (mNext is Fin<Next<A, B>>.Fail(var e))
                 {
@@ -58,7 +60,7 @@ public partial class Flow<RT, REQ>
                 var next = (Next<A, B>)mNext;
 
                 if (next.IsDone) return Fin.Succ(next.Done);
-                value = next.Loop;
+                current = next.Loop;
             }
         });
 
