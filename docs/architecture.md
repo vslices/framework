@@ -1,11 +1,39 @@
-VSlices
->  primitives
+# Architecture
 
-VSlices.Domain
->  domain modeling, value objects, repositories contracts, domain envs
+VSlices is split by responsibility, not by technical fashion.
 
-VSlices.Application
->  features, flows, observability, orchestration
+## VSlices
 
-VSlices.Infrastructure
->  implementations and batteries, it does not define the mental model, just technical details
+Core primitives shared by the rest of the framework.
+
+Includes:
+- errors
+- literals
+- monads
+- base traits
+
+## VSlices.Domain
+
+Domain modeling primitives.
+
+Includes:
+- value objects
+- repositories contracts
+- domain environments
+- domain runtime capabilities
+
+## VSlices.Application
+
+Application behavior and feature execution.
+
+Includes:
+- features
+- flows
+- observability
+- orchestration
+
+## VSlices.Infrastructure
+
+Concrete technical implementations and batteries.
+
+Infrastructure implements capabilities, but does not define the framework mental model.

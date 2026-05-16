@@ -171,7 +171,7 @@ Conceptually:
 
 ```txt
 REQ -> Flow<RT, REQ, RES>
-````
+```
 
 `Flow<RT, REQ, RES>` is the primary execution abstraction of VSlices.
 
@@ -198,11 +198,9 @@ A feature should request only the minimum runtime capabilities it needs:
 
 ```csharp
 where RT : HasClock<RT>, HasPersistence<RT>
-````
+```
 
 Prefer minimal capability constraints over broad runtime bundles such as `ApplicationRuntime<RT>`, unless the feature truly depends on the full application runtime.
-
-Presentation adapters such as Web APIs, workers, CLIs, event consumers, or UI integrations should not contain business behavior. They should only translate external input into `REQ`, execute the corresponding `Flow`, and translate the result back into the presentation-specific response.
 
 ### Feature Rules
 
