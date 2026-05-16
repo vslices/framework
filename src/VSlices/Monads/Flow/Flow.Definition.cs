@@ -14,7 +14,6 @@
 public sealed partial class Flow<RT, REQ, RES>(
     Func<RT, REQ, IO<RES>> run)
     : K<Flow<RT, REQ>, RES>
-    where RES : notnull
 {
     /// <summary>
     /// Executes the flow with the provided runtime environment and request, 
