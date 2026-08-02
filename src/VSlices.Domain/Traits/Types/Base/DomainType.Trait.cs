@@ -52,8 +52,8 @@ public interface DomainRepresent<REPR>
 ///
 /// <para>
 /// This interface intentionally does not define how instances are created. Construction is
-/// delegated to separate abstractions (e.g., <see cref="DomainFactory{SELF,IN}"/> and
-/// <see cref="DomainFactory{SELF,TYPE,IN}"/>) to allow different creation strategies
+/// delegated to separate abstractions (e.g., <see cref="DomainTransformation{SELF,IN}"/> and
+/// <see cref="DomainTransformation{SELF,TYPE,IN}"/>) to allow different creation strategies
 /// such as pure validation, effectful generation, or runtime-dependent construction.
 /// </para>
 ///
@@ -69,27 +69,3 @@ public interface DomainType<SELF, REPR> :
     DomainType<SELF>,
     DomainRepresent<REPR>
     where SELF : DomainType<SELF, REPR>;
-
-/// <summary>
-/// Represents a domain type that can expose its underlying representation
-/// and be constructed from that same representation through a pure factory.
-/// </summary>
-/// <typeparam name="SELF">The concrete domain type implementing this trait.</typeparam>
-/// <typeparam name="REPR">The underlying representation used by the domain type.</typeparam>
-public interface DomainTypeFactory<SELF, REPR> :
-    DomainType<SELF, REPR>,
-    DomainFactory<SELF, REPR>
-    where SELF : DomainTypeFactory<SELF, REPR>;
-
-/// <summary>
-/// Represents a domain type that can expose its underlying representation
-/// and be constructed from that same representation through an effectful factory.
-/// </summary>
-/// <typeparam name="SELF">The concrete domain type implementing this trait.</typeparam>
-/// <typeparam name="M">The effect context used during construction.</typeparam>
-/// <typeparam name="REPR">The underlying representation used by the domain type.</typeparam>
-public interface DomainTypeFactoryM<SELF, M, REPR> :
-    DomainType<SELF, REPR>,
-    DomainFactoryM<SELF, M, REPR>
-    where SELF : DomainTypeFactoryM<SELF, M, REPR>
-    where M : Monad<M>;

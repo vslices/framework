@@ -17,7 +17,7 @@
 /// </typeparam>
 /// <remarks>
 /// <para>
-/// <see cref="DomainFactoryM{SELF, M, TYPE, IN}"/> separates effectful construction from
+/// <see cref="DomainTransformationM{SELF, M, TYPE, IN}"/> separates effectful construction from
 /// domain representation.
 /// </para>
 /// <para>
@@ -25,7 +25,7 @@
 /// or runtime-dependent data, such as IO, configuration, time, randomness, repositories,
 /// external services, or an environment.
 /// </para>
-/// 
+///
 /// <para>
 /// Conceptually:
 /// </para>
@@ -37,8 +37,8 @@
 /// Factories return <see cref="FinT{M, A}"/> to model construction that can both run inside
 /// an effect and fail with an explicit <see cref="Error"/>.
 /// </remarks>
-public interface DomainFactoryM<SELF, M, TYPE, IN>
-    where SELF : DomainFactoryM<SELF, M, TYPE, IN>
+public interface DomainTransformationM<SELF, M, TYPE, IN> : DomainType<SELF>
+    where SELF : DomainTransformationM<SELF, M, TYPE, IN>
     where M : Monad<M>
     where TYPE : DomainType<TYPE>
 {
@@ -68,7 +68,7 @@ public interface DomainFactoryM<SELF, M, TYPE, IN>
 }
 
 
-/// <inheritdoc/> 
-public interface DomainFactoryM<SELF, M, IN> : DomainFactoryM<SELF, M, SELF, IN>
-    where SELF : DomainFactoryM<SELF, M, IN>, DomainType<SELF>
+/// <inheritdoc/>
+public interface DomainTransformationM<SELF, M, IN> : DomainTransformationM<SELF, M, SELF, IN>
+    where SELF : DomainTransformationM<SELF, M, IN>
     where M : Monad<M>;

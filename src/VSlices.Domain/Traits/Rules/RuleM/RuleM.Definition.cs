@@ -11,7 +11,7 @@ namespace VSlices.Domain.Traits;
 /// <typeparam name="SELF">
 /// The concrete rule type. Used to enable static abstract members and reusable rule instances.
 /// </typeparam>
-/// <typeparam name="A">
+/// <typeparam name="M">
 /// The kind validated by the rule.
 /// </typeparam>
 /// <typeparam name="A">
@@ -43,14 +43,14 @@ public interface RuleM<SELF, M, A>
     /// <c>true</c> when the wrapped rule is not satisfied; otherwise, <c>false</c>.
     /// </returns>
     public static virtual FinT<M, A> ValidateM(
-        A v, 
+        A v,
         Func<SELF, A, K<M, Error>> Fail) =>
         from followsRule in SELF.Check(v)
-        let mResult = followsRule 
-            ? FinT.lift<M, A>(Pure(v)) 
+        let mResult = followsRule
+            ? FinT.lift<M, A>(Pure(v))
             : FinT.lift(Fail(SELF.Instance, v))
                   .Bind(FinT.Fail<M, A>)
-        from result in mResult 
+        from result in mResult
         select result;
 
 }

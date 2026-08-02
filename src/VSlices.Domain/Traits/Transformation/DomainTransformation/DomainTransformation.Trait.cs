@@ -14,7 +14,7 @@
 /// </typeparam>
 /// <remarks>
 /// <para>
-/// <see cref="DomainFactory{SELF, TYPE, IN}"/> separates the construction of domain values
+/// <see cref="DomainTransformation{SELF, TYPE, IN}"/> separates the construction of domain values
 /// from their representation. This allows different creation strategies (validation,
 /// transformation, or contextual mapping) without coupling them to the domain type itself.
 /// </para>
@@ -31,8 +31,8 @@
 /// allowing validation failures to be handled explicitly.
 /// </para>
 /// </remarks>
-public interface DomainFactory<SELF, TYPE, IN>
-    where SELF : DomainFactory<SELF, TYPE, IN>
+public interface DomainTransformation<SELF, TYPE, IN> : DomainType<SELF>
+    where SELF : DomainTransformation<SELF, TYPE, IN>
     where TYPE : DomainType<TYPE>
 {
     /// <summary>
@@ -64,15 +64,12 @@ public interface DomainFactory<SELF, TYPE, IN>
 /// <typeparam name="SELF">
 /// The concrete factory type, enabling static polymorphism.
 /// </typeparam>
-/// <typeparam name="TYPE">
-/// The domain type produced by this factory.
-/// </typeparam>
 /// <typeparam name="IN">
 /// The input type used to construct the domain value.
 /// </typeparam>
 /// <remarks>
 /// <para>
-/// <see cref="DomainFactory{SELF, TYPE, IN}"/> separates the construction of domain values
+/// <see cref="DomainTransformation{SELF, TYPE, IN}"/> separates the construction of domain values
 /// from their representation. This allows different creation strategies (validation,
 /// transformation, or contextual mapping) without coupling them to the domain type itself.
 /// </para>
@@ -89,5 +86,5 @@ public interface DomainFactory<SELF, TYPE, IN>
 /// allowing validation failures to be handled explicitly.
 /// </para>
 /// </remarks>
-public interface DomainFactory<SELF, IN> : DomainFactory<SELF, SELF, IN>
-    where SELF : DomainFactory<SELF, IN>, DomainType<SELF>;
+public interface DomainTransformation<SELF, IN> : DomainTransformation<SELF, SELF, IN>
+    where SELF : DomainTransformation<SELF, IN>;

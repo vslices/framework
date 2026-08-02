@@ -11,7 +11,7 @@ public static partial class VSlicesDomainPrelude
     /// </summary>
     /// <typeparam name="M">The monadic type that defines the context.</typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, REPR}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, REPR}"/>
     /// and <see cref="DomainType{T, REPR}"/>.
     /// </typeparam>
     /// <param name="repr">The unsafe representation of the domain type.</param>
@@ -19,12 +19,12 @@ public static partial class VSlicesDomainPrelude
     /// An instance of <see cref="K{M, T}"/> created from the provided unsafe representation.
     /// </returns>
     /// <remarks>
-    /// This method relies on the domain type's implementation of 
-    /// <see cref="DomainFactoryM{T, M, REPR}.FromUnsafeM"/> to construct the result.
+    /// This method relies on the domain type's implementation of
+    /// <see cref="DomainTransformationM{T, M, REPR}.FromUnsafeM"/> to construct the result.
     /// </remarks>
     public static K<M, T> Unsafe<M, T>(bool repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, bool>, DomainType<T, bool> =>
+        where T : DomainTransformationM<T, M, bool>, DomainType<T, bool> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -34,7 +34,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the context for the operation.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, char}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, char}"/>
     /// and <see cref="DomainType{T, char}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -45,7 +45,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(char repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, char>, DomainType<T, char> =>
+        where T : DomainTransformationM<T, M, char>, DomainType<T, char> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -55,7 +55,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the computational context.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, string}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, string}"/>
     /// and <see cref="DomainType{T, string}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -66,7 +66,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(string repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, string>, DomainType<T, string> =>
+        where T : DomainTransformationM<T, M, string>, DomainType<T, string> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -74,13 +74,13 @@ public static partial class VSlicesDomainPrelude
     /// </summary>
     /// <typeparam name="M">The monad type that defines the computational context.</typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, byte}"/> and <see cref="DomainType{T, byte}"/>.
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, byte}"/> and <see cref="DomainType{T, byte}"/>.
     /// </typeparam>
     /// <param name="repr">The unsafe representation of the domain type.</param>
     /// <returns>An instance of <see cref="K{M, T}"/> created from the unsafe representation.</returns>
     public static K<M, T> Unsafe<M, T>(byte repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, byte>, DomainType<T, byte> =>
+        where T : DomainTransformationM<T, M, byte>, DomainType<T, byte> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -90,7 +90,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the context in which the operation is performed.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, short}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, short}"/>
     /// and <see cref="DomainType{T, short}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -101,7 +101,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(short repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, short>, DomainType<T, short> =>
+        where T : DomainTransformationM<T, M, short>, DomainType<T, short> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -111,7 +111,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the computational context.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, ushort}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, ushort}"/>
     /// and <see cref="DomainType{T, ushort}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -122,7 +122,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(ushort repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, ushort>, DomainType<T, ushort> =>
+        where T : DomainTransformationM<T, M, ushort>, DomainType<T, ushort> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -132,7 +132,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the computational context.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements <see cref="DomainFactoryM{T, M, int}"/> and <see cref="DomainType{T, int}"/>.
+    /// The domain type that implements <see cref="DomainTransformationM{T, M, int}"/> and <see cref="DomainType{T, int}"/>.
     /// </typeparam>
     /// <param name="repr">
     /// The unsafe representation of the domain type.
@@ -142,7 +142,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(int repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, int>, DomainType<T, int> =>
+        where T : DomainTransformationM<T, M, int>, DomainType<T, int> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -152,7 +152,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the context in which the operation is performed.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, uint}"/> and <see cref="DomainType{T, uint}"/>.
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, uint}"/> and <see cref="DomainType{T, uint}"/>.
     /// </typeparam>
     /// <param name="repr">
     /// The unsafe representation of the value of type <see cref="uint"/>.
@@ -162,7 +162,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(uint repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, uint>, DomainType<T, uint> =>
+        where T : DomainTransformationM<T, M, uint>, DomainType<T, uint> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -170,13 +170,13 @@ public static partial class VSlicesDomainPrelude
     /// </summary>
     /// <typeparam name="M">The monad type that defines the computation context.</typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, long}"/> and <see cref="DomainType{T, long}"/>.
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, long}"/> and <see cref="DomainType{T, long}"/>.
     /// </typeparam>
     /// <param name="repr">The unsafe representation of the domain type.</param>
     /// <returns>An instance of <see cref="K{M, T}"/> created from the unsafe representation.</returns>
     public static K<M, T> Unsafe<M, T>(long repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, long>, DomainType<T, long> =>
+        where T : DomainTransformationM<T, M, long>, DomainType<T, long> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -186,7 +186,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the computation context.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements <see cref="DomainFactoryM{T, M, ulong}"/> and <see cref="DomainType{T, ulong}"/>.
+    /// The domain type that implements <see cref="DomainTransformationM{T, M, ulong}"/> and <see cref="DomainType{T, ulong}"/>.
     /// </typeparam>
     /// <param name="repr">
     /// The unsafe representation of the domain type.
@@ -196,7 +196,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(ulong repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, ulong>, DomainType<T, ulong> =>
+        where T : DomainTransformationM<T, M, ulong>, DomainType<T, ulong> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -206,7 +206,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the context in which the operation is performed.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, float}"/> and <see cref="DomainType{T, float}"/>.
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, float}"/> and <see cref="DomainType{T, float}"/>.
     /// </typeparam>
     /// <param name="repr">
     /// The unsafe representation of the domain type.
@@ -216,7 +216,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(float repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, float>, DomainType<T, float> =>
+        where T : DomainTransformationM<T, M, float>, DomainType<T, float> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -226,21 +226,21 @@ public static partial class VSlicesDomainPrelude
     /// The monadic context in which the operation is performed. Must implement <see cref="Monad{M}"/>.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that represents the value. Must implement both <see cref="DomainFactoryM{T, M, double}"/> 
+    /// The domain type that represents the value. Must implement both <see cref="DomainTransformationM{T, M, double}"/>
     /// and <see cref="DomainType{T, double}"/>.
     /// </typeparam>
     /// <param name="repr">The unsafe representation of the value.</param>
     /// <returns>
-    /// An instance of <see cref="K{M, T}"/> encapsulating the domain type <typeparamref name="T"/> 
+    /// An instance of <see cref="K{M, T}"/> encapsulating the domain type <typeparamref name="T"/>
     /// within the monadic context <typeparamref name="M"/>.
     /// </returns>
     /// <remarks>
-    /// This method is considered unsafe because it directly converts the provided representation 
+    /// This method is considered unsafe because it directly converts the provided representation
     /// into the domain type without additional validation.
     /// </remarks>
     public static K<M, T> Unsafe<M, T>(double repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, double>, DomainType<T, double> =>
+        where T : DomainTransformationM<T, M, double>, DomainType<T, double> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -250,7 +250,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the computational context.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, decimal}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, decimal}"/>
     /// and <see cref="DomainType{T, decimal}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -261,7 +261,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(decimal repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, decimal>, DomainType<T, decimal> =>
+        where T : DomainTransformationM<T, M, decimal>, DomainType<T, decimal> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -269,14 +269,14 @@ public static partial class VSlicesDomainPrelude
     /// </summary>
     /// <typeparam name="M">The monadic type that defines the computational context.</typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, DateOnly}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, DateOnly}"/>
     /// and <see cref="DomainType{T, DateOnly}"/>.
     /// </typeparam>
     /// <param name="repr">The unsafe representation of the domain type.</param>
     /// <returns>An instance of <see cref="K{M, T}"/> created from the unsafe representation.</returns>
     public static K<M, T> Unsafe<M, T>(DateOnly repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, DateOnly>, DomainType<T, DateOnly> =>
+        where T : DomainTransformationM<T, M, DateOnly>, DomainType<T, DateOnly> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -284,14 +284,14 @@ public static partial class VSlicesDomainPrelude
     /// </summary>
     /// <typeparam name="M">The monad type that defines the computational context.</typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, TimeOnly}"/> and 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, TimeOnly}"/> and
     /// <see cref="DomainType{T, TimeOnly}"/>.
     /// </typeparam>
     /// <param name="repr">The unsafe representation of type <see cref="TimeOnly"/>.</param>
     /// <returns>An instance of <see cref="K{M, T}"/> created from the provided unsafe representation.</returns>
     public static K<M, T> Unsafe<M, T>(TimeOnly repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, TimeOnly>, DomainType<T, TimeOnly> =>
+        where T : DomainTransformationM<T, M, TimeOnly>, DomainType<T, TimeOnly> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -301,7 +301,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the computational context.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, DateTime}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, DateTime}"/>
     /// and <see cref="DomainType{T, DateTime}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -312,7 +312,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(DateTime repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, DateTime>, DomainType<T, DateTime> =>
+        where T : DomainTransformationM<T, M, DateTime>, DomainType<T, DateTime> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -322,7 +322,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that defines the computational context.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements <see cref="DomainFactoryM{T, M, DateTimeOffset}"/> 
+    /// The domain type that implements <see cref="DomainTransformationM{T, M, DateTimeOffset}"/>
     /// and <see cref="DomainType{T, DateTimeOffset}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -333,7 +333,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(DateTimeOffset repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, DateTimeOffset>, DomainType<T, DateTimeOffset> =>
+        where T : DomainTransformationM<T, M, DateTimeOffset>, DomainType<T, DateTimeOffset> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -341,7 +341,7 @@ public static partial class VSlicesDomainPrelude
     /// </summary>
     /// <typeparam name="M">The monadic type that defines the context for the operation.</typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, TimeSpan}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, TimeSpan}"/>
     /// and <see cref="DomainType{T, TimeSpan}"/>.
     /// </typeparam>
     /// <param name="repr">The unsafe representation of the domain type.</param>
@@ -352,7 +352,7 @@ public static partial class VSlicesDomainPrelude
     /// </remarks>
     public static K<M, T> Unsafe<M, T>(TimeSpan repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, TimeSpan>, DomainType<T, TimeSpan> =>
+        where T : DomainTransformationM<T, M, TimeSpan>, DomainType<T, TimeSpan> =>
         T.FromUnsafeM(repr);
 
     /// <summary>
@@ -362,7 +362,7 @@ public static partial class VSlicesDomainPrelude
     /// The monadic type that provides the context for the operation.
     /// </typeparam>
     /// <typeparam name="T">
-    /// The domain type that implements both <see cref="DomainFactoryM{T, M, Guid}"/> 
+    /// The domain type that implements both <see cref="DomainTransformationM{T, M, Guid}"/>
     /// and <see cref="DomainType{T, Guid}"/>.
     /// </typeparam>
     /// <param name="repr">
@@ -373,7 +373,7 @@ public static partial class VSlicesDomainPrelude
     /// </returns>
     public static K<M, T> Unsafe<M, T>(Guid repr)
         where M : Monad<M>
-        where T : DomainFactoryM<T, M, Guid>, DomainType<T, Guid> =>
+        where T : DomainTransformationM<T, M, Guid>, DomainType<T, Guid> =>
         T.FromUnsafeM(repr);
 
 }

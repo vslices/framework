@@ -9,9 +9,7 @@ namespace VSlices.Monads
     {
         public Flow<RT, REQ, RES> Finally<X>(K<Flow<RT, REQ>, X> mx) =>
             Flow<RT, REQ>.Finally(this, mx);
-        
-        public Flow<RT, REQ, RES> Finally<X>(K<Eff<RT>, X> mx) =>
-            Flow<RT, REQ>.Finally(this, Flow<RT, REQ>.);
+
     }
 }
 
