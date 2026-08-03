@@ -1,6 +1,6 @@
 namespace VSlices.Domain.ValueObjects;
 
-public readonly struct Mass : MagnitudeType<Mass, double>
+public readonly struct Mass : Magnitude<Mass, double>
 {
     readonly double Value;
 

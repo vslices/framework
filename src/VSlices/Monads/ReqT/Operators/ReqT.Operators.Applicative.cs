@@ -4,7 +4,8 @@ namespace VSlices;
 
 public static partial class ReqApplicativeOperatorExtensions
 {
-    extension<IN, A>(K<Req<IN>, A> ma)
+    extension<IN, M, A>(K<ReqT<M, IN>, A>)
+        where M : Monad<M>
     {
 
     }

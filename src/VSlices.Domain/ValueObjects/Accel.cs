@@ -9,7 +9,7 @@
 /// value, then extract using various unit-of-measure
 /// accessors (MetresPerSecond2, etc.) or divide by 1.MetresPerSecond2()
 /// </remarks>
-public readonly struct Accel : MagnitudeType<Accel, double>
+public readonly struct Accel : Magnitude<Accel, double>
 {
     readonly double Value;
 
@@ -130,7 +130,7 @@ public readonly struct Accel : MagnitudeType<Accel, double>
 
     public double MetresPerSecond2 => Value;
 
-    public static Accel operator -(Accel value) => 
+    public static Accel operator -(Accel value) =>
         new(-value.Value);
 
     public static Accel From(double repr) =>

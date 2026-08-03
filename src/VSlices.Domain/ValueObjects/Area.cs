@@ -10,7 +10,7 @@
 /// value, then extract using various unit-of-measure
 /// accessors (SqMetres, SqCentimetres, etc.) or divide by 1.SqMetre()
 /// </remarks>
-public readonly struct Area : MagnitudeType<Area, double>
+public readonly struct Area : Magnitude<Area, double>
 {
     readonly double Value;
 
@@ -34,7 +34,7 @@ public readonly struct Area : MagnitudeType<Area, double>
     public override int GetHashCode() =>
         Value.GetHashCode();
 
-    public int CompareTo(object? obj) => 
+    public int CompareTo(object? obj) =>
         obj switch
         {
             null       => 1,
@@ -121,7 +121,7 @@ public readonly struct Area : MagnitudeType<Area, double>
     public double SqMetres      => Value;
     public double SqCentimetres => Value * 10000.0;
     public double SqMillimetres => Value * 1000000.0;
-    public static Area operator -(Area value) => 
+    public static Area operator -(Area value) =>
         new Area(-value.Value);
 
     public static Area AdditiveIdentity { get; } = new(0);

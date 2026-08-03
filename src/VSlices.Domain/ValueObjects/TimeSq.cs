@@ -4,7 +4,7 @@
 /// Numeric time-span squared value
 /// </summary>
 public readonly struct TimeSq :
-    MagnitudeType<TimeSq, double>
+    Magnitude<TimeSq, double>
 {
     readonly double Value;
 
@@ -103,7 +103,7 @@ public readonly struct TimeSq :
         new (Math.Max(Value, rhs.Value));
 
     public double Seconds2 => Value;
-    public static TimeSq operator -(TimeSq value) => 
+    public static TimeSq operator -(TimeSq value) =>
         new(-value.Value);
 
 

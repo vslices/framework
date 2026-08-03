@@ -2,7 +2,7 @@
 
 namespace VSlices.Domain.ValueObjects;
 
-public readonly struct Temperature : MagnitudeType<Temperature, double>
+public readonly struct Temperature : Magnitude<Temperature, double>
 {
     internal enum UnitType
     {
@@ -23,13 +23,13 @@ public readonly struct Temperature : MagnitudeType<Temperature, double>
 
         if (this < AbsoluteZero) throw new ArgumentOutOfRangeException(nameof(value), $"{value} [{type}]", "Less than absolute zero");
     }
-    
+
     public static Temperature FromCelcius(double value) =>
         new (UnitType.C, value);
-    
+
     public static Temperature FromFahrenheit(double value) =>
         new (UnitType.F, value);
-    
+
     public static Temperature FromKelvin(double value) =>
         new (UnitType.K, value);
 
@@ -194,11 +194,11 @@ public readonly struct Temperature : MagnitudeType<Temperature, double>
                               _          => throw new NotSupportedException(Type.ToString())
                           },
             _ => throw new NotSupportedException(Type.ToString())
-        }; 
+        };
 
     public Temperature Add(double rhs) =>
         new (Type, Value + rhs);
-    
+
     public Temperature Subtract(Temperature rhs) =>
         Type switch
         {
@@ -306,7 +306,7 @@ public readonly struct Temperature : MagnitudeType<Temperature, double>
                           },
             _ => throw new NotSupportedException(Type.ToString())
         };
-    
+
     public Temperature Max(Temperature rhs) =>
         Type switch
         {
@@ -334,7 +334,7 @@ public readonly struct Temperature : MagnitudeType<Temperature, double>
             _ => throw new NotSupportedException(Type.ToString())
         };
 
-    public static Temperature operator -(Temperature value) => 
+    public static Temperature operator -(Temperature value) =>
         new(value.Type, -value.Value);
 
 

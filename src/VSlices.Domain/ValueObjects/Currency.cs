@@ -34,7 +34,7 @@ public interface Currency :
     /// <summary>
     /// Returns the canonical representation of the currency.
     /// </summary>
-    string DomainRepresent<string>.To() =>
+    string Represented<string>.To() =>
         Code;
 }
 

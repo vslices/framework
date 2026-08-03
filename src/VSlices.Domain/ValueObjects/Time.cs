@@ -9,8 +9,8 @@
 /// accessors (Milliseconds, Seconds, etc.) or divide by 1.Second()
 /// Implicitly convertible to TimeSpan
 /// </summary>
-public readonly struct Time : 
-    MagnitudeType<Time, double>
+public readonly struct Time :
+    Magnitude<Time, double>
 {
     readonly double Value;
 

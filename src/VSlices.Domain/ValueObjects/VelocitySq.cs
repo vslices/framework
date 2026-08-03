@@ -5,7 +5,7 @@
 /// Handles unit conversions automatically
 /// </summary>
 public readonly struct VelocitySq :
-    MagnitudeType<VelocitySq, double>
+    Magnitude<VelocitySq, double>
 {
     readonly double Value;
 
@@ -104,7 +104,7 @@ public readonly struct VelocitySq :
         new (Math.Max(Value, rhs.Value));
 
     public double MetresPerSecond2 => Value;
-    public static VelocitySq operator -(VelocitySq value) => 
+    public static VelocitySq operator -(VelocitySq value) =>
         new(-value.Value);
 
 

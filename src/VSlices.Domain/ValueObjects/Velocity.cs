@@ -10,7 +10,7 @@
 /// accessors (MetresPerSecond, etc.) or divide by 1.MetrePerSecond()
 /// </summary>
 public readonly struct Velocity :
-    MagnitudeType<Velocity, double>
+    Magnitude<Velocity, double>
 {
     readonly double Value;
 
@@ -131,7 +131,7 @@ public readonly struct Velocity :
     public double MilesPerSecond      => Value                                    / 1609.344000006437376000025749504;
     public double MilesPerHour        => Value / 1609.344000006437376000025749504 * 3600.0;
     public double Knots               => Value                                    / 0.51444444444444;
-    public static Velocity operator -(Velocity value) => 
+    public static Velocity operator -(Velocity value) =>
         new(-value.Value);
 
 

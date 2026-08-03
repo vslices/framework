@@ -9,7 +9,7 @@
 /// value, then extract using various unit-of-measure
 /// accessors (Metres, Centimetres, etc.) or divide by 1.Metre()
 /// </summary>
-public readonly struct Length : MagnitudeType<Length, double> 
+public readonly struct Length : Magnitude<Length, double>
 {
     readonly double Value;
 
@@ -137,10 +137,10 @@ public readonly struct Length : MagnitudeType<Length, double>
     public double Micrometres   => Value * 1000000.0;
     public double Nanometres    => Value * 1000000000.0;
     public double Angstroms     => Value * 10000000000.0;
-    
-    public static Length From(double repr) => 
+
+    public static Length From(double repr) =>
         new (repr);
-    
+
     public double To() =>
         Value;
 
