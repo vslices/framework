@@ -4,9 +4,10 @@ namespace VSlices;
 
 public static partial class ReqWritableExtensions
 {
-    extension<IN, A>(K<Req<IN>, A> ma)
+    extension<M, IN, A>(K<ReqT<M, IN>, A> ma)
+        where M : Monad<M>
     {
-        public Req<IN, Unit> Tell(Error error) =>
+        public ReqT<M, IN, Unit> Tell(Error error) =>
             ma.As().Tell(error);
     }
 }

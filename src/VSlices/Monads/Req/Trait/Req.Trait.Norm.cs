@@ -1,5 +1,3 @@
-using System.Net.Cache;
-
 namespace VSlices.Monads;
 
 /// <summary>
@@ -9,10 +7,10 @@ namespace VSlices.Monads;
 public partial class Req<IN>
 {
     public static Req<IN, IN> Input =>
-        Readable.ask<Req<IN>, IN>().As();
+        Req<IN, IN>.Input;
 
     public static Req<IN, Unit> Append(Error e) =>
-        +Writable.tell<Req<IN>, Error>(e);
+        Input.Tell(e);
 
     public static Req<IN, bool> Check(Func<IN, bool> fCheck) =>
         Input * fCheck;

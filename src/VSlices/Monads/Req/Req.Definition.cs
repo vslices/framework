@@ -4,6 +4,8 @@ public delegate (A Value, Error Error) ReqExecute<IN, A>(IN input, Error error);
 
 public sealed record Req<IN, A>(ReqExecute<IN, A> RawRun) : K<Req<IN>, A>
 {
+    public static readonly Req<IN, IN> Input = Readable.ask<Req<IN>, IN>().As();
+
     public Fin<A> Run(IN input) =>
         RawRun(input, Error.Empty)
             .Map(Fin<A> (v) => v.Item2.IsEmpty ? v.Item1 : v.Item2);
@@ -19,13 +21,6 @@ public sealed record Req<IN, A>(ReqExecute<IN, A> RawRun) : K<Req<IN>, A>
 
     public Req<IN, Unit> Tell(Error error) =>
         +Writable.tell<Req<IN>, Error>(error);
-
-    public Req<IN, (A Value, Error Error)> Listen() =>
-        Listens(x => x);
-
-    public Req<IN, (A Value, B Output)> Listens<B>(
-        Func<Error, B> f) =>
-        new((i, e) => RawRun(i, e).Map(ra => ((ra.Item1, f(ra.Item2)), ra.Item2)));
 
     public static Req<IN, A> Pure(A v) =>
         +Applicative.pure<Req<IN>, A>(v);

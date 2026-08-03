@@ -65,7 +65,8 @@ public partial class Req<IN> :
 
     static K<Req<IN>, (A Value, Error Output)> Writable<Req<IN>, Error>.Listen<A>(
         K<Req<IN>, A> ma) =>
-        ma.As().Listen();
+        new Req<IN, (A Value, Error Output)>(
+            (i, e) => ma.RawRun(i, e).Map(ra => ((ra.Item1, ra.Item2), ra.Item2)));
 
     static K<Req<IN>, A> Writable<Req<IN>, Error>.Pass<A>(
         K<Req<IN>, (A Value, Func<Error, Error> Function)> action) =>

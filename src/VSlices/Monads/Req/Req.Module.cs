@@ -1,3 +1,5 @@
+using System.ComponentModel.Design.Serialization;
+
 namespace VSlices.Monads;
 
 public static partial class Req
