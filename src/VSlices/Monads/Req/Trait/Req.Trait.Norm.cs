@@ -1,3 +1,5 @@
+using System.Net.Cache;
+
 namespace VSlices.Monads;
 
 /// <summary>
@@ -22,4 +24,7 @@ public partial class Req<IN>
         Func<IN, bool> fCheck,
         Func<IN, Error> Fail) =>
         +iff(Check(fCheck), Then: Req.Ok, Else: Prescribe(Fail));
+
+    public static Req<IN, OUT> Transform<OUT>(Func<IN, OUT> fOut) =>
+        Input * fOut;
 }

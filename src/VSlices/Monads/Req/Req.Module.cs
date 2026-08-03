@@ -17,4 +17,7 @@ public static partial class Req
         Func<IN, bool> fCheck,
         Func<IN, Error> Fail) =>
         Req<IN>.Ensure(fCheck, Fail);
+
+    public static Req<IN, OUT> Transform<IN, OUT>(Func<IN, OUT> fOut) =>
+        Req<IN>.Transform(fOut);
 }
