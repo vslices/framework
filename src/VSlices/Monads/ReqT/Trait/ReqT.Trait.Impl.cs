@@ -1,5 +1,10 @@
 namespace VSlices.Monads;
 
+/// <summary>
+///
+/// </summary>
+/// <typeparam name="M"></typeparam>
+/// <typeparam name="IN"></typeparam>
 public partial class ReqT<M, IN> :
     MonadT<ReqT<M, IN>, M>,
     Readable<ReqT<M, IN>, IN>,

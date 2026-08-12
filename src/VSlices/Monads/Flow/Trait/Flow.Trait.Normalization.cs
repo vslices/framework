@@ -17,7 +17,7 @@ public partial class Flow<RT, REQ>
         +Functor.map(f, ma);
 
     /// <summary>
-    /// Creates a new <see cref="Flow{RT, REQ, O}"/> by mapping all values of the provided computation 
+    /// Creates a new <see cref="Flow{RT, REQ, O}"/> by mapping all values of the provided computation
     /// to a constant value.
     /// </summary>
     /// <typeparam name="T">The type of the input value in the computation.</typeparam>
@@ -51,7 +51,7 @@ public partial class Flow<RT, REQ>
     /// Gets a <see cref="Flow{RT, REQ, Unit}"/> instance representing a unit value.
     /// </summary>
     /// <remarks>
-    /// This property provides a predefined instance of <see cref="Flow{RT, REQ, Unit}"/> 
+    /// This property provides a predefined instance of <see cref="Flow{RT, REQ, Unit}"/>
     /// that can be used when no meaningful value is required, adhering to functional programming principles.
     /// </remarks>
     public static Flow<RT, REQ, Unit> Unit { get; } = Pure(unit);
@@ -62,16 +62,16 @@ public partial class Flow<RT, REQ>
     /// <typeparam name="A">The type of the value to wrap.</typeparam>
     /// <param name="v">The value to wrap in an <see cref="Option{A}"/>.</param>
     /// <returns>
-    /// A <see cref="Flow{RT, REQ, Option{A}}"/> containing the provided value wrapped in an <see cref="Option{A}"/>.
+    ///
     /// </returns>
     public static Flow<RT, REQ, Option<A>> Some<A>(A v) =>
         Pure<Option<A>>(v);
 
     /// <summary>
-    /// Creates a <see cref="Flow{RT, REQ, Option{A}}"/> instance representing a "None" value.
+    ///
     /// </summary>
     /// <typeparam name="A">The type of the value wrapped in the <see cref="Option{A}"/>.</typeparam>
-    /// <returns>A <see cref="Flow{RT, REQ, Option{A}}"/> instance containing an "None" value.</returns>
+    /// <returns></returns>
     public static Flow<RT, REQ, Option<A>> None<A>() =>
         Pure<Option<A>>(Option.None);
 
@@ -84,10 +84,10 @@ public partial class Flow<RT, REQ>
     /// <param name="mb">The second computation to execute.</param>
     /// <returns>A new <see cref="Flow{RT, REQ, O}"/> representing the combined computation.</returns>
     public static Flow<RT, REQ, O> Action<A, O>(
-        K<Flow<RT, REQ>, A> ma, 
+        K<Flow<RT, REQ>, A> ma,
         K<Flow<RT, REQ>, O> mb) =>
         +Applicative.action(ma, mb);
-    
+
     /// <summary>
     /// Applies a function encapsulated in a monadic context to a value encapsulated in another monadic context.
     /// </summary>
@@ -100,17 +100,16 @@ public partial class Flow<RT, REQ>
         K<Flow<RT, REQ>, Func<T, O>> mf,
         K<Flow<RT, REQ>, T> ma) =>
         +Applicative.apply(mf, ma);
-    
+
     /// <summary>
-    /// Binds a computation to a function that produces a new computation, 
+    /// Binds a computation to a function that produces a new computation,
     /// enabling the chaining of operations in a monadic flow.
     /// </summary>
     /// <typeparam name="T">The type of the input value of the computation.</typeparam>
     /// <typeparam name="O">The type of the output value of the resulting computation.</typeparam>
     /// <param name="ma">The initial computation to bind.</param>
     /// <param name="fb">
-    /// A function that takes the result of the initial computation and returns 
-    /// a new computation of type <see cref="K{Flow{RT, REQ}, O}"/>.
+    ///
     /// </param>
     /// <returns>A new computation of type <see cref="Flow{RT, REQ, O}"/>.</returns>
     public static Flow<RT, REQ, O> Bind<T, O>(
@@ -125,8 +124,7 @@ public partial class Flow<RT, REQ>
     /// <typeparam name="O">The type of the final output value.</typeparam>
     /// <param name="value">The initial value to process.</param>
     /// <param name="f">
-    /// A function that takes the current value and returns a computation wrapped in 
-    /// a <see cref="K{Flow{RT, REQ}, Next{T, O}}"/> indicating the next step or the final result.
+    ///
     /// </param>
     /// <returns>
     /// A <see cref="Flow{RT, REQ, O}"/> representing the result of the recursive computation.
@@ -144,14 +142,13 @@ public partial class Flow<RT, REQ>
     /// <returns>A <see cref="Flow{RT, REQ, A}"/> representing the lifted computation.</returns>
     public static Flow<RT, REQ, A> LiftIO<A>(IO<A> ma) =>
         +MonadIO.liftIO<Flow<RT, REQ>, A>(ma);
-    
+
     /// <summary>
-    /// Converts a monadic computation of type <see cref="K{Flow{RT, REQ}, A}"/> 
-    /// into a computation that produces an <see cref="IO{A}"/> result.
+    ///
     /// </summary>
     /// <typeparam name="A">The type of the result produced by the computation.</typeparam>
     /// <param name="ma">The monadic computation to convert.</param>
-    /// <returns>A new <see cref="Flow{RT, REQ, IO{A}}"/> representing the computation as an IO operation.</returns>
+    /// <returns></returns>
     public static Flow<RT, REQ, IO<A>> ToIO<A>(K<Flow<RT, REQ>, A> ma) =>
         +MonadUnliftIO.toIO(ma);
 
@@ -197,7 +194,7 @@ public partial class Flow<RT, REQ>
     /// <typeparam name="A">The type of the result produced by the computation.</typeparam>
     /// <param name="fa">The computation to be executed.</param>
     /// <param name="Predicate">
-    /// A function that determines whether an error should be handled. 
+    /// A function that determines whether an error should be handled.
     /// Returns <c>true</c> if the error matches the condition; otherwise, <c>false</c>.
     /// </param>
     /// <param name="Fail">
@@ -256,7 +253,7 @@ public partial class Flow<RT, REQ>
     /// <param name="my">The second flow to combine.</param>
     /// <returns>A new flow that represents the combination of the two input flows.</returns>
     public static Flow<RT, REQ, A> Combine<A>(
-        K<Flow<RT, REQ>, A> mx, 
+        K<Flow<RT, REQ>, A> mx,
         K<Flow<RT, REQ>, A> my) =>
         +SemigroupK.combine(mx, my);
 
@@ -273,7 +270,7 @@ public partial class Flow<RT, REQ>
         K<Flow<RT, REQ>, A> fa,
         K<Flow<RT, REQ>, X> fx) =>
         +(fa | Final.final(fx));
-    
+
     /// <summary>
     /// Creates a new <see cref="Flow{RT, REQ, A}"/> by applying the provided function
     /// to the runtime and request values.

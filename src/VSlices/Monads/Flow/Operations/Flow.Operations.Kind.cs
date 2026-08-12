@@ -6,8 +6,12 @@ namespace VSlices;
 public static partial class FlowExtensions
 {
     extension<C, R, A>(K<Flow<C, R>, A>)
-        where A : notnull
     {
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="mx"></param>
+        /// <returns></returns>
         public static Flow<C, R, A> operator +(K<Flow<C, R>, A> mx) =>
             mx.As();
     }

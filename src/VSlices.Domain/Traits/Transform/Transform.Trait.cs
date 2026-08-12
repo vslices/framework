@@ -1,4 +1,6 @@
-﻿namespace VSlices.Domain.Traits;
+﻿using VSlices.Monads;
+
+namespace VSlices.Domain.Traits;
 
 /// <summary>
 ///
@@ -6,29 +8,26 @@
 /// <typeparam name="SELF">
 ///
 /// </typeparam>
-/// <typeparam name="TYPE">
+/// <typeparam name="A">
 ///
 /// </typeparam>
-/// <typeparam name="IN">
+/// <typeparam name="B">
 ///
 /// </typeparam>
 /// <remarks>
 ///
 /// </remarks>
-public interface Transform<SELF, TYPE, IN> : DomainType<SELF>
-    where SELF : Transform<SELF, TYPE, IN>
-    where TYPE : DomainType<TYPE>
+public interface Transform<SELF, A, B> : DomainType<SELF>
+    where SELF : Transform<SELF, A, B>
+    where A : DomainType<A>
 {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="repr">
-    ///
-    /// </param>
     /// <returns>
     ///
     /// </returns>
-    public static abstract Fin<TYPE> From(IN repr);
+    static abstract Req<B, A> Invariants { get; }
 
     /// <summary>
     ///
@@ -39,24 +38,34 @@ public interface Transform<SELF, TYPE, IN> : DomainType<SELF>
     /// <returns>
     ///
     /// </returns>
-    /// <exception cref="Exception">
+    public static virtual Fin<A> Create(B repr) =>
+        SELF.Invariants.Onto(repr);
+
+    /// <summary>
     ///
-    /// </exception>
-    public static virtual TYPE FromUnsafe(IN repr) =>
-        SELF.From(repr).ThrowIfFail();
+    /// </summary>
+    /// <param name="repr">
+    ///
+    /// </param>
+    /// <returns>
+    ///
+    /// </returns>
+    public static virtual A New(B repr) =>
+        SELF.Create(repr).ThrowIfFail();
 }
 
 /// <summary>
 ///
 /// </summary>
-/// <typeparam name="SELF">
+/// <typeparam name="A">
 ///
 /// </typeparam>
-/// <typeparam name="IN">
+/// <typeparam name="B">
 ///
 /// </typeparam>
 /// <remarks>
 ///
 /// </remarks>
-public interface Transform<SELF, IN> : Transform<SELF, SELF, IN>
-    where SELF : Transform<SELF, IN>;
+public interface Transform<A, B> : Transform<A, A, B>
+    where A : Transform<A, B>;
+

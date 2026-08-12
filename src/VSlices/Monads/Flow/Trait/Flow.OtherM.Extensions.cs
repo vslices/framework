@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Linq;
-using VSlices.Monads;
+﻿namespace VSlices.Monads;
 
-namespace LanguageExt;
-
+/// <summary>
+///
+/// </summary>
 public static partial class FlowExtensions
 {
     extension<RES>(K<Eff, RES> ma)
@@ -48,7 +45,7 @@ public static partial class FlowExtensions
         public Flow<RT, REQ, RES> ToFlow<RT, REQ>() =>
             Flow<RT, REQ>.Lift(ma);
     }
-    
+
     extension<RES>(K<FinT<IO>, RES> ma)
     {
         /// <summary>

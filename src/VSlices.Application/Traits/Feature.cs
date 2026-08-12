@@ -3,11 +3,11 @@
 namespace VSlices.Application;
 
 /// <summary>
-/// Represents a feature interface that defines a contract for implementing a specific functionality
+/// Represents a feature that defines a contract for implementing a specific functionality
 /// with a runtime environment, request, and response types.
 /// </summary>
 /// <remarks>
-/// This interface is designed to be implemented by concrete feature classes, it is the base for every functionality 
+/// This trait is designed to be implemented by concrete feature classes, it is the base for every functionality
 /// inside a system that uses VSlices
 /// </remarks>
 /// <typeparam name="F">
@@ -63,8 +63,8 @@ public interface Feature<F, RT, REQ, RES>
     /// Executes the feature's flow logic in an unsafe manner, bypassing safety mechanisms.
     /// </summary>
     /// <remarks>
-    /// This method directly runs the feature's flow logic without encapsulating the result in a 
-    /// <see cref="Fin{T}"/> or other safety constructs. It is intended for scenarios where the 
+    /// This method directly runs the feature's flow logic without encapsulating the result in a
+    /// <see cref="Fin{T}"/> or other safety constructs. It is intended for scenarios where the
     /// caller is confident that the operation will succeed and does not require additional safety checks.
     /// </remarks>
     /// <param name="input">The input request for the feature.</param>
@@ -87,7 +87,7 @@ public interface Feature<F, RT, REQ, RES>
     /// <param name="runtime">The runtime environment required for the feature.</param>
     /// <param name="envIO">The environment I/O used during execution.</param>
     /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains a <see cref="Fin{T}"/> 
+    /// A task that represents the asynchronous operation. The task result contains a <see cref="Fin{T}"/>
     /// representing the outcome of the feature execution, which can either be a success or a failure.
     /// </returns>
     /// <remarks>
@@ -104,7 +104,7 @@ public interface Feature<F, RT, REQ, RES>
     /// Executes the feature's flow logic asynchronously in an unsafe manner.
     /// </summary>
     /// <remarks>
-    /// This method runs the feature's flow logic without enforcing safety checks, 
+    /// This method runs the feature's flow logic without enforcing safety checks,
     /// which may result in exceptions if the flow encounters errors.
     /// </remarks>
     /// <param name="input">The input request for the feature.</param>

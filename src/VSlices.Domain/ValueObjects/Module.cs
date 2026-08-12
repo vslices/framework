@@ -484,32 +484,32 @@ public partial class VSlicesDomainPrelude
     /// <summary>
     /// Miles per hour
     /// </summary>
-    public static readonly Velocity mph = miles /hour;
+    public static readonly Velocity mph = miles / hour;
 
     /// <summary>
     /// Kilometres per hour
     /// </summary>
-    public static readonly Velocity kph = km /hour;
+    public static readonly Velocity kph = km / hour;
 
     /// <summary>
     /// Metres per-second squared
     /// </summary>
-    public static readonly Accel ms2 = m /s /s;
+    public static readonly Accel ms2 = m / s / s;
 
     /// <summary>
     /// Degrees Celsius
     /// </summary>
-    public static readonly Domain.ValueObjects.Temperature degC = new (Domain.ValueObjects.Temperature.UnitType.C, 1);
+    public static readonly Domain.ValueObjects.Temperature degC = new(Domain.ValueObjects.Temperature.UnitType.C, 1);
 
     /// <summary>
     /// Degrees Fahrenheit
     /// </summary>
-    public static readonly Domain.ValueObjects.Temperature degF = new (Domain.ValueObjects.Temperature.UnitType.F, 1);
+    public static readonly Domain.ValueObjects.Temperature degF = new(Domain.ValueObjects.Temperature.UnitType.F, 1);
 
     /// <summary>
     /// kelvin
     /// </summary>
-    public static readonly Domain.ValueObjects.Temperature K = new (Domain.ValueObjects.Temperature.UnitType.K, 1);
+    public static readonly Domain.ValueObjects.Temperature K = new(Domain.ValueObjects.Temperature.UnitType.K, 1);
 
     /// <summary>
     /// Gram

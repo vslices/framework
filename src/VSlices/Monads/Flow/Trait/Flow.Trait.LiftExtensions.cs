@@ -16,13 +16,13 @@ public partial class Flow<RT, REQ>
     /// </returns>
     public static Flow<RT, REQ, A> LiftIO<A>(Func<RT, REQ, IO<A>> f) =>
         new(f);
-    
+
     /// <summary>
     /// Lifts a function that produces an effectful computation into the <see cref="Flow{RT, REQ, A}"/> context.
     /// </summary>
     /// <typeparam name="A">The type of the result produced by the effectful computation.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>,
     /// and returns a computation of type <see cref="K{IO, A}"/>.
     /// </param>
     /// <returns>
@@ -37,8 +37,8 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="A">The type of the result produced by the asynchronous computation.</typeparam>
     /// <param name="f">
-    /// A function that takes an environment of type <typeparamref name="RT"/>, 
-    /// a requirement of type <typeparamref name="REQ"/>, and an <see cref="EnvIO"/> 
+    /// A function that takes an environment of type <typeparamref name="RT"/>,
+    /// a requirement of type <typeparamref name="REQ"/>, and an <see cref="EnvIO"/>
     /// to produce a <see cref="Task{A}"/>.
     /// </param>
     /// <returns>
@@ -52,7 +52,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/> 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>
     /// and returns a value of type <typeparamref name="O"/>.
     /// </param>
     /// <returns>
@@ -66,7 +66,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>,
     /// and returns a value of type <see cref="Eff{O}"/>.
     /// </param>
     /// <returns>
@@ -81,7 +81,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two inputs of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
+    /// A function that takes two inputs of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>,
     /// and produces a value of type <see cref="K{Eff, O}"/>.
     /// </param>
     /// <returns>
@@ -95,7 +95,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output value produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>,
     /// and produces a result of type <see cref="Eff{RT, O}"/>.
     /// </param>
     /// <returns>
@@ -109,8 +109,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
-    /// and returns a value of type <see cref="K{Eff{RT}, O}"/>.
+    ///
     /// </param>
     /// <returns>
     /// A new <see cref="Flow{RT, REQ, O}"/> instance that represents the lifted function.
@@ -123,7 +122,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the result produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>,
     /// and returns a <see cref="Fin{T}"/> representing a computation that may succeed or fail.
     /// </param>
     /// <returns>
@@ -133,12 +132,12 @@ public partial class Flow<RT, REQ>
         new((c, r) => f(c, r).Match(Succ: IO.pure, Fail: IO.fail<O>));
 
     /// <summary>
-    /// Lifts a function that produces a result of type <typeparamref name="O"/> 
+    /// Lifts a function that produces a result of type <typeparamref name="O"/>
     /// within a context of <see cref="K{Fin, O}"/> into a <see cref="Flow{RT, REQ, O}"/>.
     /// </summary>
     /// <typeparam name="O">The type of the result produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and
     /// <typeparamref name="REQ"/>, and returns a result of type <see cref="K{Fin, O}"/>.
     /// </param>
     /// <returns>
@@ -152,7 +151,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the result produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>,
     /// and returns a <see cref="FinT{TMonad, TResult}"/> representing a computation that may succeed or fail.
     /// </param>
     /// <returns>
@@ -166,8 +165,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output produced by the computation.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
-    /// and returns a computation of type <see cref="K{FinT{IO}, O}"/>.
+    ///
     /// </param>
     /// <returns>
     /// A <see cref="Flow{RT, REQ, O}"/> instance that encapsulates the lifted computation.
@@ -180,7 +178,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output value produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
+    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>,
     /// and returns a <see cref="FinT{Eff, T}"/> representing a computation that may succeed or fail.
     /// </param>
     /// <returns>
@@ -195,8 +193,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the output value produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two arguments of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
-    /// and returns a value wrapped in a <see cref="K{FinT{Eff}, O}"/> context.
+    ///
     /// </param>
     /// <returns>
     /// A <see cref="Flow{RT, REQ, O}"/> instance that represents the lifted function.
@@ -206,12 +203,11 @@ public partial class Flow<RT, REQ>
                               .As().Flatten());
 
     /// <summary>
-    /// Lifts a function that produces a <see cref="FinT{Eff{RT}, O}"/> into a <see cref="Flow{RT, REQ, O}"/>.
+    ///
     /// </summary>
     /// <typeparam name="O">The type of the output value.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters, <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
-    /// and produces a <see cref="FinT{Eff{RT}, O}"/>.
+    ///
     /// </param>
     /// <returns>
     /// A <see cref="Flow{RT, REQ, O}"/> that encapsulates the lifted function.
@@ -225,8 +221,7 @@ public partial class Flow<RT, REQ>
     /// </summary>
     /// <typeparam name="O">The type of the result produced by the function.</typeparam>
     /// <param name="f">
-    /// A function that takes two parameters of types <typeparamref name="RT"/> and <typeparamref name="REQ"/>, 
-    /// and produces a value of type <see cref="K{FinT{Eff{RT}}, O}"/>.
+    ///
     /// </param>
     /// <returns>
     /// A new <see cref="Flow{RT, REQ, O}"/> instance that represents the lifted function.
@@ -245,7 +240,7 @@ public partial class Flow<RT, REQ>
         Lift<O>((_, _) => m);
 
     /// <summary>
-    /// Lifts a computation of type <see cref="K{Eff{RT}, O}"/> into a <see cref="Flow{RT, REQ, O}"/>.
+    ///
     /// </summary>
     /// <typeparam name="O">The type of the output produced by the computation.</typeparam>
     /// <param name="m">The computation to be lifted.</param>
@@ -266,13 +261,13 @@ public partial class Flow<RT, REQ>
     /// Lifts a computation represented by a <see cref="K{TMonad, TResult}"/> into a <see cref="Flow{RT, REQ, O}"/>.
     /// </summary>
     /// <typeparam name="O">The type of the result produced by the computation.</typeparam>
-    /// <param name="m">The computation to be lifted, represented as a <see cref="K{FinT{IO}, O}"/>.</param>
+    /// <param name="m"></param>
     /// <returns>A <see cref="Flow{RT, REQ, O}"/> that encapsulates the lifted computation.</returns>
     public static Flow<RT, REQ, O> Lift<O>(K<FinT<IO>, O> m) =>
         Lift<O>((_, _) => m);
 
     /// <summary>
-    /// Lifts a computation of type <see cref="K{FinT{Eff}, O}"/> into a <see cref="Flow{RT, REQ, O}"/>.
+    ///
     /// </summary>
     /// <typeparam name="O">The type of the result produced by the computation.</typeparam>
     /// <param name="m">The computation to be lifted.</param>
@@ -281,7 +276,7 @@ public partial class Flow<RT, REQ>
         Lift<O>((_, _) => m);
 
     /// <summary>
-    /// Lifts a computation of type <see cref="K{FinT{Eff{RT}}, O}"/> into a <see cref="Flow{RT, REQ, O}"/>.
+    ///
     /// </summary>
     /// <typeparam name="O">The type of the result produced by the computation.</typeparam>
     /// <param name="m">The computation to be lifted.</param>
