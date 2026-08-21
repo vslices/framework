@@ -14,7 +14,7 @@ public static class TransformExt
         /// <param name="repr"></param>
         /// <returns></returns>
         public static Fin<SELF> Create(A repr) =>
-            SELF.Invariants.Onto(repr);
+            SELF.Create(repr);
 
         /// <summary>
         ///
@@ -22,7 +22,14 @@ public static class TransformExt
         /// <param name="repr"></param>
         /// <returns></returns>
         public static SELF New(A repr) =>
-            SELF.Create(repr).ThrowIfFail();
+            SELF.New(repr);
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="repr"></param>
+        /// <returns></returns>
+        public static Seq<SELF> New(Seq<A> repr) =>
+            SELF.New(repr);
     }
 }

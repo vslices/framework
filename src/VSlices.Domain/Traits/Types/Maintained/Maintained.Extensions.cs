@@ -14,14 +14,22 @@ public static class MaintainerExtensions
         /// <summary>
         ///
         /// </summary>
-        public static Option<A> FindM(Func<A, bool> fa) =>
-            findM(fa);
+        public static Option<A> Find(Func<A, bool> fa) =>
+            find(fa);
 
         /// <summary>
         ///
         /// </summary>
-        public static A Find(Func<A, bool> fa) =>
-            find(fa);
+        public static A First(Func<A, bool> fa) =>
+            first(fa);
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="fa"></param>
+        /// <returns></returns>
+        public static bool Exists(Func<A, bool> fa) =>
+            find(fa).IsSome;
     }
 
     extension<A>(A a)

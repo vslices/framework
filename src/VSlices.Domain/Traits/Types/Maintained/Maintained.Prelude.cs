@@ -13,18 +13,24 @@ public static partial class VSlicesDomainPrelude
     /// <summary>
     ///
     /// </summary>
-    public static Option<A> findM<A>(Func<A, bool> fa)
+    public static Option<A> find<A>(Func<A, bool> fa)
         where A : Maintained<A> =>
-        get<A>().Find(fa);
+        A.Find(fa);
 
     /// <summary>
     ///
     /// </summary>
-    public static A find<A>(Func<A, bool> fa)
+    public static A first<A>(Func<A, bool> fa)
         where A : Maintained<A> =>
-        findM(fa).Case switch
-        {
-            A a => a,
-            _ => throw new InvalidOperationException("Option was None")
-        };
+        A.First(fa);
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="A"></typeparam>
+    /// <param name="fa"></param>
+    /// <returns></returns>
+    public static bool exists<A>(Func<A, bool> fa)
+        where A : Maintained<A> =>
+        A.Exists(fa);
 }
