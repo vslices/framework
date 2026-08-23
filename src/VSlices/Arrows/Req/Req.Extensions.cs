@@ -5,7 +5,24 @@ namespace VSlices.Arrows;
 /// </summary>
 public static partial class ReqExtensions
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="IN"></typeparam>
+    /// <typeparam name="OUT"></typeparam>
+    /// <param name="ma"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public static Fin<OUT> RunFin<IN, OUT>(this Req<IN, OUT, IN, OUT> ma, IN input) =>
+        ma.RawRun(input, ReqState.New(input))
+            .Match(
+                Left: Fin.Fail<OUT>,
+                Right: r => r switch
+                {
+                    (_, { IsEmpty: false } e) => Fin.Fail<OUT>(e),
+                    var (v, _) => Fin.Succ(v)
+                });
+    
     extension<IN, OUT>(Req<IN, OUT, IN, OUT> ma)
     {
         /// <summary>
