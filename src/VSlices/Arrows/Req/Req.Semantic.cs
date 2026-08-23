@@ -166,6 +166,18 @@ public partial class Req<IN, OUT>
             previous.Bind<ReqState<O>>(p => p.IsValid ? p.Map(f) : p.Error));
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="I2"></typeparam>
+    /// <typeparam name="O2"></typeparam>
+    /// <param name="rules"></param>
+    /// <returns></returns>
+    public static Req<IN, OUT, I2, O2> Adapt<I2, O2>(
+        Req<I2, O2, I2, O2> rules) =>
+        new((_, previous) =>
+            previous.Bind(s => rules.RawRun(s.Value, previous)));
+    
+    /// <summary>
     ///
     /// </summary>
     /// <typeparam name="I"></typeparam>
@@ -174,11 +186,14 @@ public partial class Req<IN, OUT>
     /// <param name="rules"></param>
     /// <param name="To"></param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     public static Req<IN, OUT, I, I> Apply<I, I2, O2>(
         Req<I2, O2, I2, O2> rules,
         Func<I, I2> To) =>
-        throw new NotImplementedException();
+        Req<IN, OUT, I>.Identity
+            .Bind(i => Compose(
+                Lift(To),
+                Adapt(rules),
+                Lift<O2, I>(_ => i)));
 
     /// <summary>
     ///
@@ -193,7 +208,28 @@ public partial class Req<IN, OUT>
     public static Req<IN, OUT, I, I> ApplySeq<I, I2, O2>(
         Req<I2, O2, I2, O2> rules,
         Func<I, Seq<I2>> To) =>
-        throw new NotImplementedException();
+        Req<IN, OUT, I>.Identity
+            .Bind(i => To(i).Fold(
+                Req<IN, OUT, I>.Identity, 
+                (acc, item) => Compose(acc, Apply(rules, To: (I _) => item))));
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="I"></typeparam>
+    /// <typeparam name="I2"></typeparam>
+    /// <typeparam name="O2"></typeparam>
+    /// <param name="rules"></param>
+    /// <param name="To"></param>
+    /// <returns></returns>
+    // TODO: Mejorar para que use Option<T>
+    public static Req<IN, OUT, I, I> ApplyOpt<I, I2, O2>(
+        Req<I2, O2, I2, O2> rules,
+        Func<I, Option<I2>> To) =>
+        Req<IN, OUT, I>.Identity
+            .Bind(i => To(i).Fold(
+                Req<IN, OUT, I>.Identity,
+                (acc, item) => Compose(acc, Apply(rules, To: (I _) => item))));
 }
 
 /// <summary>
