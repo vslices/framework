@@ -3,14 +3,19 @@
 /// <summary>
 ///
 /// </summary>
-public readonly struct Length :
-    Magnitude<Length, double>,
-    Transform<Length, double>
+public readonly struct Length : Magnitude<Length, double>
 {
     readonly double Value;
 
     internal Length(double value) =>
         Value = value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="repr"></param>
+    /// <returns></returns>
+    public Length New(double repr) => new(repr);
 
     /// <summary>
     ///
@@ -175,15 +180,6 @@ public readonly struct Length :
     /// <returns></returns>
     public static double operator /(Length lhs, Length rhs) =>
         lhs.Value / rhs.Value;
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="lhs"></param>
-    /// <param name="rhs"></param>
-    /// <returns></returns>
-    public static Accel operator /(Length lhs, TimeSq rhs) =>
-        new Accel(lhs.Value / rhs.Seconds2);
 
     /// <summary>
     ///
@@ -370,19 +366,6 @@ public readonly struct Length :
     ///
     /// </summary>
     public double Angstroms => Value * 10000000000.0;
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr"></param>
-    /// <returns></returns>
-    public Length From(double repr) => new(repr);
-
-    /// <summary>
-    ///
-    /// </summary>
-    static Req<double, Length> Transform<Length, Length, double>.Invariants { get; } =
-        Req.Transform(Length (double v) => new Length(v));
 
     /// <summary>
     ///

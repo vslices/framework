@@ -1,6 +1,4 @@
-﻿using VSlices.Monads;
-
-namespace VSlices.Domain.ValueObjects;
+﻿namespace VSlices.Domain.ValueObjects;
 
 /// <summary>
 ///
@@ -8,9 +6,7 @@ namespace VSlices.Domain.ValueObjects;
 /// <remarks>
 ///
 /// </remarks>
-public readonly struct Accel :
-    Magnitude<Accel, double>,
-    Transform<Accel, double>
+public readonly struct Accel : Magnitude<Accel, double>
 {
     readonly double Value;
 
@@ -151,24 +147,6 @@ public readonly struct Accel :
     /// <returns></returns>
     public static Velocity operator *(Time lhs, Accel rhs) =>
         new(lhs.Seconds * rhs.Value);
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="lhs"></param>
-    /// <param name="rhs"></param>
-    /// <returns></returns>
-    public static Length operator *(Accel lhs, TimeSq rhs) =>
-        new(lhs.Value * rhs.Seconds2);
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="lhs"></param>
-    /// <param name="rhs"></param>
-    /// <returns></returns>
-    public static Length operator *(TimeSq lhs, Accel rhs) =>
-        new(rhs.Value * lhs.Seconds2);
 
     /// <summary>
     ///
@@ -318,9 +296,6 @@ public readonly struct Accel :
     /// <returns></returns>
     public static Accel operator -(Accel value) =>
         new(-value.Value);
-
-    static Req<double, Accel> Transform<Accel, Accel, double>.Invariants { get; } =
-        Req.Transform(Accel (double v) => new Accel(v));
 
     /// <summary>
     ///

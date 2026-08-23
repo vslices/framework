@@ -3,14 +3,19 @@
 /// <summary>
 ///
 /// </summary>
-public readonly struct Time :
-    Magnitude<Time, double>,
-    Transform<Time, double>
+public readonly struct Time : Magnitude<Time, double>
 {
     readonly double Value;
 
     internal Time(double value) =>
         Value = value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="repr"></param>
+    /// <returns></returns>
+    public Time New(double repr) => new(repr);
 
     /// <summary>
     ///
@@ -128,26 +133,6 @@ public readonly struct Time :
     /// <returns></returns>
     public static Time operator *(double lhs, Time rhs) =>
         rhs.Multiply(lhs);
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="lhs"></param>
-    /// <param name="rhs"></param>
-    /// <returns></returns>
-    public static TimeSq operator *(Time lhs, Time rhs) =>
-        new(lhs.Value * rhs.Value);
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="lhs"></param>
-    /// <param name="power"></param>
-    /// <returns></returns>
-    public static TimeSq operator ^(Time lhs, int power) =>
-        power == 2
-            ? new TimeSq(lhs.Value * lhs.Value)
-            : raise<TimeSq>(new NotSupportedException("Time can only be raised to the power of 2"));
 
     /// <summary>
     ///
@@ -355,19 +340,6 @@ public readonly struct Time :
     /// <returns></returns>
     public static Time operator -(Time value) =>
         new(-value.Value);
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr"></param>
-    /// <returns></returns>
-    public Time From(double repr) => new(repr);
-
-    /// <summary>
-    ///
-    /// </summary>
-    static Req<double, Time> Transform<Time, Time, double>.Invariants { get; } =
-        Req.Transform(Time (double v) => new Time(v));
 
     /// <summary>
     ///

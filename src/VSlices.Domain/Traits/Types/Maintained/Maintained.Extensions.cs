@@ -1,5 +1,4 @@
-﻿using System;
-using VSlices.Domain.Traits;
+﻿using LanguageExt;
 
 namespace VSlices;
 

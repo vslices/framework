@@ -6,8 +6,7 @@
 /// <remarks>
 ///
 /// </remarks>
-public interface Currency :
-    DomainType<Currency, string>
+public interface Currency : DomainType<Currency, string>
 {
     /// <summary>
     ///

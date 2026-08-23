@@ -1,4 +1,6 @@
-﻿namespace VSlices;
+﻿using VSlices.Domain.ValueObjects;
+
+namespace VSlices;
 
 public partial class VSlicesDomainPrelude
 {

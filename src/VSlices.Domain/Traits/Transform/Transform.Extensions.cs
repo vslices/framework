@@ -1,3 +1,5 @@
+using LanguageExt;
+
 namespace VSlices;
 
 /// <summary>

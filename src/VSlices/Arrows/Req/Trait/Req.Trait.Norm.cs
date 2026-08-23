@@ -1,6 +1,7 @@
 using VSlices.Traits;
+// ReSharper disable InconsistentNaming
 
-namespace VSlices.Monads;
+namespace VSlices.Arrows;
 
 public partial class Req
 {

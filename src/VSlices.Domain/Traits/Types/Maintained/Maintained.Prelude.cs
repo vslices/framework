@@ -1,4 +1,6 @@
 ﻿
+using LanguageExt;
+
 namespace VSlices;
 
 public static partial class VSlicesDomainPrelude

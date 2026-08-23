@@ -3,14 +3,19 @@ namespace VSlices.Domain.ValueObjects;
 /// <summary>
 ///
 /// </summary>
-public readonly struct Mass :
-    Magnitude<Mass, double>,
-    Transform<Mass, double>
+public readonly struct Mass : Magnitude<Mass, double>
 {
     readonly double Value;
 
     internal Mass(double value) =>
         Value = value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="repr"></param>
+    /// <returns></returns>
+    public Mass New(double repr) => new(repr);
 
     /// <summary>
     ///
@@ -301,19 +306,6 @@ public readonly struct Mass :
     /// <returns></returns>
     public static Mass operator -(Mass value) =>
         new(-value.Value);
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr"></param>
-    /// <returns></returns>
-    public Mass From(double repr) => new(repr);
-
-    /// <summary>
-    ///
-    /// </summary>
-    static Req<double, Mass> Transform<Mass, Mass, double>.Invariants { get; } =
-        Req.Transform(Mass (double v) => new Mass(v));
 
     /// <summary>
     ///

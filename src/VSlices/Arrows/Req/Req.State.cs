@@ -1,4 +1,4 @@
-namespace VSlices.Monads;
+namespace VSlices.Arrows;
 
 /// <summary>
 /// 

@@ -8,14 +8,20 @@ namespace VSlices.Domain.ValueObjects;
 /// <remarks>
 ///
 /// </remarks>
-public readonly struct Area :
-    Magnitude<Area, double>,
-    Transform<Area, double>
+public readonly struct Area : Magnitude<Area, double>
 {
     readonly double Value;
 
     internal Area(double value) =>
         Value = value;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static Area New(double value) =>
+        new(value);
 
     /// <summary>
     ///
@@ -277,16 +283,6 @@ public readonly struct Area :
     /// <returns></returns>
     public Area Max(Area rhs) =>
         new Area(Math.Max(Value, rhs.Value));
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr"></param>
-    /// <returns></returns>
-    public Area From(double repr) => new(repr);
-
-    static Req<double, Area> Transform<Area, Area, double>.Invariants { get; } =
-        Req.Transform(Area (double v) => new Area(v));
 
     /// <summary>
     ///

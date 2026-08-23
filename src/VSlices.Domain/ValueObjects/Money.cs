@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using LanguageExt;
 
 namespace VSlices.Domain.ValueObjects;
 
@@ -9,9 +10,7 @@ namespace VSlices.Domain.ValueObjects;
 /// <remarks>
 ///
 /// </remarks>
-public readonly struct Money<C> :
-    Magnitude<Money<C>, decimal, decimal>,
-    Transform<Money<C>, decimal>
+public readonly struct Money<C> : Magnitude<Money<C>, decimal, decimal>
     where C : Currency, new()
 {
     private readonly decimal _value;
@@ -36,12 +35,6 @@ public readonly struct Money<C> :
     /// </summary>
     public decimal To() =>
         _value;
-
-    /// <summary>
-    ///
-    /// </summary>
-    static Req<decimal, Money<C>> Transform<Money<C>, Money<C>, decimal>.Invariants { get; } =
-        Req.Transform(Money<C> (decimal v) => new Money<C>(v));
 
     /// <summary>
     ///

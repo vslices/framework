@@ -3,7 +3,7 @@ using LanguageExt;
 using LanguageExt.Traits;
 using LanguageExt.Common;
 
-namespace VSlices.Monads;
+namespace VSlices.Arrows;
 
 public partial class Req<IN, OUT> :
     ArrowApply<Req<IN, OUT>>

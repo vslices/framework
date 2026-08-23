@@ -10,4 +10,18 @@
 		<PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-77" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Using Include="LanguageExt" />
+		<Using Include="LanguageExt.Common" />
+		<Using Include="LanguageExt.Traits" />
+		<Using Include="LanguageExt.Effects" />
+		<Using Include="LanguageExt.Pretty" />
+		<Using Include="LanguageExt.Traits.Domain" />
+		
+		<Using Include="LanguageExt.Prelude" Static="true" />
+		
+		<Using Include="VSlices.VSlicesPrelude" Static="true" />
+		
+	</ItemGroup>
+
 </Project>

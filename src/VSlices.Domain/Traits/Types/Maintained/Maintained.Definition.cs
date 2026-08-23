@@ -1,4 +1,6 @@
-﻿namespace VSlices.Domain.Traits;
+﻿using LanguageExt;
+
+namespace VSlices.Domain.Traits;
 
 /// <summary>
 ///

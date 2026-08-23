@@ -1,4 +1,6 @@
-﻿namespace VSlices.Domain.ValueObjects;
+﻿using LanguageExt;
+
+namespace VSlices.Domain.ValueObjects;
 
 /// <summary>
 ///

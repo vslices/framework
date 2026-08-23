@@ -3,14 +3,19 @@
 /// <summary>
 ///
 /// </summary>
-public readonly struct Velocity :
-    Magnitude<Velocity, double>,
-    Transform<Velocity, double>
+public readonly struct Velocity : Magnitude<Velocity, double>
 {
     readonly double Value;
 
     internal Velocity(double value) =>
         Value = value;
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="repr"></param>
+    /// <returns></returns>
+    public Velocity New(double repr) => new(repr);
 
     /// <summary>
     ///
@@ -322,19 +327,6 @@ public readonly struct Velocity :
     /// <returns></returns>
     public static Velocity operator -(Velocity value) =>
         new(-value.Value);
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr"></param>
-    /// <returns></returns>
-    public Velocity From(double repr) => new(repr);
-
-    /// <summary>
-    ///
-    /// </summary>
-    static Req<double, Velocity> Transform<Velocity, Velocity, double>.Invariants { get; } =
-        Req.Transform(Velocity (double v) => new Velocity(v));
 
     /// <summary>
     ///

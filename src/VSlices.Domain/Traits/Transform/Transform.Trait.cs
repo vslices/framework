@@ -1,4 +1,5 @@
 ﻿using VSlices.Monads;
+using LanguageExt;
 
 namespace VSlices.Domain.Traits;
 

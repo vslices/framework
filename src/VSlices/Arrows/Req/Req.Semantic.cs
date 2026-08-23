@@ -4,7 +4,7 @@ using LanguageExt.Traits;
 using VSlices.Traits;
 using static LanguageExt.Prelude;
 
-namespace VSlices.Monads;
+namespace VSlices.Arrows;
 
 /// <summary>
 /// 

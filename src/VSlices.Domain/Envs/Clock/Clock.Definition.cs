@@ -1,4 +1,6 @@
-﻿namespace VSlices.Domain.Envs;
+﻿using LanguageExt;
+
+namespace VSlices.Domain.Envs;
 
 /// <summary>
 /// Represents an interface for clock-related operations, providing functionality
@@ -7,7 +9,7 @@
 public interface ClockIO
 {
     /// <summary>
-    /// Gets an <see cref="IO{T}"/> instance that represents the current date and time.
+    /// Gets an <see cref="IO"/> instance that represents the current date and time.
     /// </summary>
     /// <remarks>
     /// The returned value is typically used to retrieve the current time in a functional programming context.
