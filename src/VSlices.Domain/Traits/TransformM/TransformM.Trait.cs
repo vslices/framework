@@ -23,7 +23,6 @@ namespace VSlices.Domain.Traits;
 public interface TransformM<SELF, M, OUT, IN> : DomainType<SELF>
     where SELF : TransformM<SELF, M, OUT, IN>
     where M : Monad<M>
-    where OUT : DomainType<OUT>
 {
     /// <summary>
     ///
