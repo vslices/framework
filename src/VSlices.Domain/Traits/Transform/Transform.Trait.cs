@@ -50,7 +50,7 @@ public interface Transform<SELF, OUT, IN> : DomainType<SELF>
     /// <returns>
     ///
     /// </returns>
-    public static virtual OUT New(IN repr) =>
+    public static virtual OUT Instanciate(IN repr) =>
         SELF.Create(repr).ThrowIfFail();
 
     /// <summary>
@@ -59,7 +59,7 @@ public interface Transform<SELF, OUT, IN> : DomainType<SELF>
     /// <param name="repr"></param>
     /// <returns></returns>
     public static virtual Seq<OUT> New(Seq<IN> repr) =>
-        repr.Map(SELF.New);
+        repr.Map(SELF.Instanciate);
 }
 
 /// <summary>
