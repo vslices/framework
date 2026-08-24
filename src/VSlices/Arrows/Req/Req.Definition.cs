@@ -111,6 +111,15 @@ public sealed record Req<IN, OUT, I, O>(Func<IN, Either<Error, ReqState<I>>, Eit
         K<Req<IN, OUT>, O4, O5> m5,
         K<Req<IN, OUT>, O5, FinO> m6) =>
         Req<IN, OUT, I>.Compose(this, m2, m3, m4, m5, m6);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="M"></typeparam>
+    /// <returns></returns>
+    public ReqK<M, IN, OUT, I, O> ToK<M>()
+        where M : Monad<M> =>
+        ReqK<M, IN, OUT>.Lift(this);
 
     /// <summary>
     /// 

@@ -160,6 +160,17 @@ public partial class ReqK<M, IN, OUT>
     /// </summary>
     /// <typeparam name="I"></typeparam>
     /// <typeparam name="O"></typeparam>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    public static ReqK<M, IN, OUT, I, O> Lift<I, O>(
+        Req<IN, OUT, I, O> req) =>
+        ReqK<M, IN, OUT, I>.Lift(req);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="I"></typeparam>
+    /// <typeparam name="O"></typeparam>
     /// <param name="f"></param>
     /// <returns></returns>
     public static ReqK<M, IN, OUT, I, O> Transform<I, O>(Func<I, O> f) =>
@@ -313,7 +324,7 @@ public partial class ReqK<M, IN, OUT, I>
     /// <typeparam name="O"></typeparam>
     /// <param name="req"></param>
     /// <returns></returns>
-    public static ReqK<M, IN, OUT, I, O> Lift<I, O>(
+    public static ReqK<M, IN, OUT, I, O> Lift<O>(
         Req<IN, OUT, I, O> req) =>
         new((input, previous) => req.RawRun(input, previous));
 
