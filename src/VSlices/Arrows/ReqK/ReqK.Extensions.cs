@@ -19,7 +19,10 @@ public static partial class ReqKExtensions
     /// <returns></returns>
     public static FinT<M, OUT> RunFinT<M, IN, OUT>(this ReqK<M, IN, OUT, IN, OUT> ma, IN input)
         where M : Monad<M> =>
-        throw new NotImplementedException();
+        FinT.lift(ma.RawRun(input).Run()
+                    .Map(either => either.Match(
+                        Left: Fin.Fail<OUT>,
+                        Right: s => s.IsValid ? Fin.Succ(s.Value) : Fin.Fail<OUT>(s.Error))));
 
     extension<M, IN, OUT>(ReqK<M, IN, OUT, IN, OUT> ma)
         where M : Monad<M>
