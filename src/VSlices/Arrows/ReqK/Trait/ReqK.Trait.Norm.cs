@@ -135,6 +135,16 @@ public partial class ReqK<M, IN, OUT>
     /// <summary>
     /// 
     /// </summary>
+    /// <typeparam name="I"></typeparam>
+    /// <typeparam name="O"></typeparam>
+    /// <param name="f"></param>
+    /// <returns></returns>
+    public static ReqK<M, IN, OUT, I, O> LiftK<I, O>(Func<I, K<M, O>> f) =>
+        ReqK<M, IN, OUT, I>.LiftK(f);
+    
+    /// <summary>
+    /// 
+    /// </summary>
     /// <typeparam name="I1"></typeparam>
     /// <typeparam name="I2"></typeparam>
     /// <typeparam name="O"></typeparam>
@@ -267,6 +277,15 @@ public partial class ReqK<M, IN, OUT, I>
     public static ReqK<M, IN, OUT, I, O> Lift<O>(Func<I, O> f) =>
         Arrow.Lift<ReqK<M, IN, OUT>, I, O>(f).AsBi();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="O"></typeparam>
+    /// <param name="f"></param>
+    /// <returns></returns>
+    public static ReqK<M, IN, OUT, I, O> LiftK<O>(Func<I, K<M, O>> f) =>
+        Kleisli.LiftK<ReqK<M, IN, OUT>, M, I, O>(f).AsBi();
+    
     /// <summary>
     /// 
     /// </summary>

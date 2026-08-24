@@ -1,5 +1,14 @@
 ﻿namespace VSlices.Arrows;
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="M"></typeparam>
+/// <typeparam name="IN"></typeparam>
+/// <typeparam name="OUT"></typeparam>
+/// <typeparam name="I"></typeparam>
+/// <typeparam name="O"></typeparam>
+/// <param name="RawRunF"></param>
 public sealed record ReqK<M, IN, OUT, I, O>(
     Func<IN, Either<Error, ReqState<I>>, EitherT<Error, M, ReqState<O>>> RawRunF) :
     K<ReqK<M, IN, OUT>, I, O>,
@@ -8,6 +17,13 @@ public sealed record ReqK<M, IN, OUT, I, O>(
 {
     private Func<IN, Either<Error, ReqState<I>>, EitherT<Error, M, ReqState<O>>> RawRunF { get; } = RawRunF;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="previous"></param>
+    /// <returns></returns>
+    
     public EitherT<Error, M, ReqState<O>> RawRun(IN input, Either<Error, ReqState<I>> previous) =>
         RawRunF(input, previous);
 
