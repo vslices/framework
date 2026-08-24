@@ -1,26 +1,6 @@
 namespace VSlices.Arrows;
 
 /// <summary>
-///
-/// </summary>
-/// <typeparam name="IN">
-///
-/// </typeparam>
-/// <typeparam name="A">
-///
-/// </typeparam>
-/// <param name="input">
-///
-/// </param>
-/// <param name="error">
-///
-/// </param>
-/// <returns>
-///
-/// </returns>
-public delegate (A Value, Error Error) ReqExecute<IN, A>(IN input, Error error);
-
-/// <summary>
 /// 
 /// </summary>
 /// <typeparam name="IN"></typeparam>

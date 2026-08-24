@@ -20,7 +20,6 @@ namespace VSlices.Domain.Traits;
 /// </remarks>
 public interface Transform<SELF, OUT, IN> : DomainType<SELF>
     where SELF : Transform<SELF, OUT, IN>
-    where OUT : DomainType<OUT>
 {
     /// <summary>
     ///
