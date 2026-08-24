@@ -59,23 +59,40 @@ public partial class ReqK<M, IN, OUT, I> :
     where M : Monad<M>
 {
     static K<ReqK<M, IN, OUT, I>, A> Readable<ReqK<M, IN, OUT, I>, IN>.Asks<A>(Func<IN, A> f) =>
-        throw new NotImplementedException();
+        new ReqK<M, IN, OUT, I, A>(
+            (input, previous) =>
+                previous.Map(state =>
+                    state.Map(_ => f(input))));
 
-        
     static K<ReqK<M, IN, OUT, I>, A> Readable<ReqK<M, IN, OUT, I>, IN>.Local<A>(
-        Func<IN, IN> f, K<ReqK<M, IN, OUT, I>, A> ma) =>
-        throw new NotImplementedException();
+        Func<IN, IN> f, 
+        K<ReqK<M, IN, OUT, I>, A> ma) =>
+        new ReqK<M, IN, OUT, I, A>(
+            (input, previous) => ma.RawRun(f(input), previous));
 
     static K<ReqK<M, IN, OUT, I>, Unit> Writable<ReqK<M, IN, OUT, I>, Error>.Tell(
         Error item) =>
-        throw new NotImplementedException();
+        new ReqK<M, IN, OUT, I, Unit>(
+            (_, previous) => previous
+                .Map(state => state.Map(_ => unit).MapError(error => error + item)));
 
     static K<ReqK<M, IN, OUT, I>, (A Value, Error Output)> Writable<ReqK<M, IN, OUT, I>, Error>.Listen<A>(
         K<ReqK<M, IN, OUT, I>, A> ma) =>
-        
-        throw new NotImplementedException();
+        new ReqK<M, IN, OUT, I, (A Value, Error Output)>(
+            (input, previous) => ma.RawRun(input, previous)
+                .Map(state => state.Map(value => (value, state.Error))));
 
     static K<ReqK<M, IN, OUT, I>, A> Writable<ReqK<M, IN, OUT, I>, Error>.Pass<A>(
         K<ReqK<M, IN, OUT, I>, (A Value, Func<Error, Error> Function)> action) =>
-        throw new NotImplementedException();
+        new ReqK<M, IN, OUT, I, A>(
+            (input, previous) =>
+                action.RawRun(input, previous)
+                      .Map(state =>
+                      {
+                          var (value, function) = state.Value;
+
+                          return ReqState.New(
+                              value,
+                              function(state.Error));
+                      }));
 }
