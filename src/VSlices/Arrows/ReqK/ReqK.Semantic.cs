@@ -196,6 +196,24 @@ public partial class ReqK<M, IN, OUT>
                 Lift<O2, I>(_ => i)));
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="I"></typeparam>
+    /// <typeparam name="I2"></typeparam>
+    /// <typeparam name="O2"></typeparam>
+    /// <param name="rules"></param>
+    /// <param name="To"></param>
+    /// <returns></returns>
+    public static ReqK<M, IN, OUT, I, I> Apply<I, I2, O2>(
+        ReqK<M, IN, OUT, I2, O2> rules,
+        Func<I, I2> To) =>
+        ReqK<M, IN, OUT, I>.Identity
+            .Bind(i => Compose(
+                Lift(To),
+                rules,
+                Lift<O2, I>(_ => i)));
+
+    /// <summary>
     ///
     /// </summary>
     /// <typeparam name="I"></typeparam>

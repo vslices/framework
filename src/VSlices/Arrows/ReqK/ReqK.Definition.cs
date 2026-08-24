@@ -119,6 +119,19 @@ public sealed record ReqK<M, IN, OUT, I, O>(
     /// <summary>
     /// 
     /// </summary>
+    /// <typeparam name="I2"></typeparam>
+    /// <typeparam name="O2"></typeparam>
+    /// <param name="rules"></param>
+    /// <param name="To"></param>
+    /// <returns></returns>
+    public ReqK<M, IN, OUT, I, O> Apply<I2, O2>(
+        ReqK<M, IN, OUT, I2, O2> rules,
+        Func<O, I2> To) =>
+        Compose(ReqK<M, IN, OUT>.Apply(rules, To));
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="mf"></param>
     public static implicit operator ReqK<M, IN, OUT, I, O>(Pure<O> mf) =>
         ReqK<M, IN, OUT, I>.Accept(mf.Value);
