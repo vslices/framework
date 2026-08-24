@@ -175,8 +175,7 @@ public partial class ReqK<M, IN, OUT>
     /// <returns></returns>
     public static ReqK<M, IN, OUT, I2, O2> Adapt<I2, O2>(
         Req<I2, O2, I2, O2> rules) =>
-        new((_, previous) =>
-            previous.Bind(s => rules.RawRun(s.Value, previous)));
+        new((_, previous) => previous.Bind(s => rules.RawRun(s.Value, previous)));
 
     /// <summary>
     ///
@@ -288,6 +287,28 @@ public partial class ReqK<M, IN, OUT, I>
     /// <returns></returns>
     public static ReqK<M, IN, OUT, I, Unit> Prescribe(Func<I, Error> f) =>
         Lift(f).Bind(ReqK<M, IN, OUT, Error>.Write);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="I"></typeparam>
+    /// <typeparam name="O"></typeparam>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    public static ReqK<M, IN, OUT, I, O> Lift<I, O>(
+        Req<IN, OUT, I, O> req) =>
+        new((input, previous) => req.RawRun(input, previous));
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="I"></typeparam>
+    /// <typeparam name="O"></typeparam>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    public static ReqK<M, IN, OUT, I, O> Lift<I, O>(
+        K<Req<IN, OUT>, I, O> req) =>
+        new((input, previous) => req.RawRunBi(input, previous));
 
     /// <summary>
     /// 

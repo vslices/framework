@@ -276,6 +276,7 @@ public partial class ReqK<M, IN, OUT, I>
     /// <returns></returns>
     public static ReqK<M, IN, OUT, I, O> Lift<O>(Func<I, O> f) =>
         Arrow.Lift<ReqK<M, IN, OUT>, I, O>(f).AsBi();
+    
 
     /// <summary>
     /// 
