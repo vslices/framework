@@ -33,7 +33,7 @@ public static partial class ReqKExtensions
     /// <param name="req"></param>
     /// <param name="input"></param>
     /// <returns></returns>
-    public static Eff<RT, OUT> CollapseIntoEff<RT, IN, OUT>(
+    public static Eff<RT, OUT> ToEff<RT, IN, OUT>(
         this ReqK<Eff<RT>, IN, OUT, IN, OUT> req,
         IN input) =>
         +req.RunFinT(input).Run()
