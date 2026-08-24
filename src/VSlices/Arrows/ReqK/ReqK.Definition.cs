@@ -129,18 +129,6 @@ public sealed record ReqK<M, IN, OUT, I, O>(
         Func<O, I2> To) =>
         Compose(ReqK<M, IN, OUT>.Apply(rules, To));
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="I2"></typeparam>
-    /// <typeparam name="O2"></typeparam>
-    /// <param name="rules"></param>
-    /// <param name="To"></param>
-    /// <returns></returns>
-    public ReqK<M, IN, OUT, I, O> Apply<I2, O2>(
-        Func<ReqK<M, IN, OUT, I2, O2>> rules,
-        Func<O, I2> To) =>
-        Apply(rules(), To);
 
     /// <summary>
     /// 

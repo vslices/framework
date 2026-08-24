@@ -24,6 +24,21 @@ public static partial class ReqKExtensions
                         Left: Fin.Fail<OUT>,
                         Right: s => s.IsValid ? Fin.Succ(s.Value) : Fin.Fail<OUT>(s.Error))));
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="RT"></typeparam>
+    /// <typeparam name="IN"></typeparam>
+    /// <typeparam name="OUT"></typeparam>
+    /// <param name="req"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
+    public static Eff<RT, OUT> CollapseIntoEff<RT, IN, OUT>(
+        this ReqK<Eff<RT>, IN, OUT, IN, OUT> req,
+        IN input) =>
+        +req.RunFinT(input).Run()
+            .Bind(m => m.Match(Succ: Eff<RT, OUT>.Pure, Fail: Eff<RT, OUT>.Fail));
+
     extension<M, IN, OUT>(ReqK<M, IN, OUT, IN, OUT> ma)
         where M : Monad<M>
     {
