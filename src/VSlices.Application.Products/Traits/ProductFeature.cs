@@ -14,7 +14,7 @@ public interface ProductFeature<F, REQ, RES> : Feature<F, REQ, RES>
     /// <summary>
     /// 
     /// </summary>
-    static abstract AppRole ExecutableBy { get; }
+    static abstract ProductRole ExecutableBy { get; }
 }
 
 /// <summary>

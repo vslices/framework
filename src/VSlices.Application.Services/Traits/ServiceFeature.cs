@@ -15,7 +15,7 @@ public interface ServiceFeature<F, REQ, RES> : Feature<F, REQ, RES>
     /// <summary>
     /// 
     /// </summary>
-    static abstract AppClaim ExecutableBy { get; }
+    static abstract ServiceClaim ExecutableBy { get; }
 }
 
 /// <summary>
