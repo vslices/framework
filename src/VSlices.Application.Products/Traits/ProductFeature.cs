@@ -2,25 +2,11 @@
 
 namespace VSlices.Application;
 
-/// <summary>
-/// 
-/// </summary>
-/// <typeparam name="F"></typeparam>
-/// <typeparam name="REQ"></typeparam>
-/// <typeparam name="RES"></typeparam>
-public interface ProductFeature<F, REQ, RES> : Feature<F, REQ, RES>
-    where F : ProductFeature<F, REQ, RES>
+public interface ProductFeature<F, RT, REQ, RES> : Feature<F, RT, REQ, RES>
+    where F : ProductFeature<F, RT, REQ, RES>
 {
-    /// <summary>
-    /// 
-    /// </summary>
     static abstract ProductRole ExecutableBy { get; }
 }
 
-/// <summary>
-/// 
-/// </summary>
-/// <typeparam name="F"></typeparam>
-/// <typeparam name="REQ"></typeparam>
-public interface ProductFeature<F, REQ> : ProductFeature<F, REQ, Unit>
-    where F : ProductFeature<F, REQ>;
+public interface ProductFeature<F, RT, REQ> : ProductFeature<F, RT, REQ, Unit>
+    where F : ProductFeature<F, RT, REQ>;
