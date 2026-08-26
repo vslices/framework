@@ -24,7 +24,7 @@ public static class TransformExt
         /// <param name="repr"></param>
         /// <returns></returns>
         public static SELF New(A repr) =>
-            SELF.Instanciate(repr);
+            SELF.New(repr);
 
         /// <summary>
         ///
