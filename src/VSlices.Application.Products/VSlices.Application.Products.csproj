@@ -1,7 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
 	<ItemGroup>
-		<ProjectReference Include="..\VSlices.Domain\VSlices.Domain.csproj" />
+		<ProjectReference Include="..\VSlices.Application\VSlices.Application.csproj" />
+		<ProjectReference Include="..\VSlices.Domain.Products\VSlices.Domain.Products.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

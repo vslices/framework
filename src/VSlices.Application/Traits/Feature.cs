@@ -2,6 +2,7 @@
 
 namespace VSlices.Application;
 
+
 /// <summary>
 /// Represents a feature that defines a contract for implementing a specific functionality
 /// with a runtime environment, request, and response types.
@@ -27,6 +28,7 @@ public interface Feature<F, RT, REQ, RES>
     /// It is intended to be implemented by concrete feature classes to specify their name.
     /// </remarks>
     static abstract string Name { get; }
+    
 
     /// <summary>
     /// Retrieves the flow definition for the feature.
