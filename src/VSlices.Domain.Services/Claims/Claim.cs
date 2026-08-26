@@ -2,7 +2,7 @@ using VSlices.Domain.Traits;
 
 namespace VSlices.Services;
 
-public abstract class vClaim : DomainType<vClaim, vClaim.Repr>
+public abstract class AppClaim : DomainType<AppClaim, AppClaim.Repr>
 {
     public readonly record struct Repr(string Service, string Capability);
 
@@ -17,7 +17,7 @@ public abstract class vClaim : DomainType<vClaim, vClaim.Repr>
         $"{Service}.{Capability}";
 
     public override bool Equals(object? obj) =>
-        obj is vClaim other &&
+        obj is AppClaim other &&
         Service.Equals(other.Service, StringComparison.Ordinal) &&
         Capability.Equals(other.Capability, StringComparison.Ordinal);
 
