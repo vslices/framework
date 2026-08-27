@@ -27,7 +27,7 @@ public interface TransformM<SELF, M, OUT, IN> : DomainType<SELF>
     /// <summary>
     ///
     /// </summary>
-    public static abstract ReqK<M, IN, OUT, IN, OUT> Invariants { get; }
+    public static abstract ReqK<M, IN, OUT>.Completed Invariants { get; }
 
     /// <summary>
     ///
