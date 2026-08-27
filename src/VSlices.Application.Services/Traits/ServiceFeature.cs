@@ -21,3 +21,10 @@ public interface ServiceFeature<F, RT, REQ, RES> : Feature<F, RT, REQ, RES>
             F.UniqueName,
             F.Description);
 }
+
+/// <summary>
+/// Represents a completion-only service feature.
+/// </summary>
+public interface ServiceFeature<F, RT, REQ> :
+    ServiceFeature<F, RT, REQ, Unit>
+    where F : ServiceFeature<F, RT, REQ>;
