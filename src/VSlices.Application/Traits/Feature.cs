@@ -19,26 +19,58 @@ namespace VSlices.Application;
 public interface Feature<F, RT, REQ, RES>
     where F : Feature<F, RT, REQ, RES>
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     static abstract Flow<RT, REQ, RES> Get();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="runtime"></param>
+    /// <param name="envIO"></param>
+    /// <returns></returns>
     static virtual Fin<RES> Run(
         REQ input,
         RT runtime,
         EnvIO envIO) =>
         F.Get().Run(runtime, input, envIO);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="runtime"></param>
+    /// <param name="envIO"></param>
+    /// <returns></returns>
     static virtual RES RunUnsafe(
         REQ input,
         RT runtime,
         EnvIO envIO) =>
         F.Get().RunUnsafe(runtime, input, envIO);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="runtime"></param>
+    /// <param name="envIO"></param>
+    /// <returns></returns>
     static virtual Task<Fin<RES>> RunAsync(
         REQ input,
         RT runtime,
         EnvIO envIO) =>
         F.Get().RunAsync(runtime, input, envIO);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="runtime"></param>
+    /// <param name="envIO"></param>
+    /// <returns></returns>
     static virtual Task<RES> RunUnsafeAsync(
         REQ input,
         RT runtime,
