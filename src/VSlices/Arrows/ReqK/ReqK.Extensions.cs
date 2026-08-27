@@ -40,7 +40,12 @@ public static partial class ReqKExtensions
             .Bind(m => m.Match(Succ: Eff<RT, OUT>.Pure, Fail: Eff<RT, OUT>.Fail));
 
     public static Eff<RT, OUT> RunEff<RT, IN, OUT>(
-        this ReqK<Eff<RT>, IN, OUT>.Completed req,
+        this ReqK<Eff<RT>, IN, OUT>.Full req,
+        IN input) =>
+        req.Value.RunEff(input);
+
+    public static Eff<RT, IN> RunEff<RT, IN>(
+        this ReqK<Eff<RT>, IN>.Full req,
         IN input) =>
         req.Value.RunEff(input);
 
