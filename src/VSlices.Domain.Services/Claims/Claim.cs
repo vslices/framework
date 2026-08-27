@@ -1,28 +1,72 @@
+using System.Collections.Concurrent;
 using VSlices.Domain.Traits;
 
 namespace VSlices.Services;
 
-public abstract class ServiceClaim : DomainType<ServiceClaim, ServiceClaim.Repr>
+public sealed class ServiceClaim : DomainType<ServiceClaim, ServiceClaim.Repr>
 {
-    public readonly record struct Repr(string Service, string Capability);
+    private sealed record Registration(
+        ServiceClaim Claim,
+        Type Owner);
 
-    public abstract string Service { get; }
+    private static readonly ConcurrentDictionary<string, Registration> Registry =
+        new(StringComparer.Ordinal);
 
-    public abstract string Capability { get; }
+    public readonly record struct Repr(
+        string UniqueName,
+        string Description);
+
+    private ServiceClaim(
+        string uniqueName,
+        string description) =>
+        (UniqueName, Description) =
+        (uniqueName, description);
+
+    public string UniqueName { get; }
+
+    public string Description { get; }
+
+    public static ServiceClaim New<OWNER>(
+        string uniqueName,
+        string description)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(uniqueName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+
+        var owner = typeof(OWNER);
+        var candidate = new Registration(
+            new ServiceClaim(uniqueName, description),
+            owner);
+
+        var registered = Registry.GetOrAdd(
+            uniqueName,
+            candidate);
+
+        if (registered.Owner != owner)
+        {
+            throw new NotSupportedException(
+                $"ServiceClaim '{uniqueName}' is already registered by " +
+                $"'{registered.Owner.FullName}' and cannot also be registered by " +
+                $"'{owner.FullName}'.");
+        }
+
+        return registered.Claim;
+    }
 
     public Repr To() =>
-        new(Service, Capability);
+        new(
+            UniqueName,
+            Description);
 
     public override string ToString() =>
-        $"{Service}.{Capability}";
+        UniqueName;
 
     public override bool Equals(object? obj) =>
         obj is ServiceClaim other &&
-        Service.Equals(other.Service, StringComparison.Ordinal) &&
-        Capability.Equals(other.Capability, StringComparison.Ordinal);
+        UniqueName.Equals(
+            other.UniqueName,
+            StringComparison.Ordinal);
 
     public override int GetHashCode() =>
-        HashCode.Combine(
-            StringComparer.Ordinal.GetHashCode(Service),
-            StringComparer.Ordinal.GetHashCode(Capability));
+        StringComparer.Ordinal.GetHashCode(UniqueName);
 }
