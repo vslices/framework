@@ -76,6 +76,15 @@ namespace VSlices
                 ma.As().Bind(mf);
 
             /// <summary>
+            /// 
+            /// </summary>
+            /// <typeparam name="O"></typeparam>
+            /// <param name="mf"></param>
+            /// <returns></returns>
+            public Flow<C, R, O> Bind<O>(Func<I, K<Flow<C, R>, O>> mf) =>
+                ma.As().Bind(mf);
+
+            /// <summary>
             ///
             /// </summary>
             /// <typeparam name="O"></typeparam>
@@ -130,12 +139,30 @@ namespace VSlices
                 ma.Bind(i => Flow<C, R>.Lift(mf(i)));
 
             /// <summary>
+            /// 
+            /// </summary>
+            /// <typeparam name="O"></typeparam>
+            /// <param name="mf"></param>
+            /// <returns></returns>
+            public Flow<C, R, O> Bind<O>(Func<I, K<Eff, O>> mf) =>
+                ma.Bind(i => Flow<C, R>.Lift(mf(i)));
+
+            /// <summary>
             ///
             /// </summary>
             /// <typeparam name="O"></typeparam>
             /// <param name="mf"></param>
             /// <returns></returns>
             public Flow<C, R, O> Bind<O>(Func<I, Eff<C, O>> mf) =>
+                ma.Bind(i => Flow<C, R>.Lift(mf(i)));
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <typeparam name="O"></typeparam>
+            /// <param name="mf"></param>
+            /// <returns></returns>
+            public Flow<C, R, O> Bind<O>(Func<I, K<Eff<C>, O>> mf) =>
                 ma.Bind(i => Flow<C, R>.Lift(mf(i)));
 
             /// <summary>

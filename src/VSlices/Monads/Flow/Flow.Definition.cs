@@ -50,5 +50,5 @@ public sealed partial class Flow<RT, REQ, RES>(
     /// <returns>The converted flow instance.</returns>
     public static implicit operator Flow<RT, REQ, RES>(Fail<Error> a) =>
         Flow<RT, REQ>.Fail<RES>(a);
-
+    
 }
