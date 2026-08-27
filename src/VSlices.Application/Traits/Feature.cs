@@ -7,13 +7,18 @@ namespace VSlices.Application;
 /// </summary>
 /// <typeparam name="F">The concrete feature type.</typeparam>
 /// <typeparam name="RT">The runtime required to execute the feature.</typeparam>
-/// <typeparam name="REQ">The feature request.</typeparam>
-/// <typeparam name="RES">The feature response.</typeparam>
+/// <typeparam name="REQ">The feature-owned request type.</typeparam>
+/// <typeparam name="RES">The feature-owned response type.</typeparam>
+/// <remarks>
+/// Concrete features should declare their request and response as nested
+/// <c>Request</c> and <c>Response</c> types and bind those types here.
+/// C# does not currently support associated types directly, so the generic
+/// parameters preserve compile-time enforcement while the nested types provide
+/// the canonical nominal contract.
+/// </remarks>
 public interface Feature<F, RT, REQ, RES>
     where F : Feature<F, RT, REQ, RES>
 {
-    static abstract string Name { get; }
-
     static abstract Flow<RT, REQ, RES> Get();
 
     static virtual Fin<RES> Run(
@@ -40,6 +45,3 @@ public interface Feature<F, RT, REQ, RES>
         EnvIO envIO) =>
         F.Get().RunUnsafeAsync(runtime, input, envIO);
 }
-
-public interface Feature<F, RT, REQ> : Feature<F, RT, REQ, Unit>
-    where F : Feature<F, RT, REQ>;
