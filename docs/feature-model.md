@@ -2,331 +2,294 @@
 
 Features are the main executable unit of application behavior in VSlices.
 
-A feature represents one vertical slice of behavior:
+A Feature represents one explicit slice of behavior with:
 
-- one explicit input;
-- one explicit output;
-- explicit runtime capabilities;
-- explicit effectful execution;
-- explicit failure handling.
+- one request type;
+- one response type;
+- one runtime capability contract;
+- controlled effectful execution;
+- explicit failure propagation.
 
-A feature is not a service, handler, controller, manager, helper, or use-case class.
+A Feature is not a controller, handler, service class, manager, or presentation adapter.
 
-A feature is a declaration of behavior that can be executed by different presentation adapters.
+For canonical code shapes, see `docs/code-patterns.md`.
 
-## Shape
+## Core shape
 
-A feature should be modeled as a function from a request to a `Flow`.
+The canonical type is:
 
-```txt
-REQ -> Flow<RT, REQ, RES>
-````
-
-Conceptually, a `Flow` represents:
-
-```txt
-RT + REQ -> effectful result of RES
+```csharp
+Feature<F, RT, REQ, RES>
 ```
 
-Where:
+and its executable definition is:
 
-* `RT` is the runtime capability carrier;
-* `REQ` is the input request;
-* `RES` is the successful result;
-* expected failures are represented explicitly;
-* side effects are delayed and controlled.
+```csharp
+Flow<RT, REQ, RES> Get()
+```
 
-## Request
+Conceptually:
 
-The request type represents the external input needed by the feature.
+```txt
+RT + REQ -> effectful RES
+```
 
-Requests should be small, explicit, and feature-specific.
+`RT` remains part of the Feature type because runtime constraints are part of the execution contract.
+Do not move the runtime generic to `Get<RT>()` when the Feature needs type-level capabilities.
+
+For Unit responses, use the reduced form:
+
+```csharp
+Feature<F, RT, REQ>
+```
+
+## Service and Product specialization
+
+VSlices distinguishes general Feature execution from authorization semantics.
+
+A service capability is modeled with:
+
+```csharp
+ServiceFeature<F, RT, REQ, RES>
+```
+
+and exposes:
+
+```csharp
+static abstract ServiceClaim ExecutableBy { get; }
+```
+
+A product behavior is modeled with:
+
+```csharp
+ProductFeature<F, RT, REQ, RES>
+```
+
+and exposes:
+
+```csharp
+static abstract ProductRole ExecutableBy { get; }
+```
+
+This keeps `Feature` general while allowing service and product execution models to specialize it.
+
+## Request and runtime are different channels
+
+A `Flow` receives two independent inputs:
+
+```txt
+RT  = runtime capability carrier
+REQ = request for this execution
+```
+
+Use the canonical readers:
+
+```csharp
+Flow.runtime<RT, REQ>()
+Flow.request<RT, REQ>()
+```
+
+Do not obtain the request through `asks` or a runtime capability.
+The request is not part of `RT`.
+
+## Runtime capabilities
+
+Features declare only the runtime capabilities they require.
 
 Prefer:
 
 ```csharp
-public sealed record RegisterUser(
-    string Email,
-    string DisplayName
-);
+public sealed class CreateIdentity<RT> :
+    ServiceFeature<CreateIdentity<RT>, RT, SrvIdentity.Input>
+    where RT : HasRepositoryAccess<RT>
 ```
 
-Avoid generic or shared request bags:
+Avoid broad runtime constraints that contain unrelated capabilities.
+
+Capabilities remain type-level requirements. Application code may expose focused effect values from them, for example:
 
 ```csharp
-public sealed record Request(
-    Dictionary<string, object> Values
-);
+RepositoryAccessEnv<RT>.identities
 ```
 
-A request should not expose infrastructure concepts such as HTTP, database rows, message broker envelopes, or UI component state.
+Do not constructor-inject repositories or hide runtime requirements behind generic service objects.
 
-Presentation adapters are responsible for translating external input into the request type.
+## Feature body
 
-## Response
-
-The response type represents the successful output of the feature.
-
-Prefer explicit response types when the result has domain or application meaning:
+Prefer a small declarative pipeline:
 
 ```csharp
-public sealed record RegisterUserResult(
-    UserId UserId
-);
+public static Flow<RT, Request, Unit> Get() =>
+    Flow.request<RT, Request>() >>
+    (request => Validate(request)) >>
+    (value => Persist(value).IgnoreF());
 ```
 
-For features that do not need to return data, use an explicit unit-like result instead of returning `null`.
+Use `>>` for linear composition when each step naturally consumes the previous result.
 
-## Runtime Capabilities
+Do not extract `Execute`, `Core`, or similar wrapper methods when their only purpose is to preserve imperative structure.
+Extract behavior when the name adds domain meaning, the operation is reused, or the local pipeline becomes harder to understand.
 
-Features must declare the minimum runtime capabilities they need.
+## Closed domain variants
 
-Prefer narrow constraints:
+When a request or domain type models a closed sum and provides `Match`, prefer it over a C# type switch:
 
 ```csharp
-where RT : HasClock, HasPersistence
+input.Match(
+    Natural: n => CreateNatural<RT>.Invariants.RunEff(n).MapSuper(),
+    Legal:   l => CreateLegal<RT>.Invariants.RunEff(l).MapSuper())
 ```
 
-Avoid broad runtime requirements unless the feature truly needs them:
+This gives one canonical expression for sum-type elimination.
+
+Use a C# `switch` when no domain `Match` exists or when the pattern requires semantics that `Match` cannot express.
+
+## ReqK execution
+
+When a completed `ReqK<Eff<RT>, ...>` is executed from application code, use:
 
 ```csharp
-where RT : ApplicationRuntime
+rules.RunEff(input)
 ```
 
-Capabilities should describe what the runtime can do, not which concrete service is used.
+`RunEff` communicates execution. Do not use the former `ToEff` naming for this operation.
 
-Good capability examples:
+## Upcasting effectful domain values
 
-* `HasClock`
-* `HasPersistence`
-* `HasTransaction`
-* `HasLog`
-* `HasMetric`
-* `HasTrace`
-* `HasCurrentUser`
-
-Bad feature dependencies:
-
-* `UserService`
-* `UserManager`
-* `RepositoryHelper`
-* `ApplicationServices`
-* service locator access
-* static/global infrastructure access
-
-## Example
-
-A feature should be readable as a small vertical slice.
+When alternative branches produce domain subtypes and the next step consumes their common supertype, use a focused pure helper such as:
 
 ```csharp
-public sealed record RegisterUser(
-    string Email,
-    string DisplayName
-);
+.MapSuper()
+```
 
-public sealed record RegisterUserResult(
-    UserId UserId
-);
+instead of repeating generic identity maps such as:
 
-public static class RegisterUserFeature
+```csharp
+.Map<SrvIdentity>(x => x)
+```
+
+Such helpers must remain pure functor mappings and must not introduce behavior.
+
+## Service Claims
+
+A `ServiceFeature` exposes the stable claim that authorizes it.
+
+Canonical shape:
+
+```csharp
+public sealed class CreateIdentityClaim :
+    ServiceClaim,
+    Const<CreateIdentityClaim>
 {
-    public static Flow<RT, RegisterUser, RegisterUserResult> Handle<RT>()
-        where RT : HasClock, HasPersistence
-        =>
-        Flow.From<RT, RegisterUser, RegisterUserResult>(request =>
-            from now in Clock.UtcNow<RT>()
-            from email in EmailAddress.Create(request.Email).ToFlow<RT>()
-            from displayName in DisplayName.Create(request.DisplayName).ToFlow<RT>()
-            from user in User.Register(email, displayName, now).ToFlow<RT>()
-            from _ in Users.Save<RT>(user)
-            select new RegisterUserResult(user.Id)
-        );
+    public static CreateIdentityClaim Value { get; } = new();
+
+    public override string Service => "Identities";
+    public override string Capability => "Create";
 }
 ```
 
-The exact helper names may vary, but the shape should remain stable:
+and:
+
+```csharp
+public static ServiceClaim ExecutableBy => CreateIdentityClaim.Value;
+```
+
+The Feature owns executable behavior. The Claim owns authorization identity.
+
+## Canonical service example
+
+```csharp
+public sealed class CreateIdentity<RT> :
+    ServiceFeature<CreateIdentity<RT>, RT, SrvIdentity.Input>
+    where RT : HasRepositoryAccess<RT>
+{
+    public static string Name => "Identities.Create";
+
+    public static ServiceClaim ExecutableBy => CreateIdentityClaim.Value;
+
+    public static Flow<RT, SrvIdentity.Input, Unit> Get() =>
+        Flow.request<RT, SrvIdentity.Input>() >>
+        (input => input.Match(
+            Natural: n => CreateNatural<RT>.Invariants.RunEff(n).MapSuper(),
+            Legal:   l => CreateLegal<RT>.Invariants.RunEff(l).MapSuper())) >>
+        (entity => RepositoryAccessEnv<RT>.identities.Create(entity).IgnoreF());
+}
+```
+
+The default reading is:
 
 ```txt
 request
-  -> validate / construct domain values
-  -> execute domain behavior
-  -> use capabilities explicitly
-  -> return explicit result
+-> eliminate request variant
+-> enforce contextual invariants
+-> normalize to the consumed domain type
+-> execute capability-backed effect
 ```
 
-## Presentation Adapters
+## Presentation adapters
 
-Presentation adapters must not contain business behavior.
-
-They should only:
+Presentation adapters should only:
 
 1. receive external input;
 2. translate it into `REQ`;
-3. execute the feature `Flow`;
-4. translate the result into a presentation-specific response.
+3. execute the Feature;
+4. translate the result into the presentation response.
 
-Example responsibilities:
+Features must not contain HTTP, UI, worker, or transport-specific concerns.
 
-| Adapter        | Responsibility                |
-| -------------- | ----------------------------- |
-| Web API        | HTTP request/response mapping |
-| Worker         | queue/message mapping         |
-| CLI            | command-line argument mapping |
-| UI             | component event/state mapping |
-| Event consumer | event envelope mapping        |
+## Side effects
 
-The feature itself should not know which adapter executes it.
-
-## Error Handling
-
-Expected failures must be modeled explicitly.
-
-Do not throw exceptions for normal domain or application failures.
-
-Prefer domain-specific errors:
-
-```csharp
-public sealed record EmailAlreadyRegistered(EmailAddress Email) : Expected;
-public sealed record InvalidDisplayName(string Reason) : Expected;
-```
-
-Avoid stringly typed failures:
-
-```csharp
-"Invalid user"
-"Something went wrong"
-```
-
-A feature should preserve error meaning across composition.
-
-## Side Effects
-
-Side effects must happen through runtime capabilities.
-
-A feature may perform effects such as:
-
-* reading the current time;
-* saving data;
-* publishing events;
-* writing logs;
-* recording metrics;
-* calling external systems.
-
-But those effects must remain explicit in the `Flow` and in the required `RT` constraints.
+Side effects occur through explicit runtime capabilities and effect values.
 
 Do not perform uncontrolled side effects inside domain methods or static helpers.
 
-## Transactions
+Repository, clock, transaction, logging, external API, and similar access should remain visible in the capability requirements or effect composition.
 
-Transactions are execution concerns.
+## Expected failures
 
-If a feature requires transactional behavior, it should use an explicit transaction capability.
+Expected domain and application failures must remain explicit values.
 
-```csharp
-public static Flow<RT, RegisterUser, RegisterUserResult> Handle<RT>()
-    where RT : HasClock, HasPersistence, HasTransaction
-    =>
-    Transaction.In<RT, RegisterUser, RegisterUserResult>(
-        Flow.From<RT, RegisterUser, RegisterUserResult>(request =>
-            // feature body
-        )
-    );
-```
-
-Do not manually spread transaction mechanics throughout feature code.
-
-Keep transaction boundaries visible.
+Do not throw exceptions for normal failure paths.
+Preserve error meaning across `Req`, `ReqK`, `Eff`, and `Flow` composition.
 
 ## Testing
 
-Features should be tested through their `Flow` API.
+Test Features through the same `Flow` contract used in production.
 
-Prefer fake or test runtimes over mocking service classes.
+Prefer test runtimes that implement the required capabilities over mocked service classes.
 
-```csharp
-[Fact]
-public async Task register_user_persists_a_valid_user()
-{
-    var rt = TestRuntime.Create()
-        .WithFixedClock(FixedInstant)
-        .WithInMemoryPersistence();
-
-    var request = new RegisterUser(
-        Email: "user@example.com",
-        DisplayName: "User"
-    );
-
-    var result = await RegisterUserFeature
-        .Handle<TestRuntime>()
-        .Run(rt, request);
-
-    result.ShouldBeSuccess();
-}
-```
-
-A test should verify behavior through the same model used by production code:
+A test should exercise:
 
 ```txt
 RT + REQ -> Flow result
 ```
 
-Do not introduce service wrappers only to make testing easier.
-
-Improve the test runtime instead.
-
-## Feature File Organization
-
-A feature should be easy to understand in isolation.
-
-Recommended structure:
-
-```txt
-Features/
-  RegisterUser/
-    RegisterUser.cs
-    RegisterUserResult.cs
-    RegisterUserFeature.cs
-    RegisterUserErrors.cs
-    RegisterUserTests.cs
-```
-
-For very small features, request, result, errors, and behavior may live in one file.
-
-Prefer locality over premature layering.
-
 ## Rules
 
-A feature must:
+A Feature must:
 
-* be modeled around `Flow<RT, REQ, RES>`;
-* receive explicit input through `REQ`;
-* return explicit output through `RES`;
-* declare minimum runtime capabilities through `RT`;
-* model expected failures explicitly;
-* keep side effects inside controlled effectful execution;
-* remain independent from presentation adapters;
-* be testable with a fake/test runtime.
+- use `Flow<RT, REQ, RES>` as its execution model;
+- keep `RT` constraints explicit;
+- read `REQ` through the Flow request channel;
+- keep orchestration local and readable;
+- keep side effects controlled;
+- remain presentation-independent.
 
-A feature must not:
+A Feature must not:
 
-* depend directly on infrastructure concretions;
-* resolve dependencies through service locators;
-* use constructor-injected services;
-* hide runtime requirements behind generic service objects;
-* throw exceptions for expected failures;
-* contain HTTP, UI, worker, or database-specific concerns;
-* introduce shared orchestration layers without a real need.
+- hide capability requirements;
+- resolve dependencies through service locators;
+- use constructor-injected service dependencies;
+- treat the request as part of the runtime;
+- introduce wrapper methods that add no semantic meaning;
+- throw exceptions for expected failures.
 
-## Deprecated Model
+## Deprecated model
 
 Do not introduce new usages of `FeatureEff<RT, A>`.
 
-`FeatureEff<RT, A>` was an earlier execution abstraction and is deprecated.
-
-New feature execution code must use:
+New Feature execution code uses:
 
 ```txt
 Flow<RT, REQ, RES>
-```
-
 ```
