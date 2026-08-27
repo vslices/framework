@@ -34,6 +34,9 @@ public sealed class ServiceClaim : DomainType<ServiceClaim, ServiceClaim.Repr>
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
 
         var owner = typeof(OWNER);
+        if (owner.IsGenericType)
+            owner = owner.GetGenericTypeDefinition();
+
         var candidate = new Registration(
             new ServiceClaim(uniqueName, description),
             owner);
