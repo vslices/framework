@@ -4,76 +4,25 @@ using LanguageExt;
 namespace VSlices.Domain.Traits;
 
 /// <summary>
-///
+/// Defines a transformation from <typeparamref name="IN"/> to <typeparamref name="OUT"/>.
 /// </summary>
-/// <typeparam name="SELF">
-///
-/// </typeparam>
-/// <typeparam name="OUT">
-///
-/// </typeparam>
-/// <typeparam name="IN">
-///
-/// </typeparam>
-/// <remarks>
-///
-/// </remarks>
 public interface Transform<SELF, OUT, IN> : DomainType<SELF>
     where SELF : Transform<SELF, OUT, IN>
 {
-    /// <summary>
-    ///
-    /// </summary>
-    /// <returns>
-    ///
-    /// </returns>
-    static abstract Req<IN, OUT, IN, OUT> Invariants { get; }
+    public static abstract Req<IN, OUT>.Full Invariants { get; }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr">
-    ///
-    /// </param>
-    /// <returns>
-    ///
-    /// </returns>
     public static virtual Fin<OUT> Create(IN repr) =>
         SELF.Invariants.RunFin(repr);
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr">
-    ///
-    /// </param>
-    /// <returns>
-    ///
-    /// </returns>
     public static virtual OUT New(IN repr) =>
         SELF.Create(repr).ThrowIfFail();
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="repr"></param>
-    /// <returns></returns>
     public static virtual Seq<OUT> New(Seq<IN> repr) =>
         repr.Map(SELF.New);
 }
 
 /// <summary>
-///
+/// Defines a transformation from <typeparamref name="IN"/> to <typeparamref name="SELF"/>.
 /// </summary>
-/// <typeparam name="SELF">
-///
-/// </typeparam>
-/// <typeparam name="IN">
-///
-/// </typeparam>
-/// <remarks>
-///
-/// </remarks>
 public interface Transform<SELF, IN> : Transform<SELF, SELF, IN>
     where SELF : Transform<SELF, IN>;
-
