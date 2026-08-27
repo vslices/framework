@@ -9,7 +9,7 @@ namespace VSlices.Domain.Traits;
 public interface Transform<SELF, OUT, IN> : DomainType<SELF>
     where SELF : Transform<SELF, OUT, IN>
 {
-    public static abstract Req<IN, OUT, IN, OUT> Invariants { get; }
+    public static abstract Req<IN, OUT>.Full Invariants { get; }
 
     public static virtual Fin<OUT> Create(IN repr) =>
         SELF.Invariants.RunFin(repr);
