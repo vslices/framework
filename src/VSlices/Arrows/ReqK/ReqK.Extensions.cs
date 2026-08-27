@@ -39,6 +39,11 @@ public static partial class ReqKExtensions
         +req.RunFinT(input).Run()
             .Bind(m => m.Match(Succ: Eff<RT, OUT>.Pure, Fail: Eff<RT, OUT>.Fail));
 
+    public static Eff<RT, OUT> RunEff<RT, IN, OUT>(
+        this ReqK<Eff<RT>, IN, OUT>.Completed req,
+        IN input) =>
+        req.Value.RunEff(input);
+
     extension<M, IN, OUT>(ReqK<M, IN, OUT, IN, OUT> ma)
         where M : Monad<M>
     {
