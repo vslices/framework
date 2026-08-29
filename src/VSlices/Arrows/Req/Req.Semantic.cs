@@ -194,6 +194,10 @@ public partial class Req<IN, OUT>
                 Lift(To),
                 Adapt(rules),
                 Lift<O2, I>(_ => i)));
+    public static Req<IN, OUT, I, I> Apply<I, I2, O2>(
+        Req<I2, O2>.Full rules,
+        Func<I, I2> To) =>
+        Apply(rules.Value, To);
 
     /// <summary>
     ///
@@ -212,7 +216,12 @@ public partial class Req<IN, OUT>
             .Bind(i => To(i).Fold(
                 Req<IN, OUT, I>.Identity, 
                 (acc, item) => Compose(acc, Apply(rules, To: (I _) => item))));
-    
+
+    public static Req<IN, OUT, I, I> ApplySeq<I, I2, O2>(
+        Req<I2, O2>.Full rules,
+        Func<I, Seq<I2>> To) =>
+        ApplySeq(rules.Value, To);
+
     /// <summary>
     /// 
     /// </summary>
@@ -230,6 +239,12 @@ public partial class Req<IN, OUT>
             .Bind(i => To(i).Fold(
                 Req<IN, OUT, I>.Identity,
                 (acc, item) => Compose(acc, Apply(rules, To: (I _) => item))));
+
+    public static Req<IN, OUT, I, I> ApplyOpt<I, I2, O2>(
+        Req<I2, O2>.Full rules,
+        Func<I, Option<I2>> To) =>
+        ApplyOpt(rules.Value, To);
+    
 }
 
 /// <summary>
