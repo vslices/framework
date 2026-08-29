@@ -11,8 +11,9 @@ A VSIR source file and its C# projection should be colocated with the applicatio
 Example:
 
 ```text
-ActivateAccount.feature.vsir
-ActivateAccount.feature.vsir.cs
+Features/
+├── ActivateAccount.vsir
+└── ActivateAccount.vsir.cs
 ```
 
 The `.vsir.cs` file is not conventional generated code and must not be treated as read-only.
@@ -40,6 +41,39 @@ human refinement
 ```
 
 Manual divergence is information, not corruption.
+
+## File identity
+
+VSIR uses a single semantic filename form:
+
+```text
+<Symbol>.vsir
+<Symbol>.vsir.cs
+```
+
+The artifact kind is not repeated in the filename. It is established by repository structure and validated by the VSIR document itself through:
+
+```yaml
+kind: feature
+```
+
+or:
+
+```yaml
+kind: invariant
+```
+
+Typical placement is therefore:
+
+```text
+Features/CreateIdentity.vsir
+Features/CreateIdentity.vsir.cs
+
+Invariants/ExistingAccount.vsir
+Invariants/ExistingAccount.vsir.cs
+```
+
+The filename preserves symbol identity while the folder and payload preserve artifact-kind identity.
 
 ## Never overwrite an edited projection silently
 
@@ -170,7 +204,7 @@ Possible metadata:
 
 ```csharp
 // <vsir
-// source="ActivateAccount.feature.vsir"
+// source="ActivateAccount.vsir"
 // source-hash="sha256:..."
 // projection-hash="sha256:..."
 // />
