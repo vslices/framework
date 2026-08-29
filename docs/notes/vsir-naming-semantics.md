@@ -16,7 +16,7 @@ A useful short rule is:
 
 > Feature names describe behavior to execute. Invariant names describe a fact established about their output.
 
-This distinction should be visible directly in symbol names and filenames.
+This distinction should be visible directly in symbol names and repository structure.
 
 ---
 
@@ -317,52 +317,70 @@ If the concept is knowledge established in the second form, name it as a fact or
 
 ## Filename convention
 
-VSIR filenames should preserve the symbol name and expose the artifact kind explicitly.
-
-Features:
+VSIR filenames preserve the semantic symbol name and use one semantic extension:
 
 ```text
-CreateIdentity.feature.vsir
-ActivateAccount.feature.vsir
-UpdateAccount.feature.vsir
+<Symbol>.vsir
 ```
 
-Invariants:
+The artifact kind is established by repository structure and validated by the explicit `kind` field inside the VSIR document.
+
+For example:
 
 ```text
-IdentityCanBeCreated.invariant.vsir
-ExistingAccount.invariant.vsir
-AccountCanBeActivated.invariant.vsir
-EmailNotInUse.invariant.vsir
+Features/
+├── CreateIdentity.vsir
+├── ActivateAccount.vsir
+└── UpdateAccount.vsir
+
+Invariants/
+├── IdentityCanBeCreated.vsir
+├── ExistingAccount.vsir
+├── AccountCanBeActivated.vsir
+└── EmailNotInUse.vsir
 ```
 
 Editable C# projections follow the same identity:
 
 ```text
-CreateIdentity.feature.vsir.cs
-ExistingAccount.invariant.vsir.cs
+CreateIdentity.vsir.cs
+ExistingAccount.vsir.cs
 ```
 
 PascalCase is preferred because these files represent application symbols rather than general prose documents.
+
+The filename does not repeat `feature` or `invariant` because that information is already available from the containing structure and from the VSIR payload itself:
+
+```yaml
+kind: feature
+```
+
+or:
+
+```yaml
+kind: invariant
+```
+
+When a file is moved outside its expected structural context, tooling should rely on the explicit `kind` field for validation rather than requiring an artifact-kind suffix in the filename.
 
 ---
 
 ## Naming should expose responsibility
 
-The filename should make accidental responsibility confusion harder.
+Responsibility should remain obvious from the semantic symbol even though the filename no longer repeats the artifact kind.
 
 For example:
 
 ```text
-CreateIdentity.feature.vsir
+Features/CreateIdentity.vsir
 ```
 
 reads naturally as executable behavior.
 
-By contrast:
+By contrast, placing:
 
 ```text
-CreateIdentity.invariant.vsir
+Invariants/CreateIdentity.vsir
 ```
 
 should look suspicious because `CreateIdentity` describes an action rather than a fact established by validation or refinement.
@@ -370,13 +388,13 @@ should look suspicious because `CreateIdentity` describes an action rather than 
 A better invariant name might be:
 
 ```text
-IdentityCanBeCreated.invariant.vsir
+Invariants/IdentityCanBeCreated.vsir
 ```
 
 or, depending on the actual transformation:
 
 ```text
-CreatableIdentity.invariant.vsir
+Invariants/CreatableIdentity.vsir
 ```
 
 The exact name should follow what the successful output means.
