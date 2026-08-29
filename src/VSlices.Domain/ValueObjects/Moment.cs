@@ -34,7 +34,7 @@ public sealed class Moment :
     /// <summary>
     /// 
     /// </summary>
-    public static Req<Input, Moment, Input, Moment> Invariants =>
+    public static Req<Input, Moment>.Full Invariants =>
         Transform((Input i) => new Moment(i.Value));
 
     /// <summary>
