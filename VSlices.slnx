@@ -1,0 +1,38 @@
+<Solution>
+  <Folder Name="/examples/" />
+  <Folder Name="/examples/simple-workflow/">
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Core/SampleWorkflow.Core.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="AGENTS.md" />
+    <File Path="docs/architecture.md" />
+    <File Path="docs/capabilities.md" />
+    <File Path="docs/do-not.md" />
+    <File Path="docs/feature-model.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <Project Path="src/VSlices.Application/VSlices.Application.csproj" />
+    <Project Path="src/VSlices.Domain/VSlices.Domain.csproj" />
+    <Project Path="src/VSlices.Infrastructure/VSlices.Infrastructure.csproj" Id="aabbb6eb-6bcb-4070-a584-9e9ed3d34d62" />
+    <Project Path="src/VSlices/VSlices.csproj" />
+  </Folder>
+  <Folder Name="/src/Language-Ext/">
+    <Project Path="language-ext/LanguageExt.Core/LanguageExt.Core.csproj" />
+    <Project Path="language-ext/LanguageExt.FSharp/LanguageExt.FSharp.csproj" />
+    <Project Path="language-ext/LanguageExt.Megaparsec/LanguageExt.Megaparsec.csproj" />
+    <Project Path="language-ext/LanguageExt.Parsec/LanguageExt.Parsec.csproj" />
+    <Project Path="language-ext/LanguageExt.Rx/LanguageExt.Rx.csproj" />
+    <Project Path="language-ext/LanguageExt.Streaming/LanguageExt.Streaming.csproj" />
+    <Project Path="language-ext/LanguageExt.Sys/LanguageExt.Sys.csproj" />
+    <Project Path="language-ext/LanguageExt.XUnitExt/LanguageExt.XUnitExt.csproj" />
+  </Folder>
+  <Folder Name="/src/Language-Ext/samples/">
+    <Project Path="language-ext/Samples/BlazorApp/BlazorApp.csproj" />
+    <Project Path="language-ext/Samples/DomainTypesExamples/DomainTypesExamples.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="language-ext/LanguageExt.Tests/LanguageExt.Tests.csproj" />
+    <Project Path="tests/VSlices.Tests/VSlices.Tests.csproj" Id="58e0e2db-df3c-4f98-8635-a99989c3050b" />
+  </Folder>
+</Solution>

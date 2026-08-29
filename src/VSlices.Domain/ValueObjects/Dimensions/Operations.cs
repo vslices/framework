@@ -1,0 +1,1 @@
+namespace VSlices.Domain.ValueObjects;
