@@ -1,29 +1,27 @@
 ﻿// Resharper disable CheckNamespace
 
-using System.Xml;
-using VSlices.Monads;
 
-namespace VSlices.Monads
+namespace LanguageExt
 {
-    public partial class Flow<RT, RQ>
+    public static partial class FinModuleExtensions
     {
-        public static Flow<RT, RQ, B> Bind<A, B>(
-            K<Flow<RT, RQ>, A> ma,
-            Func<A, Eff<B>> fb) =>
-            ma.Bind(a => new Flow<RT, RQ, B>(rt => fb(a).RunIO()));
+        extension<RT, A, B>(Fin)
+        {
+            public static Eff<RT, B> Bind(
+                K<Fin, A> ma,
+                Func<A, Eff<RT, B>> fb) =>
+                ma.As().Match(Succ: fb, Fail: Eff<RT, B>.Fail);
 
-        public static Flow<RT, RQ, B> Bind<A, B>(
-            K<Flow<RT, RQ>, A> ma,
-            Func<A, K<Eff, B>> fb) =>
-            Bind(ma, a => +fb(a));
+            public static Eff<RT, B> Bind(
+                K<Fin, A> ma,
+                Func<A, K<Eff<RT>, B>> fb) =>
+                Fin.Bind(ma, a => +fb(a));
+        }
     }
-}
 
-namespace VSlices
-{
-    public static partial class FlowFluentAPISyntax
+    public static partial class FinFluentAPISyntax
     {
-        extension<RT, RQ, A>(K<Flow<RT, RQ>, A> ma)
+        extension<RT, A>(K<Fin, A> ma)
         {
             /// <summary>
             ///
@@ -31,8 +29,8 @@ namespace VSlices
             /// <typeparam name="B"></typeparam>
             /// <param name="fb"></param>
             /// <returns></returns>
-            public Flow<RT, RQ, B> Bind<B>(Func<A, K<Eff, B>> fb) =>
-                Flow<RT, RQ>.Bind(ma, fb);
+            public Eff<RT, B> Bind<B>(Func<A, K<Eff<RT>, B>> fb) =>
+                Fin.Bind(ma, fb);
 
             /// <summary>
             ///
@@ -40,23 +38,14 @@ namespace VSlices
             /// <typeparam name="B"></typeparam>
             /// <param name="fb"></param>
             /// <returns></returns>
-            public Flow<RT, RQ, B> Bind<B>(Func<A, Eff<B>> fb) =>
-                Flow<RT, RQ>.Bind(ma, fb);
-        }
-
-        extension<RT, A>(K<Eff, A> ma)
-        {
-            public Flow<RT, RQ, B> Bind<RQ, B>(Func<A, Flow<RT, RQ, B>> fb) =>
-                Flow<RT, RQ>.Bind(Flow<RT, RQ>.Lift(ma), fb);
-
-            public Flow<RT, RQ, B> Bind<RQ, B>(Func<A, K<Flow<RT, RQ>, B>> fb) =>
-                Flow<RT, RQ>.Bind(Flow<RT, RQ>.Lift(ma), fb);
+            public Eff<RT, B> Bind<B>(Func<A, Eff<RT, B>> fb) =>
+                Fin.Bind(ma, fb);
         }
     }
 
-    public static partial class FlowLinqSyntax
+    public static partial class FinLinqSyntax
     {
-        extension<RT, RQ, A>(K<Flow<RT, RQ>, A> ma)
+        extension<RT, A>(K<Fin, A> ma)
         {
             /// <summary>
             ///
@@ -66,8 +55,8 @@ namespace VSlices
             /// <param name="fb"></param>
             /// <param name="fc"></param>
             /// <returns></returns>
-            public Flow<RT, RQ, C> SelectMany<B, C>(
-                Func<A, Eff<B>> fb,
+            public Eff<RT, C> SelectMany<B, C>(
+                Func<A, Eff<RT, B>> fb,
                 Func<A, B, C> fc) =>
                 ma.Bind(a => fb(a).Map(b => fc(a, b)));
 
@@ -79,8 +68,21 @@ namespace VSlices
             /// <param name="fb"></param>
             /// <param name="fc"></param>
             /// <returns></returns>
-            public Flow<RT, RQ, C> SelectMany<B, C>(
-                Func<A, K<Eff, B>> fb,
+            public Eff<RT, C> SelectMany<B, C>(
+                Func<A, K<Eff<RT>, B>> fb,
+                Func<A, B, C> fc) =>
+                ma.Bind(a => fb(a).Map(b => fc(a, b)));
+        }
+
+        extension<RT, A>(K<Fin, A> ma)
+        {
+            public Eff<RT, C> SelectMany<RQ, B, C>(
+                Func<A, Eff<RT, B>> fb,
+                Func<A, B, C> fc) =>
+                ma.Bind(a => fb(a).Map(b => fc(a, b)));
+
+            public Eff<RT, C> SelectMany<RQ, B, C>(
+                Func<A, K<Eff<RT>, B>> fb,
                 Func<A, B, C> fc) =>
                 ma.Bind(a => fb(a).Map(b => fc(a, b)));
         }
@@ -88,7 +90,7 @@ namespace VSlices
 
     public static partial class FlowOperatorSyntax
     {
-        extension<RT, RQ, A, B>(K<Flow<RT, RQ>, A>)
+        extension<RT, A, B>(K<Fin, A>)
         {
 
             /// <summary>
@@ -97,9 +99,9 @@ namespace VSlices
             /// <param name="ma"></param>
             /// <param name="f"></param>
             /// <returns></returns>
-            public static Flow<RT, RQ, B> operator >>(
-                K<Flow<RT, RQ>, A> ma,
-                Func<A, K<Eff, B>> f) =>
+            public static Eff<RT, B> operator >>(
+                K<Fin, A> ma,
+                Func<A, K<Eff<RT>, B>> f) =>
                 ma.Bind(f);
 
             /// <summary>
@@ -108,9 +110,9 @@ namespace VSlices
             /// <param name="ma"></param>
             /// <param name="f"></param>
             /// <returns></returns>
-            public static Flow<RT, RQ, B> operator >>(
-                K<Flow<RT, RQ>, A> ma,
-                Func<A, Eff<B>> f) =>
+            public static Eff<RT, B> operator >>(
+                K<Fin, A> ma,
+                Func<A, Eff<RT, B>> f) =>
                 ma.Bind(f);
         }
     }
