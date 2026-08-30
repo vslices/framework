@@ -24,11 +24,17 @@ public interface vTransformMetadata<T, TInput>
 /// <summary>
 /// Metadata used by text inputs that materialize a domain value from a string.
 /// </summary>
+/// <remarks>
+/// <paramref name="Formatter"/> is a presentation adapter for the reverse direction:
+/// the domain value remains responsible only for construction from <see cref="string"/>,
+/// while the view decides how an existing value is rendered back into the text field.
+/// </remarks>
 /// <typeparam name="T">The value materialized by the text input.</typeparam>
 public sealed record vTextInputMetadata<T>(
     string? DisplayName = null,
     string InputType = "text",
     string? AutoComplete = null,
-    string? Placeholder = null)
+    string? Placeholder = null,
+    Func<T, string>? Formatter = null)
     : vTransformMetadata<T, string>
     where T : Transform<T, string>;
