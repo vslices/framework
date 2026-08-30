@@ -19,14 +19,25 @@ namespace VSlices.Views.Abstract.Forms;
 /// expected to inherit from it and provide markup and styling.
 /// </remarks>
 /// <typeparam name="T">The domain value produced from the textual representation.</typeparam>
-public abstract class vTextInput<T> : InputBase<T>
+public abstract class vTextInput<T> : InputBase<T>, IDisposable
     where T : Transform<T, string>
 {
+    private bool _subscribedToValidation;
+
     /// <summary>
     /// Gets or sets optional metadata for the transform-backed input.
     /// </summary>
     [Parameter]
     public vTextInputMetadata<T> Metadata { get; set; } = new();
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        EditContext.OnValidationRequested += ValidateCurrentRepresentation;
+        _subscribedToValidation = true;
+    }
 
     /// <inheritdoc />
     protected override void OnParametersSet()
@@ -38,6 +49,17 @@ public abstract class vTextInput<T> : InputBase<T>
         {
             DisplayName = Metadata.DisplayName;
         }
+    }
+
+    /// <inheritdoc />
+    protected override string? FormatValueAsString(T? value)
+    {
+        if (value is null)
+        {
+            return string.Empty;
+        }
+
+        return Metadata.Formatter?.Invoke(value) ?? value.ToString();
     }
 
     /// <inheritdoc />
@@ -62,5 +84,21 @@ public abstract class vTextInput<T> : InputBase<T>
         validationErrorMessage = null;
 
         return true;
+    }
+
+    private void ValidateCurrentRepresentation(
+        object? sender,
+        ValidationRequestedEventArgs args) =>
+        CurrentValueAsString = CurrentValueAsString;
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_subscribedToValidation)
+        {
+            EditContext.OnValidationRequested -= ValidateCurrentRepresentation;
+        }
+
+        GC.SuppressFinalize(this);
     }
 }
