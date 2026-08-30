@@ -23,7 +23,8 @@ public partial class ReqK
 public partial class ReqK<M, IN>
     where M : Monad<M>
 {
-
+    public static ReqK<M, IN, IN, I, O> LiftK<I, O>(Func<I, K<M, O>> f) =>
+        ReqK<M, IN, IN>.LiftK(f);
 }
 
 /// <summary>
