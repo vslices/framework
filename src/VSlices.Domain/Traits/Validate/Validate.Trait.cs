@@ -13,6 +13,4 @@ public interface Validate<SELF, IN> : DomainType<SELF>
     public static virtual Fin<IN> Check(IN input) =>
         SELF.Invariants.RunFin(input);
 
-    public static virtual IN CheckUnsafe(IN input) =>
-        SELF.Check(input).ThrowIfFail();
 }

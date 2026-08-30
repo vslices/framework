@@ -11,11 +11,7 @@ public interface ValidateM<SELF, M, IN> : DomainType<SELF>
 {
     public static abstract ReqK<M, IN>.Full Invariants { get; }
 
-    public static virtual FinT<M, IN> Check(IN input) =>
+    public static virtual FinT<M, IN> CheckM(IN input) =>
         SELF.Invariants.RunFinT(input);
-
-    public static virtual K<M, IN> CheckUnsafe(IN input) =>
-        SELF.Check(input)
-            .Run()
-            .Map(f => f.ThrowIfFail());
+    
 }

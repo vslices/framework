@@ -18,6 +18,9 @@ public interface TransformM<SELF, M, OUT, IN> : DomainType<SELF>
         SELF.Create(repr)
             .Run()
             .Map(f => f.ThrowIfFail());
+
+    public static virtual K<M, Seq<OUT>> New(Seq<IN> repr) =>
+        repr.Traverse(SELF.New);
 }
 
 /// <summary>

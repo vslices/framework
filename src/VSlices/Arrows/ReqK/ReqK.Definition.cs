@@ -116,19 +116,6 @@ public sealed record ReqK<M, IN, OUT, I, O>(
         K<ReqK<M, IN, OUT>, O5, FinO> m6) =>
         ReqK<M, IN, OUT, I>.Compose(this, m2, m3, m4, m5, m6);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="I2"></typeparam>
-    /// <typeparam name="O2"></typeparam>
-    /// <param name="rules"></param>
-    /// <param name="To"></param>
-    /// <returns></returns>
-    public ReqK<M, IN, OUT, I, O> Apply<I2, O2>(
-        ReqK<M, IN, OUT, I2, O2> rules,
-        Func<O, I2> To) =>
-        Compose(ReqK<M, IN, OUT>.Apply(rules, To));
-
 
     /// <summary>
     /// 

@@ -1,52 +1,38 @@
 ﻿// Resharper disable CheckNamespace
 
-using VSlices;
 
 namespace LanguageExt
 {
-    public static partial class FinModuleExtensions
+    public static partial class EffModuleExtensions
     {
-        extension<RT, A, B>(Fin)
+        extension<RT, A, B>(Eff<RT>)
         {
             public static Eff<RT, B> Bind(
-                K<Fin, A> ma,
-                Func<A, Eff<RT, B>> fb) =>
-                ma.As().Match(Succ: fb, Fail: Eff<RT, B>.Fail);
+                K<Eff<RT>, A> ma,
+                Func<A, Fin<B>> fb) =>
+                ma.As().Bind<B>(a => fb(a).ToEff());
 
             public static Eff<RT, B> Bind(
-                K<Fin, A> ma,
-                Func<A, K<Eff<RT>, B>> fb) =>
-                Fin.Bind(ma, a => +fb(a));
+                K<Eff<RT>, A> ma,
+                Func<A, K<Fin, B>> fb) =>
+                Eff<RT>.Bind(ma, a => +fb(a));
         }
     }
 
-    public static partial class FinFluentAPISyntax
+    public static partial class EffFluentAPISyntax
     {
-        extension<RT, A>(K<Fin, A> ma)
+        extension<RT, A>(K<Eff<RT>, A> ma)
         {
-            /// <summary>
-            ///
-            /// </summary>
-            /// <typeparam name="B"></typeparam>
-            /// <param name="fb"></param>
-            /// <returns></returns>
-            public Eff<RT, B> Bind<B>(Func<A, K<Eff<RT>, B>> fb) =>
-                Fin.Bind(ma, fb);
-
-            /// <summary>
-            ///
-            /// </summary>
-            /// <typeparam name="B"></typeparam>
-            /// <param name="fb"></param>
-            /// <returns></returns>
-            public Eff<RT, B> Bind<B>(Func<A, Eff<RT, B>> fb) =>
-                Fin.Bind(ma, fb);
+            public Eff<RT, B> Bind<B>(Func<A, Fin<B>> fb) =>
+                Eff<RT>.Bind(ma, fb);
+            public Eff<RT, B> Bind<B>(Func<A, K<Fin, B>> fb) =>
+                Eff<RT>.Bind(ma, fb);
         }
     }
 
-    public static partial class FinLinqSyntax
+    public static partial class EffLinqSyntax
     {
-        extension<RT, A>(K<Fin, A> ma)
+        extension<RT, A>(K<Eff<RT>, A> ma)
         {
             /// <summary>
             ///
@@ -57,9 +43,9 @@ namespace LanguageExt
             /// <param name="fc"></param>
             /// <returns></returns>
             public Eff<RT, C> SelectMany<B, C>(
-                Func<A, Eff<RT, B>> fb,
+                Func<A, Fin<B>> fb,
                 Func<A, B, C> fc) =>
-                ma.Bind(a => fb(a).Map(b => fc(a, b)));
+                Eff<RT>.Bind(ma, a => fb(a).Map(b => fc(a, b)));
 
             /// <summary>
             ///
@@ -70,15 +56,28 @@ namespace LanguageExt
             /// <param name="fc"></param>
             /// <returns></returns>
             public Eff<RT, C> SelectMany<B, C>(
-                Func<A, K<Eff<RT>, B>> fb,
+                Func<A, K<Fin, B>> fb,
+                Func<A, B, C> fc) =>
+                ma.Bind(a => fb(a).Map(b => fc(a, b)));
+        }
+
+        extension<RT, A>(K<Eff<RT>, A> ma)
+        {
+            public Eff<RT, C> SelectMany<RQ, B, C>(
+                Func<A, Fin<B>> fb,
+                Func<A, B, C> fc) =>
+                ma.Bind(a => fb(a).Map(b => fc(a, b)));
+
+            public Eff<RT, C> SelectMany<RQ, B, C>(
+                Func<A, K<Fin, B>> fb,
                 Func<A, B, C> fc) =>
                 ma.Bind(a => fb(a).Map(b => fc(a, b)));
         }
     }
 
-    public static partial class FinOperatorSyntax
+    public static partial class EffOperatorSyntax
     {
-        extension<RT, A, B>(K<Fin, A>)
+        extension<RT, A, B>(K<Eff<RT>, A>)
         {
 
             /// <summary>
@@ -88,8 +87,8 @@ namespace LanguageExt
             /// <param name="f"></param>
             /// <returns></returns>
             public static Eff<RT, B> operator >>(
-                K<Fin, A> ma,
-                Func<A, K<Eff<RT>, B>> f) =>
+                K<Eff<RT>, A> ma,
+                Func<A, K<Fin, B>> f) =>
                 ma.Bind(f);
 
             /// <summary>
@@ -99,8 +98,8 @@ namespace LanguageExt
             /// <param name="f"></param>
             /// <returns></returns>
             public static Eff<RT, B> operator >>(
-                K<Fin, A> ma,
-                Func<A, Eff<RT, B>> f) =>
+                K<Eff<RT>, A> ma,
+                Func<A, Fin<B>> f) =>
                 ma.Bind(f);
         }
     }

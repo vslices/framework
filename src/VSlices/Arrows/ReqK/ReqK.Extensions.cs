@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// ReSharper disable InconsistentNaming
+
+using VSlices.Monads;
 
 namespace VSlices.Arrows;
 
@@ -9,47 +9,65 @@ namespace VSlices.Arrows;
 /// </summary>
 public static partial class ReqKExtensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="IN"></typeparam>
-    /// <typeparam name="OUT"></typeparam>
-    /// <param name="ma"></param>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    public static FinT<M, OUT> RunFinT<M, IN, OUT>(this ReqK<M, IN, OUT, IN, OUT> ma, IN input)
-        where M : Monad<M> =>
-        FinT.lift(ma.RawRun(input).Run()
-                    .Map(either => either.Match(
-                        Left: Fin.Fail<OUT>,
-                        Right: s => s.IsValid ? Fin.Succ(s.Value) : Fin.Fail<OUT>(s.Error))));
+    /// <param name="mb"></param>
+    /// <typeparam name="A"></typeparam>
+    /// <typeparam name="B"></typeparam>
+    extension<M, A, B>(ReqK<M, A, B, A, B> mb)
+        where M : Monad<M>
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ma"></param>
+        /// <returns></returns>
+        public FinT<M, B> RunFinT(K<M, A> ma) =>
+            from value in FinT.lift(ma)
+            let runned = mb.RawRun(value).Run()
+            from result in FinT.lift(runned.Map(a => a.Match(
+                Left: Fin.Fail<B>,
+                Right: s => s.IsValid ? Fin.Succ(s.Value) : Fin.Fail<B>(s.Error))))
+            select result;
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="RT"></typeparam>
-    /// <typeparam name="IN"></typeparam>
-    /// <typeparam name="OUT"></typeparam>
+        public FinT<M, B> RunFinT(A a) =>
+            mb.RunFinT(M.Pure(a));
+    }
+
+    extension<M, A, B>(ReqK<M, A, A, B, B> req)
+        where M : Monad<M>
+    {
+        public ReqK<M, A, A, A, A> ApplyTo(Func<A, B> fb) =>
+            ReqK<M, A, A>.Apply(req, fb);
+    }
+
     /// <param name="req"></param>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    public static Eff<RT, OUT> RunEff<RT, IN, OUT>(
-        this ReqK<Eff<RT>, IN, OUT, IN, OUT> req,
-        IN input) =>
-        +req.RunFinT(input).Run()
-            .Bind(m => m.Match(Succ: Eff<RT, OUT>.Pure, Fail: Eff<RT, OUT>.Fail));
+    /// <typeparam name="RT"></typeparam>
+    /// <typeparam name="A"></typeparam>
+    /// <typeparam name="B"></typeparam>
+    extension<RT, A, B>(ReqK<Eff<RT>, A, B, A, B> req)
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public Eff<RT, B> RunEff(A input) =>
+            +req.RunFinT(input).Run()
+                .Bind(m => m.Match(Succ: Eff<RT, B>.Pure, Fail: Eff<RT, B>.Fail));
+    }
 
-    public static Eff<RT, OUT> RunEff<RT, IN, OUT>(
-        this ReqK<Eff<RT>, IN, OUT>.Full req,
-        IN input) =>
-        req.Value.RunEff(input);
+    extension<RT, A, B>(ReqK<Eff<RT>, A, B>.Full req)
+    {
+        public Eff<RT, B> RunEff(A input) =>
+            req.Value.RunEff(input);
+    }
 
-    public static Eff<RT, IN> RunEff<RT, IN>(
-        this ReqK<Eff<RT>, IN>.Full req,
-        IN input) =>
-        req.Value.RunEff(input);
+    extension<RT, A>(ReqK<Eff<RT>, A>.Full req)
+    {
+        public Eff<RT, A> RunEff(A input) =>
+            req.Value.RunEff(input);
+    }
 
-    extension<M, IN, OUT>(ReqK<M, IN, OUT, IN, OUT> ma)
+    extension<M, A, B>(ReqK<M, A, B, A, B> ma)
         where M : Monad<M>
     {
         /// <summary>
@@ -57,19 +75,19 @@ public static partial class ReqKExtensions
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public EitherT<Error, M, ReqState<OUT>> RawRun(IN input) =>
+        public EitherT<Error, M, ReqState<B>> RawRun(A input) =>
             ma.RawRun(input, ReqState.New(input));
     }
 
-    extension<M, IN, OUT, I, O>(K<ReqK<M, IN, OUT, I>, O> m)
+    extension<M, A, B, C, D>(K<ReqK<M, A, B, C>, D> m)
         where M : Monad<M>
     {
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public ReqK<M, IN, OUT, I, O> As() =>
-            (ReqK<M, IN, OUT, I, O>)m;
+        public ReqK<M, A, B, C, D> As() =>
+            (ReqK<M, A, B, C, D>)m;
 
         /// <summary>
         /// 
@@ -77,19 +95,19 @@ public static partial class ReqKExtensions
         /// <param name="input"></param>
         /// <param name="previous"></param>
         /// <returns></returns>
-        public EitherT<Error, M, ReqState<O>> RawRun(IN input, Either<Error, ReqState<I>> previous) =>
+        public EitherT<Error, M, ReqState<D>> RawRun(A input, Either<Error, ReqState<C>> previous) =>
             m.As().RawRun(input, previous);
     }
 
-    extension<M, IN, OUT, I, O>(K<ReqK<M, IN, OUT>, I, O> m)
+    extension<M, A, B, C, D>(K<ReqK<M, A, B>, C, D> m)
         where M : Monad<M>
     {
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public ReqK<M, IN, OUT, I, O> AsBi() =>
-            (ReqK<M, IN, OUT, I, O>)m;
+        public ReqK<M, A, B, C, D> AsBi() =>
+            (ReqK<M, A, B, C, D>)m;
 
         /// <summary>
         /// 
@@ -97,7 +115,7 @@ public static partial class ReqKExtensions
         /// <param name="input"></param>
         /// <param name="previous"></param>
         /// <returns></returns>
-        public EitherT<Error, M, ReqState<O>> RawRunBi(IN input, Either<Error, ReqState<I>> previous) =>
+        public EitherT<Error, M, ReqState<D>> RawRunBi(A input, Either<Error, ReqState<C>> previous) =>
             m.AsBi().RawRun(input, previous);
 
     }

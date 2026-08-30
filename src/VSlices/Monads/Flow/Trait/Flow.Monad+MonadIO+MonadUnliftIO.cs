@@ -17,17 +17,22 @@ public partial class Flow<RT, RQ>
     /// Binds a computation to a function that produces a new computation,
     /// enabling the chaining of operations in a monadic liftFlow.
     /// </summary>
-    /// <typeparam name="T">The type of the input value of the computation.</typeparam>
-    /// <typeparam name="O">The type of the output value of the resulting computation.</typeparam>
+    /// <typeparam name="A">The type of the input value of the computation.</typeparam>
+    /// <typeparam name="B">The type of the output value of the resulting computation.</typeparam>
     /// <param name="ma">The initial computation to bind.</param>
     /// <param name="fb">
     ///
     /// </param>
-    /// <returns>A new computation of type <see cref="Flow{RT, RQ, O}"/>.</returns>
-    public static Flow<RT, RQ, O> Bind<T, O>(
-        K<Flow<RT, RQ>, T> ma,
-        Func<T, K<Flow<RT, RQ>, O>> fb) =>
+    /// <returns>A new computation of type <see cref="Flow{RT, RQ, A}"/>.</returns>
+    public static Flow<RT, RQ, B> Bind<A, B>(
+        K<Flow<RT, RQ>, A> ma,
+        Func<A, Flow<RT, RQ, B>> fb) =>
         +Monad.bind(ma, fb);
+
+    public static Flow<RT, RQ, B> Bind<A, B>(
+        K<Flow<RT, RQ>, A> ma,
+        Func<A, K<Flow<RT, RQ>, B>> fb) =>
+        Bind(ma, a => +fb(a));
 
     static K<Flow<RT, RQ>, B> Monad<Flow<RT, RQ>>.Recur<A, B>(
         A value,
