@@ -44,6 +44,13 @@ public abstract class vTextInput<T> : InputBase<T>
     [Parameter]
     public string? Representation { get; set; }
 
+    protected string IdAttributeValue => 
+        AdditionalAttributes?.TryGetValue("id", out var explicitId) == true
+        ? Convert.ToString(explicitId) ?? string.Empty
+        : !string.IsNullOrWhiteSpace(NameAttributeValue)
+            ? NameAttributeValue
+            : FieldIdentifier.FieldName;
+
     /// <summary>
     /// Attempts to materialize <typeparamref name="T"/> from a textual representation.
     /// </summary>

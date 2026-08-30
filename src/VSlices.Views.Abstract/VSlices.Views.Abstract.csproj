@@ -15,7 +15,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\VSlices.Domain\VSlices.Domain.csproj" />
+	  <ProjectReference Include="..\VSlices.Domain\VSlices.Domain.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="LanguageExt" />
+		<Using Include="LanguageExt.Prelude" Static="true" />
+
+		<Using Include="VSlices" />
+		<Using Include="VSlices.Monads" />
+		<Using Include="VSlices.Arrows" />
+		<Using Include="VSlices.Domain.Traits" />
+		<Using Include="VSlices.VSlicesDomainPrelude" Static="true" />
 	</ItemGroup>
 
 </Project>
