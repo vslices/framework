@@ -1,6 +1,4 @@
 ﻿// Resharper disable CheckNamespace
-using VSlices.Monads;
-
 namespace VSlices.Monads
 {
     public partial class Flow<RT, RQ>
@@ -13,12 +11,12 @@ namespace VSlices.Monads
 
         public static Flow<RT, RQ, A> Lift<A>(K<Eff<RT>, A> ma) =>
             Lift(_ => ma);
-        
+
         public static Flow<RT, RQ, B> Bind<A, B>(
             K<Flow<RT, RQ>, A> ma,
             Func<A, Eff<RT, B>> fb) =>
             Bind(ma, a => Lift(fb(a)));
-        
+
         public static Flow<RT, RQ, B> Bind<A, B>(
             K<Flow<RT, RQ>, A> ma,
             Func<A, K<Eff<RT>, B>> fb) =>
@@ -38,10 +36,7 @@ namespace VSlices
             Func<RQ, K<Eff<RT>, A>> fa) =>
             Flow<RT, RQ>.Lift(fa);
     }
-}
 
-namespace VSlices
-{
     public static partial class FlowFluentAPISyntax
     {
         extension<RT, RQ, A>(K<Flow<RT, RQ>, A> ma)
@@ -82,7 +77,7 @@ namespace VSlices
                 Func<A, Eff<RT, B>> bind,
                 Func<A, B, C> project) =>
                 ma.Bind(x => bind(x).Map(y => project(x, y)));
-        
+
             /// <summary>
             ///
             /// </summary>
