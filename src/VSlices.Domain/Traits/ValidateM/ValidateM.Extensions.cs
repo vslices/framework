@@ -16,7 +16,7 @@ public static class ValidateMExt
         /// </summary>
         /// <param name="repr"></param>
         /// <returns></returns>
-        public static FinT<M, A> CheckM(K<M, A> repr) =>
+        public static FinT<M, A> CheckM(A repr) =>
             SELF.CheckM(repr);
 
     }
