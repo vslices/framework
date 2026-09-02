@@ -176,7 +176,7 @@ The invariant should be expressed as few times as practical. Its consequences ca
 
 The current model distinguishes two major testing intentions.
 
-They are not replacements for categories such as unit, integration, adapter, or system tests. They describe why evidence is being sought rather than where the test executes.
+They are not replacements for categories such as unit, integration, adapter, functional, E2E, or system tests. They describe why evidence is being sought rather than where or how the test executes.
 
 ## Verification Intent
 
@@ -237,7 +237,11 @@ A challenge may explore areas such as:
 - state-transition combinations;
 - resource limits;
 - authorization combinations;
-- distributed behavior.
+- distributed behavior;
+- environmental disturbance;
+- alternative actor paths;
+- hidden coupling;
+- model incompleteness.
 
 Conceptually:
 
@@ -264,8 +268,15 @@ Verification and Challenge form two complementary directions.
 | Direction | Regressive | Progressive |
 | Starts from | Accepted claims | Current model and assumptions |
 | Main question | Is this still true? | Where does this stop being true? |
-| Typical result | Continuity evidence | Counterexample or stronger confidence |
-| Discovery behavior | Protect known cases | Explore unknown cases |
+| Typical result | Continuity evidence | Counterexample, ambiguity, or stronger confidence |
+| Discovery behavior | Protect known knowledge | Explore unknown or insufficiently characterized regions |
+| Long-term role | Executable memory | Evolutionary pressure |
+
+A useful deeper interpretation is:
+
+> Regressive testing turns accepted knowledge into executable memory.
+
+> Progressive testing creates deliberate pressure for current knowledge to evolve.
 
 Neither is sufficient alone.
 
@@ -274,6 +285,398 @@ Verification without Challenge can preserve an incomplete model indefinitely.
 Challenge without Verification can repeatedly rediscover the same failures without retaining what was learned.
 
 Together they create an accumulating safety mechanism.
+
+## Regressive testing as executable memory
+
+Regression should not be understood only as "a bug must not return".
+
+Any sufficiently important and sufficiently stable piece of accepted knowledge can potentially become executable regression evidence.
+
+### Semantic regression
+
+Preserves the meaning of Domain Types, invariants, equality, normalization, identity, transformations, and laws.
+
+```txt
+FolderName still means what our accepted model says it means.
+```
+
+### Transition regression
+
+Preserves known Application transitions.
+
+```txt
+Given this admissible world and request,
+CreateAccount still produces the accepted resulting world and response.
+```
+
+### Realization regression
+
+Preserves the fidelity of technical realizations.
+
+```txt
+Domain -> SQL -> Domain
+```
+
+should continue preserving the relevant semantic value, identity, ordering, optionality, or other represented meaning.
+
+### Compositional regression
+
+Preserves knowledge that exists only when several parts interact.
+
+Individually correct Domain Types, Features, adapters, authorization rules, and views can still compose into an incorrect system.
+
+Functional and E2E verification become especially important when the accepted claim is inherently compositional.
+
+### Scenario regression
+
+Preserves accepted real-world paths.
+
+For example:
+
+```txt
+Requester reports problem
+    -> Analyst receives it
+    -> Specialist acts
+    -> Requester observes resolution
+```
+
+The claim does not exist inside one Domain Type or Feature. It exists only in the composed behavior of the product.
+
+### Operational regression
+
+Preserves accepted behavior under known operational conditions.
+
+A resilience or failure-mode discovery can become regression knowledge once the expected behavior is understood.
+
+This yields a general principle:
+
+> Accepted knowledge may be promoted into regression evidence at the semantic surface where that knowledge actually exists.
+
+## Progressive testing as adversarial engineering
+
+Progressive testing should not be reduced to "generate more edge cases".
+
+Its deeper role is to act adversarially toward the current model:
+
+```txt
+Claim
+    -> deliberately search for contradiction
+    -> expose the claim to hostile, unusual, or unexplored conditions
+    -> collect evidence
+```
+
+Ethical hacking and red teaming are important specializations of this structure, oriented toward security claims.
+
+VSlices can generalize the same adversarial stance toward any engineering claim:
+
+- domain validity;
+- application transitions;
+- infrastructure fidelity;
+- authorization;
+- workflow consistency;
+- concurrency;
+- resilience;
+- actor journeys;
+- architecture;
+- design assumptions;
+- even VSlices abstractions themselves.
+
+A useful working formulation is:
+
+> Ethical hacking is one specialization of progressive Challenge against security properties.
+
+Progressive testing is broader: it is adversarial engineering against explicit or implied semantic claims.
+
+## Progressive testing can mutate more than input
+
+A Challenge does not need to vary only function arguments.
+
+Depending on the claim, its exploration space may include:
+
+```txt
+Input
+x Stored State
+x Time
+x Dependency Behavior
+x Network Conditions
+x Resource Availability
+x Concurrency Schedule
+x Actor
+x Navigation Path
+x Deployment State
+```
+
+This makes several existing disciplines natural Challenge strategies.
+
+### Boundary and property exploration
+
+Searches the frontier between valid and invalid spaces and challenges algebraic or semantic properties.
+
+Property-based testing can serve either Verification or Challenge depending on whether an accepted property is being preserved or a larger space is being explored for counterexamples.
+
+### Fuzzing
+
+Searches unusual, malformed, unexpected, or adversarial inputs.
+
+With VSlices, fuzzing can become semantically guided rather than purely byte-oriented by using the represented valid space, boundaries, normalization rules, and technical realizations as search structure.
+
+### Stateful and model-based exploration
+
+Searches sequences of individually meaningful operations for unexpected resulting states.
+
+This is particularly relevant for Features, which naturally represent transitions.
+
+### Temporal and concurrency exploration
+
+Challenges assumptions about ordering, stale state, retries, simultaneous transitions, and time-dependent invariants.
+
+### Representational exploration
+
+Searches for disagreement between two representations of the same semantic concept.
+
+Examples include:
+
+```txt
+Domain <-> SQL
+Domain <-> JSON
+Domain <-> HTTP
+Domain <-> UI representation
+```
+
+### Environmental and chaos-style exploration
+
+Mutates the environment rather than the primary input.
+
+Examples include dependency unavailability, network interruption, resource exhaustion, stale observations, or partial failures.
+
+Once a discovered failure behavior becomes understood and accepted, it may become operational regression knowledge.
+
+### Adversarial security exploration
+
+Asks explicitly:
+
+> If an authorized tester wanted to violate this security claim without modifying the system, what paths would be attempted?
+
+This includes authorization substitution, stale credentials, alternate entry points, ordering, concurrency, and other security-oriented adversarial strategies.
+
+### Functional and E2E adversarial exploration
+
+Challenges complete business behavior rather than isolated implementation units.
+
+A progressive E2E campaign may vary:
+
+- actor;
+- navigation path;
+- session changes;
+- browser history;
+- retries;
+- stale tabs;
+- valid operation ordering;
+- interruption and resumption;
+- concurrent actors.
+
+The question is not merely whether the happy path works.
+
+It is:
+
+> What real actor behavior can take the system outside the world our model says should be possible?
+
+This can be understood as adversarial exploration of functional semantics.
+
+### Model and specification exploration
+
+Progressive testing may reveal that the implementation is correct and the claim itself is insufficient.
+
+For example:
+
+```txt
+Documentation:
+    Only administrators need access to X.
+
+Observed real workflow:
+    SupportAgent also needs X to perform an accepted responsibility.
+```
+
+The code may perfectly implement the documentation while the documentation fails to represent the world.
+
+This is a first-class finding.
+
+### Framework and process exploration
+
+The same structure can be applied to engineering abstractions and processes.
+
+For example:
+
+```txt
+Claim:
+    A Feature adequately represents this class of application transition.
+
+Challenge:
+    Find a real behavior that cannot be represented without semantic distortion.
+```
+
+Or:
+
+```txt
+Claim:
+    This documentation-to-VSIR path preserves required knowledge.
+
+Challenge:
+    Find relevant knowledge systematically lost during the transition.
+```
+
+These uses may eventually extend beyond Framework tooling, but the common abstract operation remains Challenge.
+
+## Testing versus observation and feedback
+
+The concept of testing should not expand until every source of evidence becomes "a test".
+
+A useful boundary is intentionality.
+
+### Testing
+
+Deliberate exposure of a claim to selected conditions in order to obtain evidence.
+
+```txt
+We intentionally create or select an experiment.
+```
+
+### Observation / Feedback
+
+Evidence produced by real use or operation without having been deliberately created as the experiment under consideration.
+
+```txt
+The world exposes something to us.
+```
+
+Both can return evidence to Understanding:
+
+```txt
+Knowledge
+    |-- deliberate Testing
+    `-- Observation / Feedback
+             |
+             v
+          Evidence
+             |
+             v
+        Interpretation
+             |
+             v
+        Understanding
+```
+
+A production incident, support ticket, user observation, or usability finding is therefore not automatically a VSlices test.
+
+It may, however, expose a missing claim and later produce a Verification or Challenge campaign.
+
+## Human-facing claims
+
+Some engineering claims concern human interaction rather than machine state alone.
+
+For example:
+
+```txt
+A representative user can understand and complete this workflow.
+```
+
+No number of deterministic browser executions proves that claim by itself.
+
+Evidence may require controlled observation with representative users, accessibility evaluation, or other human-facing methods.
+
+These methods should not all be relabeled as software testing, but their evidence can participate in the same knowledge loop when they examine claims represented or implied by the system.
+
+## Claim geometry determines evidence geometry
+
+One of the strongest emerging principles is:
+
+> The geometry of the claim determines the geometry of the evidence.
+
+A local claim can have a local faithful surface.
+
+A compositional or world-facing claim may only exist at a broad surface.
+
+Examples:
+
+```txt
+EmailAddress normalization
+    -> Domain construction surface
+
+EmailAddress persistence fidelity
+    -> Domain + real adapter + real database
+
+CreateAccount transition
+    -> Application + Domain + required real Infrastructure
+
+Requester can resolve a support problem through Ticket Support
+    -> functional/E2E product composition
+```
+
+A broader surface should therefore be preferred when the claim is inherently compositional or world-facing.
+
+The objective is not to minimize topology, and it is not to maximize topology mechanically.
+
+The objective is:
+
+> Use the evidence surface that most faithfully represents the semantic relation being tested.
+
+Or, more compactly:
+
+> Maximize claim-relative semantic fidelity.
+
+## Functional and E2E evidence
+
+Functional and E2E testing have high importance in this model because they can expose contradictions that local evidence cannot.
+
+Local evidence primarily asks:
+
+> Did we materialize this represented claim correctly?
+
+Functional and E2E evidence can additionally ask:
+
+> Does the composed system produced from our representation behave like the world we intended to model?
+
+This distinction matters especially in AI-assisted development.
+
+A wrong specification can produce coherent Domain code, Features, adapters, views, and local tests. A sufficiently faithful whole-path test can expose that the composed product does not support the real phenomenon the documentation claimed to represent.
+
+Therefore E2E should not be treated only as expensive smoke coverage at the top of a pyramid.
+
+When the claim is an actor journey or complete business outcome, E2E or another full functional surface is the natural evidence surface.
+
+## Regressive and progressive testing are orthogonal to technique
+
+Techniques do not inherently belong to only one direction.
+
+```txt
+                         Verification     Challenge
+Domain laws                   X              X
+Property testing              X              X
+Database testing              X              X
+Functional testing            X              X
+E2E                           X              X
+Security testing              X              X
+Resilience testing            X              X
+Architecture testing          X              X
+```
+
+For example:
+
+```txt
+Property testing used to preserve an accepted law
+    -> regressive
+
+Property testing used to search a wider generated space
+    -> progressive
+
+Known E2E business journey replayed continuously
+    -> regressive
+
+E2E explorer varying actor paths and ordering
+    -> progressive
+```
+
+This distinction should remain stable even if individual tools or methodologies change.
 
 ## Preventive and reactive development safety
 
@@ -329,6 +732,8 @@ This makes safety cumulative.
 A discovered edge case should not remain merely an interesting exploratory test forever if it reveals a meaningful semantic rule.
 
 Once the rule is understood and accepted, it should be incorporated into the knowledge model and propagated into ordinary verification.
+
+Challenge itself may also remain valuable after one discovery. VSlices may eventually preserve recurring Challenge campaigns that continue exploring new regions while accepted discoveries are separately promoted into deterministic regression evidence.
 
 ## Challenges do not define the domain automatically
 
@@ -398,9 +803,43 @@ Challenge:
     normalization interactions
 ```
 
-The concrete testing projection may later choose xUnit, property-based testing, fuzzing, mutation testing, integration tests, or another mechanism.
+The concrete testing projection may later choose xUnit, property-based testing, fuzzing, mutation testing, integration testing, functional testing, E2E, browser automation, chaos-style fault injection, or another mechanism.
 
 The IR should preserve the reason for the test rather than the accidental structure of the test framework.
+
+## Test generation as an iterative process
+
+A test-oriented IR should not be assumed to represent one permanent concrete test.
+
+The current direction is closer to:
+
+```txt
+Production VSIR
+    +
+Testing Intent
+    |
+    v
+Candidate generation / campaign
+    |
+    v
+Candidate tests or scenarios
+    |
+    v
+Execution
+    |
+    v
+Evidence
+    |
+    v
+Human review
+    |-- reject -> discard
+    |-- accept -> promote to suite
+    `-- semantic discovery -> revise knowledge first
+```
+
+Generated candidates do not become authoritative merely because they compile or pass.
+
+The permanent suite is curated output from the process.
 
 ## Default derived verification and explicit challenge intent
 
@@ -430,7 +869,9 @@ Challenge Specification
     -> explore assumptions or boundaries beyond known examples
 ```
 
-This distinction should help avoid reproducing test source code in another syntax.
+The test representation should reference the authoritative semantic source rather than duplicate its invariant definitions.
+
+This distinction should help avoid reproducing test source code or domain knowledge in another syntax.
 
 ## AI-assisted engineering changes the economics
 
@@ -449,7 +890,9 @@ AI can reduce the cost of producing and maintaining:
 - contracts;
 - documentation projections;
 - repetitive architectural checks;
-- challenge inputs.
+- challenge inputs;
+- functional scenarios;
+- E2E paths.
 
 The scarce resource becomes semantic correctness:
 
@@ -457,11 +900,12 @@ The scarce resource becomes semantic correctness:
 Understand
     -> specify clearly
     -> propagate
+    -> expose claims to reality
     -> obtain evidence
     -> interpret divergence
 ```
 
-This permits more derived evidence than a fully manual development process could economically maintain.
+This permits more derived and broader evidence than a fully manual development process could economically maintain.
 
 However, AI also introduces a particular risk:
 
@@ -480,7 +924,31 @@ Generated representations preserve meaning.
 
 Challenges should actively search for places where that meaning or its implementation may be incomplete.
 
+Functional, E2E, adversarial, and other broad-surface challenges become especially important when the purpose is not merely to verify code against the IR, but to test whether the IR itself captures the phenomenon represented by documentation and design.
+
 The system should automate propagation without treating generated consistency as proof of truth.
+
+## Productive and exploratory generation have different goals
+
+AI or other generation used for productive projection should converge toward stable, reproducible materialization of represented knowledge.
+
+Exploratory generation should instead seek semantic diversity.
+
+```txt
+Production generation
+    -> reduce solution space
+    -> converge
+
+Challenge generation
+    -> expand useful search space
+    -> diverge
+```
+
+The goal is not arbitrary non-determinism.
+
+It is useful semantic novelty under explicit constraints.
+
+Candidate discovery may be non-deterministic, but retained evidence and promoted regression tests should be reproducible.
 
 ## Evidence boundary is a separate dimension
 
@@ -496,6 +964,9 @@ Possible evidence boundaries include:
 - adapter;
 - persistence;
 - view/component;
+- hosted service;
+- functional product;
+- browser/E2E;
 - distributed system;
 - architecture.
 
@@ -503,16 +974,18 @@ Therefore both directions can exist at multiple levels.
 
 ```txt
                     Evidence boundary
-              Domain  Slice  Adapter  System
-Verification    x      x       x       x
-Challenge       x      x       x       x
+              Domain  Slice  Adapter  Product  System
+Verification    x      x       x        x       x
+Challenge       x      x       x        x       x
 ```
 
-A regression test does not automatically need a full distributed system.
+The evidence surface should not be selected by a rule such as "always choose the smallest possible test" or "always choose the largest realistic system".
 
-A challenge does not automatically need to be a unit test.
+It should be selected according to the claim under examination.
 
-The intended claim should be exercised at the smallest boundary that provides sufficient evidence for that claim.
+> Use the evidence surface that most faithfully represents the semantic relation being tested.
+
+Additional components improve evidence only when they participate materially in that relation.
 
 ## Aspire and whole-system evidence
 
@@ -526,9 +999,12 @@ Its strongest role is to answer questions that require the real distributed comp
 - declared dependencies are wired correctly;
 - real infrastructure is reachable;
 - service composition behaves correctly;
-- system-level contracts survive actual execution boundaries.
+- system-level contracts survive actual execution boundaries;
+- a represented full-system scenario can actually occur across independent deployments.
 
-Domain invariants or application behavior should normally be exercised at cheaper boundaries when those boundaries already provide sufficient evidence.
+Current Domain Type, invariant, and Feature VSIR normally need smaller claim-faithful surfaces such as direct Domain execution or a hosted service with real Dockerized dependencies.
+
+Future scenario, journey, or distributed-flow representations may naturally require Aspire or another whole-system surface.
 
 ## Candidate testing techniques
 
@@ -536,7 +1012,7 @@ Several existing techniques can serve the model without defining it.
 
 ### Property-based testing
 
-Especially useful for invariants, algebraic properties, transformations, Value Objects, Entities, Aggregate Roots, and generated boundary exploration.
+Especially useful for invariants, algebraic properties, transformations, Domain Types, Entities, Aggregate Roots, generated boundaries, and transition exploration.
 
 It can serve both directions:
 
@@ -551,27 +1027,51 @@ Useful for making capability and service boundaries executable and retaining con
 
 Useful for turning structural continuity rules into executable evidence.
 
-Examples include dependency constraints between Domain, Application, Infrastructure, shared dependencies, products, and services.
+Architecture can also be challenged progressively by looking for indirect semantic coupling that simple dependency rules do not expose.
 
 ### Mutation testing
 
 Useful as a challenge against the quality of the existing verification system.
 
-It can ask whether meaningful implementation changes would actually be detected by the current evidence.
+It can ask whether meaningful implementation or semantic changes would actually be detected by the current evidence.
 
 Mutation score should be treated as diagnostic evidence rather than as a number to maximize.
+
+### Fuzzing and search-based generation
+
+Useful for exploring unusual inputs, technical representations, and large spaces where deterministic enumeration is impractical.
+
+Within VSlices, generators should preferentially use semantic structure rather than produce arbitrary noise when the IR provides meaningful partitions and boundaries.
+
+### Model-based and stateful testing
+
+Useful when the target is a transition system, especially Features and sequences of Features.
+
+These techniques can explore paths, state histories, and combinations that are difficult to enumerate manually.
 
 ### Real adapter testing
 
 When an adapter's semantics depend on real infrastructure behavior, evidence should come from that real behavior where practical.
 
-A fake application port can test application semantics, but it does not prove SQL Server, serialization, messaging, or another adapter behaves the same way.
+A fake application port can serve as a model or isolated semantic aid, but it does not prove SQL Server, serialization, messaging, or another adapter behaves equivalently.
 
-### Component and browser testing
+### Component, functional, and browser testing
 
-Component-level tools should be preferred when they provide enough evidence for UI behavior.
+Component-level tools remain useful for claims local to a UI component.
 
-Full browser execution is appropriate when browser, DOM, JavaScript, rendering, navigation, or other real client behavior is itself part of the claim.
+Full hosted or browser execution is appropriate when navigation, DOM, JavaScript, authorization, sessions, actor behavior, persistence, or complete product composition is part of the claim.
+
+### Adversarial and security testing
+
+Useful when deliberately attempting to violate security, authorization, integrity, availability, or trust claims.
+
+Security is a specialized but important progressive Challenge domain.
+
+### Chaos and fault-injection testing
+
+Useful when the claim depends on behavior under environmental disturbance or dependency failure.
+
+Once accepted failure behavior is learned, parts of those experiments can become regression evidence.
 
 ## Avoid interaction-heavy testing by default
 
@@ -600,6 +1100,8 @@ Generated test data and builders should use the public semantics of the domain r
 
 The objective is to produce meaningful scenarios, not large object graphs detached from domain language.
 
+Progressive generation may deliberately construct malformed technical worlds, but those worlds should be identified as technical challenges rather than silently treated as valid Domain values.
+
 ## Core principles
 
 The current approach can be summarized by the following principles.
@@ -612,17 +1114,33 @@ Accepted knowledge should be convertible into regression evidence.
 
 The current model should never be treated as automatically exhaustive.
 
+### Treat regression as memory
+
+Regression preserves more than historical bugs. It preserves accepted semantic, transitional, compositional, technical, and operational knowledge.
+
+### Treat progression as evolutionary pressure
+
+Progressive testing should deliberately search for evidence that current knowledge is incomplete, contradictory, or incorrectly realized.
+
 ### Promote discoveries deliberately
 
-Challenges produce observations. Observations become domain knowledge only after interpretation and an explicit semantic decision.
+Challenges produce observations. Observations become domain or engineering knowledge only after interpretation and an explicit semantic decision.
 
 ### Make learned safety cumulative
 
 Meaningful discoveries should be incorporated into the knowledge model and become permanent verification where appropriate.
 
-### Use the cheapest sufficient evidence boundary
+### Let claim geometry determine evidence geometry
 
-Run a claim at the smallest boundary that provides adequate evidence for what is being asserted.
+Local claims may have local faithful surfaces. Compositional and world-facing claims may require functional, E2E, or distributed surfaces.
+
+### Maximize claim-relative semantic fidelity
+
+Do not mechanically minimize or maximize the test environment. Reproduce the semantic relation under examination as faithfully as practical.
+
+### Keep testing intentional
+
+Testing deliberately exposes claims to selected conditions. Feedback and observation also produce evidence, but should not be renamed as testing when no deliberate experiment occurred.
 
 ### Generate representations; maintain meaning
 
@@ -634,7 +1152,13 @@ A compact description of the model is:
 
 > VSlices develops safely by preserving what is known to be correct, actively challenging what is assumed to be correct, and incorporating validated discoveries back into its semantic source.
 
-An even shorter formulation is:
+A compact formulation of the two testing directions is:
+
+> Regressive testing asks whether reality still agrees with what we know.
+
+> Progressive testing asks what reality can teach us that we do not know yet.
+
+An even shorter formulation remains:
 
 > Preserve. Challenge. Learn. Preserve again.
 
@@ -649,14 +1173,15 @@ Understanding
     -> Contextualizing
     -> Planning
     -> Building
-    -> evidence from challenges and feedback
+    -> deliberate testing + observation / feedback
+    -> evidence
     -> interpretation
     -> Understanding
 ```
 
 Testing is therefore not merely a QA stage after implementation.
 
-It is one of the mechanisms by which the materialized understanding produces evidence that can return to the knowledge-forming parts of VSlices.
+It is one of the mechanisms by which the materialized understanding is exposed to conditions capable of producing evidence about both the implementation and the knowledge from which that implementation was derived.
 
 The resulting continuity is broader than knowledge-to-software continuity:
 
@@ -675,17 +1200,18 @@ That feedback path is the central idea this document intends to preserve.
 
 The following areas remain intentionally unresolved and should be explored before turning this approach into rigid conventions or tooling:
 
-- the exact shape and naming of Verification Intent IR;
-- the exact shape and naming of Challenge Specification IR;
-- which verification can be derived automatically from existing domain IR;
-- how explicit invariants should be represented for the best propagation value;
-- how discoveries should be recorded before becoming accepted semantic changes;
-- how feedback from production and users participates in the same evidence model;
-- which generated artifacts are authoritative, derived, or disposable;
-- how provenance between knowledge, generated tests, implementation, and evidence should be tracked;
-- how AI-generated challenges can remain sufficiently independent from AI-generated implementations;
-- how test execution boundaries should be selected automatically or declaratively;
-- how Aspire-based whole-system evidence should be isolated from cheaper test boundaries;
-- whether this model eventually belongs only to Framework tooling or becomes a broader VSlices concept shared with Method, Design, and Docs Standard.
+- how Verification and Challenge apply concretely to each current VSIR artifact kind;
+- the exact authored shape and naming of test-oriented IR;
+- which evidence obligations can be derived automatically from existing Domain Type, invariant, and Feature IR;
+- how test IR references one invariant, condition, intrinsic, law, or derived claim without duplicating it;
+- whether Infrastructure/adapter semantics eventually require their own representation;
+- how candidate generation, execution, evidence reduction, and human promotion are implemented;
+- how provenance between knowledge, generated candidates, implementation, environment, and evidence should be tracked;
+- how semantic diversity and redundancy of Challenge candidates should be measured;
+- how challenge generation can use different visibility policies from production generation;
+- which Challenge campaigns should recur instead of being reduced to fixed regression cases;
+- how functional/E2E Scenario or Journey knowledge should eventually be represented;
+- how human-facing evidence such as usability or accessibility should connect to the same knowledge loop without collapsing all research into "testing";
+- whether the abstract preserve/challenge/evidence model eventually becomes transversal across Method, Design, Docs Standard, and Framework while executable tooling remains primarily a Framework concern.
 
 These questions are part of the future development of the approach, not omissions to silently fill with conventional testing practice.
