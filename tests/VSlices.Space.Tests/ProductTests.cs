@@ -12,7 +12,7 @@ public class ProductTests
         var width = new ProbeLength<Kilometers, decimal>(2m);
         var depth = new ProbeLength<Meters, decimal>(3m);
 
-        Product<M.Length, M.Length, Kilometers, decimal> product = width * depth;
+        Product<M.Length, Kilometers, decimal> product = width * depth;
 
         Assert.Equal(0.006m, product.Value);
         Assert.IsAssignableFrom<Q<M.Mul<M.Length, M.Length>, Kilometers, decimal>>(product);
@@ -27,7 +27,7 @@ public class ProductTests
 
         var product = width * depth;
 
-        Assert.IsType<Product<M.Length, M.Length, Meters, double>>(product);
+        Assert.IsType<Product<M.Length, Meters, double>>(product);
         Assert.Equal(6d, product.Value);
     }
 
@@ -43,22 +43,22 @@ public class ProductTests
     }
 
     [Fact]
-    public void area_is_explicitly_established_from_the_length_product()
+    public void area_is_defined_over_squared_length_even_when_established_from_a_product()
     {
         var width = new ProbeLength<Kilometers, decimal>(2m);
         var depth = new ProbeLength<Meters, decimal>(3m);
 
-        var structural = width * depth;
+        Product<M.Length, Kilometers, decimal> structural = width * depth;
         Area<Kilometers, decimal> semantic = area(structural);
-        Product<M.Length, M.Length, Kilometers, decimal> widened = WidenArea(semantic);
+        Power<M.Length, N2, Kilometers, decimal> widened = WidenArea(semantic);
 
         Assert.Equal(0.006m, semantic.Value);
-        Assert.Equal(structural, widened);
-        Assert.IsAssignableFrom<Q<M.Mul<M.Length, M.Length>, Kilometers, decimal>>(semantic);
+        Assert.Equal(structural.Value, widened.Value);
+        Assert.IsAssignableFrom<Q<M.Pow<M.Length, N2>, Kilometers, decimal>>(semantic);
     }
 
     [Fact]
-    public void area_symbol_is_declared_without_creating_a_squared_coordinate_type()
+    public void area_symbol_is_declared_and_product_input_reduces_before_establishment()
     {
         var attribute = Assert.Single(
             typeof(Area<Meters, double>)
@@ -74,23 +74,21 @@ public class ProductTests
     }
 
     [Fact]
-    public void area_times_length_aligns_the_primitive_basis_and_uses_compact_product()
+    public void area_times_length_aligns_the_primitive_basis_and_reduces_to_cubed_length()
     {
         var width = new ProbeLength<Kilometers, decimal>(2m);
         var depth = new ProbeLength<Meters, decimal>(300m);
         var height = new ProbeLength<Meters, decimal>(500m);
         var surface = area(width * depth);
 
-        Product<M.Mul<M.Length, M.Length>, M.Length, Kilometers, decimal> structural =
-            surface * height;
+        Power<M.Length, N3, Kilometers, decimal> structural = surface * height;
 
         Assert.Equal(0.3m, structural.Value);
-        Assert.IsAssignableFrom<
-            Q<M.Mul<M.Mul<M.Length, M.Length>, M.Length>, Kilometers, decimal>>(structural);
+        Assert.IsAssignableFrom<Q<M.Pow<M.Length, N3>, Kilometers, decimal>>(structural);
     }
 
     [Fact]
-    public void volume_is_explicitly_established_from_area_times_length()
+    public void volume_is_explicitly_established_from_cubed_length()
     {
         var width = new ProbeLength<Kilometers, decimal>(2m);
         var depth = new ProbeLength<Meters, decimal>(300m);
@@ -99,13 +97,11 @@ public class ProductTests
         var structural = surface * height;
 
         Volume<Kilometers, decimal> semantic = volume(structural);
-        Product<M.Mul<M.Length, M.Length>, M.Length, Kilometers, decimal> widened =
-            WidenVolume(semantic);
+        Power<M.Length, N3, Kilometers, decimal> widened = WidenVolume(semantic);
 
         Assert.Equal(0.3m, semantic.Value);
         Assert.Equal(structural, widened);
-        Assert.IsAssignableFrom<
-            Q<M.Mul<M.Mul<M.Length, M.Length>, M.Length>, Kilometers, decimal>>(semantic);
+        Assert.IsAssignableFrom<Q<M.Pow<M.Length, N3>, Kilometers, decimal>>(semantic);
     }
 
     [Fact]
@@ -125,12 +121,12 @@ public class ProductTests
         Assert.IsType<Volume<Meters, double>>(volume(area(width * depth) * height));
     }
 
-    private static Product<M.Length, M.Length, C, T> WidenArea<C, T>(Area<C, T> area)
+    private static Power<M.Length, N2, C, T> WidenArea<C, T>(Area<C, T> area)
         where C : Coordinate<M.Length>
         where T : System.Numerics.INumber<T> =>
         area.ToBase();
 
-    private static Product<M.Mul<M.Length, M.Length>, M.Length, C, T> WidenVolume<C, T>(Volume<C, T> volume)
+    private static Power<M.Length, N3, C, T> WidenVolume<C, T>(Volume<C, T> volume)
         where C : Coordinate<M.Length>
         where T : System.Numerics.INumber<T> =>
         volume.ToBase();

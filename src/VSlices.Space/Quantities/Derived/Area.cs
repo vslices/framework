@@ -4,27 +4,28 @@ using VSlices.Space.Quantities.Abstract;
 namespace VSlices.Space.Quantities;
 
 /// <summary>
-/// Semantic area established from Length x Length.
-/// C remains a primitive Length coordinate basis; the square lives in M.Mul.
+/// Semantic area established from squared Length.
+/// Power&lt;Length,N2&gt; is the defining algebraic base; Length x Length may reach this
+/// base through the implicit Product&lt;Length,C,T&gt; -> Power&lt;Length,N2,C,T&gt; reduction.
 /// </summary>
 [AlgebraicSymbol("area")]
 public sealed record Area<C, T>(
-    Product<M.Length, M.Length, C, T> Product) :
-    Q<M.Mul<M.Length, M.Length>, C, T>,
-    DerivedSpace<Area<C, T>, Product<M.Length, M.Length, C, T>>
+    Power<M.Length, N2, C, T> Power) :
+    Q<M.Pow<M.Length, N2>, C, T>,
+    DerivedSpace<Area<C, T>, Power<M.Length, N2, C, T>>
     where C : Coordinate<M.Length>
     where T : INumber<T>
 {
-    public T Value => Product.Value;
+    public T Value => Power.Value;
 
-    public Product<M.Length, M.Length, C, T> ToBase() => Product;
+    public Power<M.Length, N2, C, T> ToBase() => Power;
 }
 
 /// <summary>
 /// Explicitly authorized Area x Length multiplication.
 /// RIGHT is converted to the Area's primitive Length basis before multiplication.
-/// Since both operands can be expressed on that shared primitive basis, the result
-/// uses the compact Product form even though their magnitude shapes differ.
+/// Because Area is already established over Length^2, the algebraic result is reduced
+/// directly to Length^3 rather than preserving an intermediate Mul&lt;Pow&lt;Length,N2&gt;,Length&gt;.
 /// </summary>
 public static class AreaProductOperators
 {
@@ -34,7 +35,7 @@ public static class AreaProductOperators
         where RIGHT_C : Coordinate<M.Length>
         where T : INumber<T>
     {
-        public static Product<M.Mul<M.Length, M.Length>, M.Length, LEFT_C, T> operator *(
+        public static Power<M.Length, N3, LEFT_C, T> operator *(
             Area<LEFT_C, T> left,
             Length<RIGHT_SELF, RIGHT_C, T> right)
         {

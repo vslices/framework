@@ -17,8 +17,8 @@ public sealed record Power<BASE_F, EXPONENT, C, T>(T Value) :
     where T : INumber<T>;
 
 /// <summary>
-/// First production pressure for Power: squaring a Length.
-/// C# has no exponentiation operator, so the structural operation is named explicitly.
+/// Explicit power operations for the exponent vocabulary currently pressured by
+/// production cases. C# has no exponentiation operator, so these operations are named.
 /// </summary>
 public static class PowerOperations
 {
@@ -28,4 +28,11 @@ public static class PowerOperations
         where C : Coordinate<M.Length>
         where T : INumber<T> =>
         new(value.Value * value.Value);
+
+    public static Power<M.Length, N3, C, T> cube<SELF, C, T>(
+        Length<SELF, C, T> value)
+        where SELF : Length<SELF, C, T>
+        where C : Coordinate<M.Length>
+        where T : INumber<T> =>
+        new(value.Value * value.Value * value.Value);
 }

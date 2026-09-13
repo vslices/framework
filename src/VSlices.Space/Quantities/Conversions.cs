@@ -11,16 +11,26 @@ namespace VSlices.Space;
 public static partial class Conversions
 {
     public static Area<C, T> area<C, T>(
-        Product<M.Length, M.Length, C, T> product)
+        Power<M.Length, N2, C, T> power)
         where C : Coordinate<M.Length>
         where T : INumber<T> =>
-        new(product);
+        new(power);
+
+    /// <summary>
+    /// Consumer convenience for rectangular area. Product reduces algebraically to
+    /// Power&lt;Length,N2&gt; before semantic establishment; Product itself never becomes Area.
+    /// </summary>
+    public static Area<C, T> area<C, T>(
+        Product<M.Length, C, T> product)
+        where C : Coordinate<M.Length>
+        where T : INumber<T> =>
+        area((Power<M.Length, N2, C, T>)product);
 
     public static Volume<C, T> volume<C, T>(
-        Product<M.Mul<M.Length, M.Length>, M.Length, C, T> product)
+        Power<M.Length, N3, C, T> power)
         where C : Coordinate<M.Length>
         where T : INumber<T> =>
-        new(product);
+        new(power);
 
     public static Speed<LENGTH_C, DURATION_C, T> speed<LENGTH_C, DURATION_C, T>(
         Quotient<M.Length, LENGTH_C, M.Duration, DURATION_C, T> quotient)

@@ -10,3 +10,8 @@ public interface Exponent;
 /// Algebraic exponent two.
 /// </summary>
 public readonly struct N2 : Exponent;
+
+/// <summary>
+/// Algebraic exponent three.
+/// </summary>
+public readonly struct N3 : Exponent;

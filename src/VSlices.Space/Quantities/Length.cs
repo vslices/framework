@@ -90,7 +90,7 @@ public static class LengthProductOperators
         where RIGHT_C : Coordinate<M.Length>
         where T : INumber<T>
     {
-        public static Product<M.Length, M.Length, LEFT_C, T> operator *(
+        public static Product<M.Length, LEFT_C, T> operator *(
             Length<LEFT_SELF, LEFT_C, T> left,
             Length<RIGHT_SELF, RIGHT_C, T> right)
         {
