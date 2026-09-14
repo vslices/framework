@@ -8,7 +8,7 @@ Coordinate   primitive measurement basis
 T            numeric carrier
 ```
 
-`Q<F,C,T>` remains the current single-basis quantity shape, but its universal status is intentionally open. `Speed` shows that real quantities may need multiple primitive bases; `Power` shows that repeated algebraic shape can still use one primitive basis.
+`Q<F,C,T>` remains the current single-basis quantity shape, but its universal status is intentionally open. `Speed` and `Acceleration` show that real quantities may need multiple primitive bases; `Power` shows that repeated algebraic shape can still use one primitive basis.
 
 ## Magnitudes
 
@@ -42,14 +42,12 @@ Current fixed references are Gram, Meter, and Second for Mass, Length, and Durat
 
 ## Product and Power
 
-Same-factor multiplication now materializes as:
+Same-factor multiplication materializes as:
 
 ```csharp
 Product<F,C,T>
     : Q<M.Mul<F,F>,C,T>
 ```
-
-For example, `2 km * 300 m` becomes `0.6 km²` on the Kilometer basis.
 
 A same-factor Product can reduce implicitly to the equivalent square Power:
 
@@ -79,7 +77,13 @@ Power<BASE_F,EXPONENT,C,T>
     : Q<M.Pow<BASE_F,EXPONENT>,C,T>
 ```
 
-Current named operations are `square(length)` and `cube(length)`.
+Current named operations include:
+
+```csharp
+square(length)
+square(duration)
+cube(length)
+```
 
 ## Area
 
@@ -128,18 +132,77 @@ volume(area(width * depth) * height)
 
 `Area * Length` aligns the incoming Length coordinate to Area's primitive basis and reduces `Length² * Length` directly to `Length³`.
 
-## Quotient and the open Q question
+## Quotient and Speed
 
-`Length / Duration` preserves both primitive bases in `Quotient<...>`. `Speed` therefore does not implement `Q<F,C,T>`.
+`Length / Duration` materializes the direct algebraic division shape:
 
-Current evidence suggests:
-
-```text
-Q<F,C,T>
-    useful for quantities with one truthful primitive basis
+```csharp
+Quotient<
+    M.Length,
+    LENGTH_C,
+    M.Duration,
+    DURATION_C,
+    T>
 ```
 
-rather than proving that `Q` is the universal definition of quantity.
+`Speed` is explicitly established from that quotient:
+
+```csharp
+speed(distance / duration)
+```
+
+It preserves both primitive coordinate bases and therefore does not currently implement `Q<F,C,T>`.
+
+## Repeated division and Acceleration
+
+The next concrete `M.Div` pressure is repeated division by the same magnitude family:
+
+```text
+Div<Div<Length,Duration>,Duration>
+```
+
+The promoted algebraic reduction is:
+
+```text
+Div<Div<Length,Duration>,Duration>
+-> Div<Length,Pow<Duration,N2>>
+```
+
+This gives one canonical acceleration base shape while preserving the two primitive bases Length and Duration:
+
+```csharp
+Quotient<
+    M.Length,
+    LENGTH_C,
+    M.Pow<M.Duration,N2>,
+    DURATION_C,
+    T>
+```
+
+Both paths are valid:
+
+```csharp
+acceleration(distance / square(duration))
+acceleration(speed(distance / elapsed) / interval)
+```
+
+For the nested path, the incoming `interval` is converted to the Duration basis already carried by Speed before the operator materializes the reduced quotient.
+
+`Acceleration` is then defined semantically over that reduced quotient:
+
+```csharp
+Acceleration<LENGTH_C,DURATION_C,T>
+    : DerivedSpace<
+        Acceleration<LENGTH_C,DURATION_C,T>,
+        Quotient<
+            M.Length,
+            LENGTH_C,
+            M.Pow<M.Duration,N2>,
+            DURATION_C,
+            T>>
+```
+
+As with Area and Volume, algebraic reduction is not semantic establishment. `Speed / Duration` may reduce to the acceleration magnitude shape, but `acceleration(...)` remains explicit.
 
 ## Current algebraic reductions
 
@@ -148,6 +211,18 @@ Only reductions pressured by concrete cases are promoted:
 ```text
 Mul<X,X> -> Pow<X,N2>
 Pow<Length,N2> x Length -> Pow<Length,N3>
+Div<Div<Length,Duration>,Duration> -> Div<Length,Pow<Duration,N2>>
 ```
 
-No general normalization engine exists yet. Product preserves performed multiplication; Power expresses reduced repeated shape; Area and Volume establish domain semantics.
+No general normalization engine exists yet. Product and Quotient preserve structural operations; Power and reduced Quotient forms express promoted algebraic reductions; Area, Volume, Speed, and Acceleration establish domain semantics.
+
+## Open quantity question
+
+Current evidence suggests:
+
+```text
+Q<F,C,T>
+    useful for quantities with one truthful primitive basis
+```
+
+rather than proving that `Q` is the universal definition of quantity. `Speed` and `Acceleration` both require multiple primitive coordinate bases without manufacturing a synthetic coordinate algebra.
