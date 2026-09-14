@@ -29,6 +29,13 @@ public static class PowerOperations
         where T : INumber<T> =>
         new(value.Value * value.Value);
 
+    public static Power<M.Duration, N2, C, T> square<SELF, C, T>(
+        Duration<SELF, C, T> value)
+        where SELF : Duration<SELF, C, T>
+        where C : Coordinate<M.Duration>
+        where T : INumber<T> =>
+        new(value.Value * value.Value);
+
     public static Power<M.Length, N3, C, T> cube<SELF, C, T>(
         Length<SELF, C, T> value)
         where SELF : Length<SELF, C, T>

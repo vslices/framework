@@ -38,4 +38,11 @@ public static partial class Conversions
         where DURATION_C : Coordinate<M.Duration>
         where T : INumber<T> =>
         new(quotient);
+
+    public static Acceleration<LENGTH_C, DURATION_C, T> acceleration<LENGTH_C, DURATION_C, T>(
+        Quotient<M.Length, LENGTH_C, M.Pow<M.Duration, N2>, DURATION_C, T> quotient)
+        where LENGTH_C : Coordinate<M.Length>
+        where DURATION_C : Coordinate<M.Duration>
+        where T : INumber<T> =>
+        new(quotient);
 }
