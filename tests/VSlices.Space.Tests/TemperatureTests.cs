@@ -18,11 +18,11 @@ public class TemperatureTests
     }
 
     [Fact]
-    public void absolute_zero_is_the_same_physical_point_across_supported_coordinates()
+    public void absolute_zero_is_the_same_point_across_supported_coordinates()
     {
-        var kelvin = Success(Temperature<Kelvin, decimal>.Create(0m));
-        var celsius = Success(Temperature<Celsius, decimal>.Create(-273.15m));
-        var fahrenheit = Success(Temperature<Fahrenheit, decimal>.Create(-459.67m));
+        var kelvin = new Temperature<Kelvin, decimal>(0m);
+        var celsius = new Temperature<Celsius, decimal>(-273.15m);
+        var fahrenheit = new Temperature<Fahrenheit, decimal>(-459.67m);
 
         Assert.Equal(0m, kelvin.Value);
         Assert.Equal(0m, celsius.Convert<Kelvin>().Value);
@@ -30,9 +30,25 @@ public class TemperatureTests
     }
 
     [Fact]
-    public void values_below_absolute_zero_are_rejected_by_space_establishment()
+    public void mathematical_temperature_may_exist_below_physical_absolute_zero()
     {
-        var result = Temperature<Celsius, decimal>.Create(-273.16m);
+        var belowAbsoluteZero = new Temperature<Kelvin, decimal>(-1m);
+        var translated = belowAbsoluteZero + new TemperatureDifference<Kelvin, decimal>(2m);
+
+        Assert.Equal(-1m, belowAbsoluteZero.Value);
+        Assert.Equal(1m, translated.Value);
+        Assert.IsAssignableFrom<Q<M.Temperature, Kelvin, decimal>>(belowAbsoluteZero);
+        Assert.Contains(
+            belowAbsoluteZero.GetType().GetInterfaces(),
+            candidate => candidate.IsGenericType &&
+                         candidate.GetGenericTypeDefinition() == typeof(AffineSpace<,,>));
+    }
+
+    [Fact]
+    public void physical_temperature_establishment_rejects_values_below_absolute_zero()
+    {
+        var mathematical = new Temperature<Celsius, decimal>(-273.16m);
+        var result = PhysicalTemperature<Celsius, decimal>.Create(mathematical);
 
         Assert.True(result.Match(Succ: _ => false, Fail: _ => true));
     }
@@ -40,7 +56,7 @@ public class TemperatureTests
     [Fact]
     public void point_conversion_uses_scale_and_absolute_zero_origin()
     {
-        var freezing = Success(Temperature<Celsius, decimal>.Create(0m));
+        var freezing = new Temperature<Celsius, decimal>(0m);
         var fahrenheit = freezing.Convert<Fahrenheit>();
 
         Assert.InRange(fahrenheit.Value, 31.999999999999999999999999m, 32.000000000000000000000001m);
@@ -49,8 +65,8 @@ public class TemperatureTests
     [Fact]
     public void subtracting_temperatures_yields_a_temperature_difference()
     {
-        var boiling = Success(Temperature<Celsius, decimal>.Create(100m));
-        var freezing = Success(Temperature<Fahrenheit, decimal>.Create(32m));
+        var boiling = new Temperature<Celsius, decimal>(100m);
+        var freezing = new Temperature<Fahrenheit, decimal>(32m);
 
         TemperatureDifference<Celsius, decimal> difference = boiling.Difference(freezing);
         var inFahrenheitDegrees = difference.Convert<Fahrenheit>();
@@ -76,9 +92,33 @@ public class TemperatureTests
     }
 
     [Fact]
-    public void translating_a_temperature_is_partial_because_absolute_zero_bounds_the_space()
+    public void temperature_affine_translation_is_total()
     {
-        var freezing = Success(Temperature<Celsius, decimal>.Create(0m));
+        var zeroKelvin = new Temperature<Kelvin, decimal>(0m);
+        var belowPhysicalZero = zeroKelvin + new TemperatureDifference<Kelvin, decimal>(-1m);
+        var recovered = belowPhysicalZero - new TemperatureDifference<Kelvin, decimal>(-1m);
+
+        Assert.Equal(-1m, belowPhysicalZero.Value);
+        Assert.Equal(0m, recovered.Value);
+        Assert.Equal(
+            new TemperatureDifference<Kelvin, decimal>(-1m),
+            belowPhysicalZero - zeroKelvin);
+    }
+
+    [Fact]
+    public void physical_temperature_is_a_derived_space_of_mathematical_temperature()
+    {
+        var mathematical = new Temperature<Celsius, decimal>(20m);
+        var physical = Success(PhysicalTemperature<Celsius, decimal>.Create(mathematical));
+
+        Assert.Equal(mathematical, physical.ToBase());
+        Assert.IsAssignableFrom<DerivedSpace<PhysicalTemperature<Celsius, decimal>, Temperature<Celsius, decimal>>>(physical);
+    }
+
+    [Fact]
+    public void physical_temperature_translation_reestablishes_the_derived_space()
+    {
+        var freezing = Success(PhysicalTemperature<Celsius, decimal>.Create(0m));
 
         var valid = freezing.Translate(new TemperatureDifference<Fahrenheit, decimal>(18m));
         var invalid = freezing.Translate(new TemperatureDifference<Celsius, decimal>(-300m));
@@ -90,14 +130,12 @@ public class TemperatureTests
     }
 
     [Fact]
-    public void physical_temperature_is_not_claimed_as_an_affine_space()
+    public void converting_a_physical_temperature_preserves_physical_establishment()
     {
-        var type = typeof(Temperature<Celsius, decimal>);
+        var celsius = Success(PhysicalTemperature<Celsius, decimal>.Create(100m));
+        var fahrenheit = celsius.Convert<Fahrenheit>();
 
-        Assert.DoesNotContain(
-            type.GetInterfaces(),
-            candidate => candidate.IsGenericType &&
-                         candidate.GetGenericTypeDefinition() == typeof(AffineSpace<,,>));
+        Assert.InRange(fahrenheit.Value, 211.99999999999999999999999m, 212.00000000000000000000001m);
     }
 
     private static A Success<A>(Fin<A> value) =>
