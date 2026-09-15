@@ -75,6 +75,17 @@ public class MoneyTests
     }
 
     [Fact]
+    public void exchange_rate_materializes_a_req_transformation()
+    {
+        var rate = Success(ExchangeRate<USD, CLP, decimal>.Create(900m));
+        var transformation = rate.ToTransformation();
+
+        var pesos = Success(transformation.RunFin(new Money<USD, decimal>(10m)));
+
+        Assert.Equal(9000m, pesos.Amount);
+    }
+
+    [Fact]
     public void exchange_rate_inversion_round_trips_money_within_carrier_precision()
     {
         var rate = Success(ExchangeRate<USD, CLP, decimal>.Create(900m));

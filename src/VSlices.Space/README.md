@@ -118,7 +118,37 @@ ExchangeRate<USD,CLP,T>.Apply(Money<USD,T>)
 
 `ExchangeRate<FROM,TO,T>` is positive runtime semantic evidence. It can be inverted and composed through matching currency spaces.
 
-This pressure also exposes a boundary in the current `Transformable` trait. `Transformable` owns static/type-level transformation rules through `Req`, while an exchange-rate value is runtime transformation evidence. The implementation therefore does not force `ExchangeRate` into `Transformable`; whether value-dependent transformation deserves a separate abstraction or an extension of the current trait remains an open design question.
+The current `Transformable` vocabulary distinguishes ownership from realization:
+
+```text
+Transformable<CTX,FROM,TO>
+    declares which semantic authority owns a canonical rule
+
+Transformation
+    is currently the Req<FROM,TO>.Full rule exposed by that owner
+```
+
+An `ExchangeRate` is not itself a `Transformable` and is not itself that `Req`. Instead it is concrete evidence that can parameterize a conversion rule. An established rate can materialize the corresponding rule explicitly:
+
+```csharp
+rate.ToTransformation()
+    -> Req<Money<FROM,T>, Money<TO,T>>.Full
+```
+
+This keeps the distinction visible:
+
+```text
+ExchangeRate
+    evidence consumed by the rule
+
+Req<Money<FROM>, Money<TO>>
+    the materialized transformation rule
+
+Transformable
+    ownership of a canonical transformation rule
+```
+
+No new general `Transformation<A,B>` abstraction is introduced by this case; `Req<FROM,TO>.Full` remains the concrete transformation vocabulary currently recognized by `Transformable`.
 
 Grounding may later own acquisition details such as quote source, observation time, market, or policy. Those details are not currently intrinsic to the established `ExchangeRate` value itself.
 
@@ -127,6 +157,7 @@ Grounding may later own acquisition details such as quote source, observation ti
 - Semantic structure precedes realization convenience.
 - A composite abstraction must add independent meaning, laws, or authority.
 - Structural operation, algebraic reduction, and semantic establishment are distinct.
+- Evidence consumed by a rule is not the same thing as the rule itself.
 - Carrier operations do not automatically belong to the semantic Space.
 - Generated realization constraints should remain owned by Tooling when they do not constitute semantic vocabulary.
 - Grounding owns contact with concrete reality; Space should not acquire ambient state by itself.

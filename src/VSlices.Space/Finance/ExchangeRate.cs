@@ -1,5 +1,6 @@
 using System.Numerics;
 using LanguageExt;
+using VSlices.Arrows;
 
 namespace VSlices.Space.Finance;
 
@@ -25,6 +26,16 @@ public sealed record ExchangeRate<FROM, TO, T> : DiscreteSpace<ExchangeRate<FROM
 
     public Money<TO, T> Apply(Money<FROM, T> money) =>
         new(money.Amount * Value);
+
+    /// <summary>
+    /// Materializes the semantic conversion rule parameterized by this established rate.
+    ///
+    /// The exchange rate is evidence consumed by the rule; the resulting Req is the
+    /// Transformation in the vocabulary currently used by Transformable.
+    /// </summary>
+    public Req<Money<FROM, T>, Money<TO, T>>.Full ToTransformation() =>
+        Req<Money<FROM, T>, Money<TO, T>>
+            .Transform<Money<FROM, T>, Money<TO, T>>(Apply);
 
     public ExchangeRate<TO, FROM, T> Invert() =>
         ExchangeRate<TO, FROM, T>.Established(T.One / Value);
