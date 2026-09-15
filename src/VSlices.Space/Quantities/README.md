@@ -16,6 +16,7 @@ T            numeric carrier
 M.Mass
 M.Length
 M.Duration
+M.Temperature
 M.Mul<A,B>
 M.Div<A,B>
 M.Pow<A,N>
@@ -39,6 +40,14 @@ Algebraic shape belongs to `M`; coordinates never encode squares, cubes, product
 ```
 
 Current fixed references are Gram, Meter, and Second for Mass, Length, and Duration respectively. They are intentionally not configurable yet.
+
+Temperature adds the first affine coordinate pressure. `TemperatureCoordinate` extends the primitive temperature basis with `ReferenceOffset`:
+
+```text
+kelvin = value * ReferenceScale + ReferenceOffset
+```
+
+The supported point coordinates are currently Kelvin, Celsius, and Fahrenheit. A `TemperatureDifference` uses only the scale component, while an absolute `Temperature` uses both scale and offset.
 
 ## Product and Power
 
@@ -204,6 +213,33 @@ Acceleration<LENGTH_C,DURATION_C,T>
 
 As with Area and Volume, algebraic reduction is not semantic establishment. `Speed / Duration` may reduce to the acceleration magnitude shape, but `acceleration(...)` remains explicit.
 
+## Temperature: affine coordinates, bounded physical space
+
+The old temperature value mixed absolute temperatures, scale conversion, vector-like arithmetic, and the absolute-zero invariant. The migrated model separates these responsibilities.
+
+`TemperatureDifference<C,T>` is a quantity and vector:
+
+```csharp
+TemperatureDifference<C,T>
+    : Q<M.Temperature,C,T>
+    : VectorSpace<TemperatureDifference<C,T>,T>
+```
+
+An absolute temperature is a point expressed in an affine coordinate:
+
+```csharp
+Temperature<C,T>
+```
+
+but it deliberately does **not** implement `AffineSpace`. Physical temperatures are bounded below by absolute zero, so arbitrary translation by a temperature difference is not closed:
+
+```text
+Temperature - Temperature -> TemperatureDifference      total
+Temperature.Translate(TemperatureDifference) -> Fin<Temperature>   partial
+```
+
+This distinction is semantic rather than a CLR limitation. An unrestricted affine coordinate line and the physically admissible temperature region are not the same space.
+
 ## Current algebraic reductions
 
 Only reductions pressured by concrete cases are promoted:
@@ -216,6 +252,27 @@ Div<Div<Length,Duration>,Duration> -> Div<Length,Pow<Duration,N2>>
 
 No general normalization engine exists yet. Product and Quotient preserve structural operations; Power and reduced Quotient forms express promoted algebraic reductions; Area, Volume, Speed, and Acceleration establish domain semantics.
 
+## Deferred general-use coordinate surface
+
+Before the quantity migration is considered ergonomically complete, the general-purpose coordinate vocabulary should be revisited. This is intentionally deferred until the semantic model stabilizes.
+
+Length should consider support for at least:
+
+```text
+miles, nautical miles, yards, feet, inches,
+kilometers, hectometers, decameters, meters,
+centimeters, millimeters, micrometers, nanometers, angstroms
+```
+
+Mass should similarly revisit a broader useful surface around:
+
+```text
+grams, kilograms, micrograms, pounds,
+and other broadly useful metric / imperial mass coordinates
+```
+
+The old `Module.cs` unit aliases may also be reconsidered as a final ergonomics layer, potentially generated rather than maintained manually.
+
 ## Open quantity question
 
 Current evidence suggests:
@@ -225,4 +282,4 @@ Q<F,C,T>
     useful for quantities with one truthful primitive basis
 ```
 
-rather than proving that `Q` is the universal definition of quantity. `Speed` and `Acceleration` both require multiple primitive coordinate bases without manufacturing a synthetic coordinate algebra.
+rather than proving that `Q` is the universal definition of quantity. `Speed` and `Acceleration` both require multiple primitive coordinate bases without manufacturing a synthetic coordinate algebra, while `Temperature` now shows that not every physically meaningful measured value is itself a vector quantity.

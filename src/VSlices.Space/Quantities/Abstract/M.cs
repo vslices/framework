@@ -26,6 +26,15 @@ public abstract class M
     }
 
     /// <summary>
+    /// Thermodynamic-temperature magnitude. Point temperatures may use affine scales;
+    /// temperature differences remain quantities of this magnitude.
+    /// </summary>
+    public sealed class Temperature : M
+    {
+        private Temperature() { }
+    }
+
+    /// <summary>
     /// Structural multiplication of two magnitudes.
     /// </summary>
     public sealed class Mul<LEFT, RIGHT> : M
