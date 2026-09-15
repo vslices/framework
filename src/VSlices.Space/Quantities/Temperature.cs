@@ -157,11 +157,16 @@ public sealed record Temperature<C, T>(T Value) :
 /// Widening to Temperature is total; narrowing from Temperature is a fallible
 /// transformation because values below absolute zero do not inhabit this space.
 /// </summary>
-public sealed record PhysicalTemperature<C, T>(Temperature<C, T> Temperature) :
+public sealed record PhysicalTemperature<C, T> :
     DerivedSpace<PhysicalTemperature<C, T>, Temperature<C, T>>
     where C : TemperatureCoordinate
     where T : IFloatingPoint<T>
 {
+    private PhysicalTemperature(Temperature<C, T> temperature) =>
+        Temperature = temperature;
+
+    public Temperature<C, T> Temperature { get; }
+
     public T Value => Temperature.Value;
 
     public Temperature<C, T> ToBase() => Temperature;
