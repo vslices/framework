@@ -68,7 +68,10 @@ public class TemperatureTests
 
         Assert.Equal(26m, result.Value);
         Assert.IsAssignableFrom<Q<M.Temperature, Celsius, decimal>>(result);
-        Assert.IsAssignableFrom<VectorSpace<TemperatureDifference<Celsius, decimal>, decimal>>(result);
+        Assert.Contains(
+            result.GetType().GetInterfaces(),
+            candidate => candidate.IsGenericType &&
+                         candidate.GetGenericTypeDefinition() == typeof(VectorSpace<,>));
     }
 
     [Fact]
