@@ -75,7 +75,7 @@ public class MoneyTests
     }
 
     [Fact]
-    public void exchange_rate_inversion_round_trips_money()
+    public void exchange_rate_inversion_round_trips_money_within_carrier_precision()
     {
         var rate = Success(ExchangeRate<USD, CLP, decimal>.Create(900m));
         var dollars = new Money<USD, decimal>(10m);
@@ -83,7 +83,10 @@ public class MoneyTests
         var pesos = rate.Apply(dollars);
         var roundTrip = rate.Invert().Apply(pesos);
 
-        Assert.Equal(dollars.Amount, roundTrip.Amount);
+        Assert.InRange(
+            roundTrip.Amount,
+            9.999999999999999999999999m,
+            10.000000000000000000000001m);
     }
 
     [Fact]
