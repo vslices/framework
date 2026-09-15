@@ -8,8 +8,8 @@ namespace VSlices.Space.Quantities;
 /// A coordinate for temperature points.
 ///
 /// ReferenceScale describes the associated temperature-difference unit relative to
-/// Kelvin, while AbsoluteZero identifies the coordinate value of the shared physical
-/// origin. Point conversion is therefore:
+/// Kelvin, while AbsoluteZero identifies the coordinate value of the physical
+/// absolute-zero point. Point conversion is therefore:
 ///
 ///   kelvin = (value - AbsoluteZero) * ReferenceScale
 ///
@@ -85,30 +85,18 @@ public sealed record TemperatureDifference<C, T>(T Value) :
 }
 
 /// <summary>
-/// A physically admissible absolute temperature expressed in one affine coordinate.
+/// A mathematical temperature point expressed in one affine coordinate.
 ///
-/// Temperature intentionally does not implement AffineSpace: the absolute-zero lower
-/// bound means arbitrary translation by TemperatureDifference is not closed. Subtracting
-/// two valid temperatures is total; translating a temperature is a partial operation
-/// that may fail when it would cross absolute zero.
+/// The affine line is intentionally total: values below physical absolute zero remain
+/// representable because the geometry itself is not responsible for physical admissibility.
+/// Physical admissibility is introduced separately by PhysicalTemperature.
 /// </summary>
-public sealed record Temperature<C, T> : DiscreteSpace<Temperature<C, T>>
+public sealed record Temperature<C, T>(T Value) :
+    Q<M.Temperature, C, T>,
+    AffineSpace<Temperature<C, T>, TemperatureDifference<C, T>, T>
     where C : TemperatureCoordinate
     where T : IFloatingPoint<T>
 {
-    private Temperature(T value) => Value = value;
-
-    public T Value { get; }
-
-    public static Fin<Temperature<C, T>> Create(T value)
-    {
-        var absoluteZero = T.CreateChecked(C.AbsoluteZero);
-
-        return value >= absoluteZero
-            ? new Temperature<C, T>(value)
-            : Error.New($"Temperature cannot be below absolute zero. Sent: {value} {typeof(C).Name}.");
-    }
-
     public Temperature<TO, T> Convert<TO>()
         where TO : TemperatureCoordinate =>
         Temperature<TO, T>.FromReference(ReferenceValue);
@@ -121,13 +109,23 @@ public sealed record Temperature<C, T> : DiscreteSpace<Temperature<C, T>>
         return new(differenceInReference / scale);
     }
 
-    public Fin<Temperature<C, T>> Translate<DELTA_C>(TemperatureDifference<DELTA_C, T> displacement)
+    public Temperature<C, T> Translate<DELTA_C>(TemperatureDifference<DELTA_C, T> displacement)
         where DELTA_C : TemperatureCoordinate
     {
         var displacementInReference = displacement.Value * T.CreateChecked(DELTA_C.ReferenceScale);
         var displacementInThisCoordinate = displacementInReference / T.CreateChecked(C.ReferenceScale);
-        return Create(Value + displacementInThisCoordinate);
+        return new(Value + displacementInThisCoordinate);
     }
+
+    public static Temperature<C, T> operator +(
+        Temperature<C, T> point,
+        TemperatureDifference<C, T> displacement) =>
+        point.Translate(displacement);
+
+    public static Temperature<C, T> operator -(
+        Temperature<C, T> point,
+        TemperatureDifference<C, T> displacement) =>
+        point.Translate(-displacement);
 
     public static TemperatureDifference<C, T> operator -(
         Temperature<C, T> left,
@@ -149,4 +147,42 @@ public sealed record Temperature<C, T> : DiscreteSpace<Temperature<C, T>>
         var absoluteZero = T.CreateChecked(C.AbsoluteZero);
         return (value - absoluteZero) * scale;
     }
+}
+
+/// <summary>
+/// A temperature point established as physically admissible under the current
+/// absolute-zero model.
+///
+/// This is a semantic subset of the complete mathematical Temperature affine line.
+/// Widening to Temperature is total; narrowing from Temperature is a fallible
+/// transformation because values below absolute zero do not inhabit this space.
+/// </summary>
+public sealed record PhysicalTemperature<C, T>(Temperature<C, T> Temperature) :
+    DerivedSpace<PhysicalTemperature<C, T>, Temperature<C, T>>
+    where C : TemperatureCoordinate
+    where T : IFloatingPoint<T>
+{
+    public T Value => Temperature.Value;
+
+    public Temperature<C, T> ToBase() => Temperature;
+
+    public static Fin<PhysicalTemperature<C, T>> Create(Temperature<C, T> temperature)
+    {
+        var absoluteZero = T.CreateChecked(C.AbsoluteZero);
+
+        return temperature.Value >= absoluteZero
+            ? new PhysicalTemperature<C, T>(temperature)
+            : Error.New($"Physical temperature cannot be below absolute zero. Sent: {temperature.Value} {typeof(C).Name}.");
+    }
+
+    public static Fin<PhysicalTemperature<C, T>> Create(T value) =>
+        Create(new Temperature<C, T>(value));
+
+    public PhysicalTemperature<TO, T> Convert<TO>()
+        where TO : TemperatureCoordinate =>
+        new(Temperature.Convert<TO>());
+
+    public Fin<PhysicalTemperature<C, T>> Translate<DELTA_C>(TemperatureDifference<DELTA_C, T> displacement)
+        where DELTA_C : TemperatureCoordinate =>
+        Create(Temperature.Translate(displacement));
 }
