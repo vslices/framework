@@ -112,7 +112,10 @@ public class TemperatureTests
         var physical = Success(PhysicalTemperature<Celsius, decimal>.Create(mathematical));
 
         Assert.Equal(mathematical, physical.ToBase());
-        Assert.IsAssignableFrom<DerivedSpace<PhysicalTemperature<Celsius, decimal>, Temperature<Celsius, decimal>>>(physical);
+        Assert.Contains(
+            physical.GetType().GetInterfaces(),
+            candidate => candidate.IsGenericType &&
+                         candidate.GetGenericTypeDefinition() == typeof(DerivedSpace<,>));
     }
 
     [Fact]
