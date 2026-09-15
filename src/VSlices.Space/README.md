@@ -86,6 +86,42 @@ Coordinates expose `ReferenceScale` with the fixed orientation:
 
 Current canonical references are Gram, Meter, and Second for Mass, Length, and Duration. Composed algebraic shape lives in `M`; coordinates do not manufacture parallel types such as squared or quotient coordinates.
 
+## Money and contextual conversion
+
+`Currency` is nominal vocabulary, not a measurement `Coordinate`. A currency can expose code, name, symbol, and decimal metadata, but it does not own a static conversion scale to other currencies.
+
+```text
+USD <-> CLP
+```
+
+cannot be modeled like:
+
+```text
+Meter <-> Kilometer
+```
+
+because the monetary relationship depends on runtime evidence rather than a fixed type-level ratio.
+
+`Money<C,T>` therefore models an amount inside one currency space and is additive/vector-like only within that same currency:
+
+```csharp
+Money<USD,T> + Money<USD,T> -> Money<USD,T>
+Money<USD,T> * T            -> Money<USD,T>
+```
+
+while cross-currency conversion requires an explicit established relation:
+
+```csharp
+ExchangeRate<USD,CLP,T>.Apply(Money<USD,T>)
+    -> Money<CLP,T>
+```
+
+`ExchangeRate<FROM,TO,T>` is positive runtime semantic evidence. It can be inverted and composed through matching currency spaces.
+
+This pressure also exposes a boundary in the current `Transformable` trait. `Transformable` owns static/type-level transformation rules through `Req`, while an exchange-rate value is runtime transformation evidence. The implementation therefore does not force `ExchangeRate` into `Transformable`; whether value-dependent transformation deserves a separate abstraction or an extension of the current trait remains an open design question.
+
+Grounding may later own acquisition details such as quote source, observation time, market, or policy. Those details are not currently intrinsic to the established `ExchangeRate` value itself.
+
 ## Working criteria
 
 - Semantic structure precedes realization convenience.
