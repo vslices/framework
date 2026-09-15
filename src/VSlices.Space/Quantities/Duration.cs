@@ -50,10 +50,53 @@ public abstract class Duration<SELF, T> : Duration<SELF, Seconds, T>
     protected Duration(T value) : base(value) { }
 }
 
-public class Duration<T> : Duration<Duration<T>, T>
+/// <summary>
+/// Default seconds-based Duration. This concrete family is also a VectorSpace:
+/// durations are displacements, have an additive origin, and close under homogeneous
+/// addition/subtraction, negation, and scalar multiplication/division.
+///
+/// The VectorSpace promotion is intentionally made on this concrete coordinate form
+/// first. More general coordinate-aware vector closure remains separate pressure.
+/// </summary>
+public class Duration<T> :
+    Duration<Duration<T>, T>,
+    VectorSpace<Duration<T>, T>
     where T : INumber<T>
 {
     public Duration(T value) : base(value) { }
+
+    public bool Equals(Duration<T>? other) =>
+        other is not null && Value == other.Value;
+
+    public override bool Equals(object? obj) =>
+        obj is Duration<T> other && Equals(other);
+
+    public override int GetHashCode() =>
+        Value.GetHashCode();
+
+    public static bool operator ==(Duration<T>? left, Duration<T>? right) =>
+        Equals(left, right);
+
+    public static bool operator !=(Duration<T>? left, Duration<T>? right) =>
+        !Equals(left, right);
+
+    public static Duration<T> operator +(Duration<T> left, Duration<T> right) =>
+        new(left.Value + right.Value);
+
+    public static Duration<T> operator -(Duration<T> left, Duration<T> right) =>
+        new(left.Value - right.Value);
+
+    public static Duration<T> operator -(Duration<T> value) =>
+        new(-value.Value);
+
+    public static Duration<T> operator *(Duration<T> value, T scalar) =>
+        new(value.Value * scalar);
+
+    public static Duration<T> operator /(Duration<T> value, T scalar) =>
+        new(value.Value / scalar);
+
+    public static Duration<T> AdditiveIdentity =>
+        new(T.Zero);
 }
 
 public sealed class vDuration : Duration<vDuration, double>
