@@ -41,13 +41,13 @@ Algebraic shape belongs to `M`; coordinates never encode squares, cubes, product
 
 Current fixed references are Gram, Meter, and Second for Mass, Length, and Duration respectively. They are intentionally not configurable yet.
 
-Temperature adds the first affine coordinate pressure. `TemperatureCoordinate` extends the primitive temperature basis with `ReferenceOffset`:
+Temperature adds the first affine-coordinate pressure. `TemperatureCoordinate` combines the scale of its associated temperature-difference unit with the coordinate value of absolute zero:
 
 ```text
-kelvin = value * ReferenceScale + ReferenceOffset
+kelvin = (value - AbsoluteZero) * ReferenceScale
 ```
 
-The supported point coordinates are currently Kelvin, Celsius, and Fahrenheit. A `TemperatureDifference` uses only the scale component, while an absolute `Temperature` uses both scale and offset.
+The supported point coordinates are currently Kelvin, Celsius, and Fahrenheit. A `TemperatureDifference` uses only `ReferenceScale`; an absolute `Temperature` also uses the coordinate's `AbsoluteZero` origin. Expressing the shared physical origin directly avoids treating affine offsets as if they were multiplicative units and keeps the boundary exact in each coordinate.
 
 ## Product and Power
 
@@ -234,9 +234,11 @@ Temperature<C,T>
 but it deliberately does **not** implement `AffineSpace`. Physical temperatures are bounded below by absolute zero, so arbitrary translation by a temperature difference is not closed:
 
 ```text
-Temperature - Temperature -> TemperatureDifference      total
-Temperature.Translate(TemperatureDifference) -> Fin<Temperature>   partial
+Temperature - Temperature -> TemperatureDifference               total
+Temperature.Translate(TemperatureDifference) -> Fin<Temperature> partial
 ```
+
+`Temperature.Create(...)` owns physical admissibility and rejects coordinate values below that coordinate's exact `AbsoluteZero`. Point conversion between established temperatures is total; displacement conversion uses scale only.
 
 This distinction is semantic rather than a CLR limitation. An unrestricted affine coordinate line and the physically admissible temperature region are not the same space.
 

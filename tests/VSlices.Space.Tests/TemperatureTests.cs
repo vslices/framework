@@ -7,13 +7,14 @@ namespace VSlices.Space.Tests;
 public class TemperatureTests
 {
     [Fact]
-    public void temperature_coordinates_are_affine_while_differences_use_only_scale()
+    public void temperature_coordinates_share_absolute_zero_but_have_distinct_scales()
     {
         Assert.Equal(1m, Kelvin.ReferenceScale);
-        Assert.Equal(0m, Kelvin.ReferenceOffset);
+        Assert.Equal(0m, Kelvin.AbsoluteZero);
         Assert.Equal(1m, Celsius.ReferenceScale);
-        Assert.Equal(273.15m, Celsius.ReferenceOffset);
+        Assert.Equal(-273.15m, Celsius.AbsoluteZero);
         Assert.Equal(5m / 9m, Fahrenheit.ReferenceScale);
+        Assert.Equal(-459.67m, Fahrenheit.AbsoluteZero);
     }
 
     [Fact]
@@ -37,7 +38,7 @@ public class TemperatureTests
     }
 
     [Fact]
-    public void point_conversion_uses_scale_and_offset()
+    public void point_conversion_uses_scale_and_absolute_zero_origin()
     {
         var freezing = Success(Temperature<Celsius, decimal>.Create(0m));
         var fahrenheit = freezing.Convert<Fahrenheit>();

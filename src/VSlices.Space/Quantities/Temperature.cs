@@ -5,40 +5,42 @@ using VSlices.Space.Quantities.Abstract;
 namespace VSlices.Space.Quantities;
 
 /// <summary>
-/// A coordinate for temperature points. ReferenceScale describes the associated
-/// temperature-difference unit, while ReferenceOffset places the coordinate origin
-/// relative to Kelvin:
+/// A coordinate for temperature points.
 ///
-///   kelvin = value * ReferenceScale + ReferenceOffset
+/// ReferenceScale describes the associated temperature-difference unit relative to
+/// Kelvin, while AbsoluteZero identifies the coordinate value of the shared physical
+/// origin. Point conversion is therefore:
+///
+///   kelvin = (value - AbsoluteZero) * ReferenceScale
 ///
 /// Temperature differences use only ReferenceScale; point temperatures use both.
 /// </summary>
 public interface TemperatureCoordinate : Coordinate<M.Temperature>
 {
-    static abstract decimal ReferenceOffset { get; }
+    static abstract decimal AbsoluteZero { get; }
 }
 
 public readonly struct Kelvin : TemperatureCoordinate
 {
     public static decimal ReferenceScale => 1m;
-    public static decimal ReferenceOffset => 0m;
+    public static decimal AbsoluteZero => 0m;
 }
 
 public readonly struct Celsius : TemperatureCoordinate
 {
     public static decimal ReferenceScale => 1m;
-    public static decimal ReferenceOffset => 273.15m;
+    public static decimal AbsoluteZero => -273.15m;
 }
 
 public readonly struct Fahrenheit : TemperatureCoordinate
 {
     public static decimal ReferenceScale => 5m / 9m;
-    public static decimal ReferenceOffset => 459.67m * 5m / 9m;
+    public static decimal AbsoluteZero => -459.67m;
 }
 
 /// <summary>
 /// A temperature displacement. Unlike an absolute Temperature point, a difference
-/// has no affine offset and therefore forms a vector space.
+/// has no affine origin and therefore forms a vector space.
 /// </summary>
 public sealed record TemperatureDifference<C, T>(T Value) :
     Q<M.Temperature, C, T>,
@@ -100,9 +102,9 @@ public sealed record Temperature<C, T> : DiscreteSpace<Temperature<C, T>>
 
     public static Fin<Temperature<C, T>> Create(T value)
     {
-        var reference = ToReference(value);
+        var absoluteZero = T.CreateChecked(C.AbsoluteZero);
 
-        return reference >= T.Zero
+        return value >= absoluteZero
             ? new Temperature<C, T>(value)
             : Error.New($"Temperature cannot be below absolute zero. Sent: {value} {typeof(C).Name}.");
     }
@@ -122,8 +124,9 @@ public sealed record Temperature<C, T> : DiscreteSpace<Temperature<C, T>>
     public Fin<Temperature<C, T>> Translate<DELTA_C>(TemperatureDifference<DELTA_C, T> displacement)
         where DELTA_C : TemperatureCoordinate
     {
-        var deltaReference = displacement.Value * T.CreateChecked(DELTA_C.ReferenceScale);
-        return FromReferenceChecked(ReferenceValue + deltaReference);
+        var displacementInReference = displacement.Value * T.CreateChecked(DELTA_C.ReferenceScale);
+        var displacementInThisCoordinate = displacementInReference / T.CreateChecked(C.ReferenceScale);
+        return Create(Value + displacementInThisCoordinate);
     }
 
     public static TemperatureDifference<C, T> operator -(
@@ -136,19 +139,14 @@ public sealed record Temperature<C, T> : DiscreteSpace<Temperature<C, T>>
     internal static Temperature<C, T> FromReference(T reference)
     {
         var scale = T.CreateChecked(C.ReferenceScale);
-        var offset = T.CreateChecked(C.ReferenceOffset);
-        return new((reference - offset) / scale);
+        var absoluteZero = T.CreateChecked(C.AbsoluteZero);
+        return new(reference / scale + absoluteZero);
     }
-
-    private static Fin<Temperature<C, T>> FromReferenceChecked(T reference) =>
-        reference >= T.Zero
-            ? FromReference(reference)
-            : Error.New("Temperature translation would cross absolute zero.");
 
     private static T ToReference(T value)
     {
         var scale = T.CreateChecked(C.ReferenceScale);
-        var offset = T.CreateChecked(C.ReferenceOffset);
-        return value * scale + offset;
+        var absoluteZero = T.CreateChecked(C.AbsoluteZero);
+        return (value - absoluteZero) * scale;
     }
 }
