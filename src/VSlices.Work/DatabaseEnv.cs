@@ -1,6 +1,5 @@
 using LanguageExt;
 using LanguageExt.Traits;
-using VSlices.Application;
 
 namespace VSlices.Work;
 

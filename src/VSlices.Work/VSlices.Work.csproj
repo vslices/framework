@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\VSlices\VSlices.csproj" />
-    <ProjectReference Include="..\VSlices.Application\VSlices.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

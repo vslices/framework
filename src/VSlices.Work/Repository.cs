@@ -1,6 +1,6 @@
 using LanguageExt;
 
-namespace VSlices.Application;
+namespace VSlices.Work;
 
 public interface Repository;
 
