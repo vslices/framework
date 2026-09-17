@@ -1,10 +1,9 @@
 using LanguageExt;
-using VSlices.Domain.Traits;
 using VSlices.Services;
 
 namespace VSlices.Products;
 
-public abstract class ProductRole : DomainType<ProductRole, ProductRole.Repr>
+public abstract class ProductRole
 {
     public sealed record Repr(
         string Name,

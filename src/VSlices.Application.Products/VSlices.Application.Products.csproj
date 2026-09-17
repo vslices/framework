@@ -8,7 +8,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\VSlices.Application\VSlices.Application.csproj" />
-		<ProjectReference Include="..\VSlices.Domain.Products\VSlices.Domain.Products.csproj" />
+		<ProjectReference Include="..\VSlices.Space.Products\VSlices.Space.Products.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

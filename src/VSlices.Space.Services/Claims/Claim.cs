@@ -1,9 +1,8 @@
 using System.Collections.Concurrent;
-using VSlices.Domain.Traits;
 
 namespace VSlices.Services;
 
-public sealed class ServiceClaim : DomainType<ServiceClaim, ServiceClaim.Repr>
+public sealed class ServiceClaim
 {
     private sealed record Registration(
         ServiceClaim Claim,
