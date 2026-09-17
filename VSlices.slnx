@@ -16,15 +16,14 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
-    <Project Path="src/VSlices.Application.Products/VSlices.Application.Products.csproj" />
-    <Project Path="src/VSlices.Application.Services/VSlices.Application.Services.csproj" />
-    <Project Path="src/VSlices.Application/VSlices.Application.csproj" />
     <Project Path="src/VSlices.EntityFrameworkCore/VSlices.EntityFrameworkCore.csproj" />
     <Project Path="src/VSlices.Grounding/VSlices.Grounding.csproj" />
     <Project Path="src/VSlices.Space.Products/VSlices.Space.Products.csproj" />
     <Project Path="src/VSlices.Space.Services/VSlices.Space.Services.csproj" />
     <Project Path="src/VSlices.Space/VSlices.Space.csproj" />
     <Project Path="src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj" />
+    <Project Path="src/VSlices.Work.Products/VSlices.Work.Products.csproj" />
+    <Project Path="src/VSlices.Work.Services/VSlices.Work.Services.csproj" />
     <Project Path="src/VSlices.Work/VSlices.Work.csproj" />
     <Project Path="src/VSlices/VSlices.csproj" />
   </Folder>

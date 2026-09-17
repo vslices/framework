@@ -1,6 +1,6 @@
 ﻿using VSlices.Products;
 
-namespace VSlices.Application;
+namespace VSlices.Work;
 
 /// <summary>
 /// Represents a product-owned executable feature.
