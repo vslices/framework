@@ -2,6 +2,7 @@
   <Folder Name="/examples/" />
   <Folder Name="/examples/simple-workflow/">
     <Project Path="examples/SampleWorkflow/SampleWorkflow.Core/SampleWorkflow.Core.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Domain/SampleWorkflow.Domain.csproj" />
   </Folder>
   <Folder Name="/examples/space-modeling/">
     <Project Path="examples/VSlices.Space.Modeling/VSlices.Space.Modeling.csproj" />
@@ -15,9 +16,15 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
+    <Project Path="src/VSlices.Application.Products/VSlices.Application.Products.csproj" />
+    <Project Path="src/VSlices.Application.Services/VSlices.Application.Services.csproj" />
     <Project Path="src/VSlices.Application/VSlices.Application.csproj" />
+    <Project Path="src/VSlices.Domain.Products/VSlices.Domain.Products.csproj" />
+    <Project Path="src/VSlices.Domain.Services/VSlices.Domain.Services.csproj" />
+    <Project Path="src/VSlices.EntityFrameworkCore/VSlices.EntityFrameworkCore.csproj" />
     <Project Path="src/VSlices.Grounding/VSlices.Grounding.csproj" />
     <Project Path="src/VSlices.Space/VSlices.Space.csproj" />
+    <Project Path="src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj" />
     <Project Path="src/VSlices.Work/VSlices.Work.csproj" />
     <Project Path="src/VSlices/VSlices.csproj" />
   </Folder>
