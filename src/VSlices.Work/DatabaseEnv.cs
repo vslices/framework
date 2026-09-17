@@ -1,7 +1,8 @@
 using LanguageExt;
 using LanguageExt.Traits;
+using VSlices.Application;
 
-namespace VSlices.Domain.Traits;
+namespace VSlices.Work;
 
 public interface DatabaseIO
 {
@@ -9,8 +10,7 @@ public interface DatabaseIO
         where A : Repository;
 }
 
-public interface HasDatabase<RT> :
-    Has<Eff<RT>, DatabaseIO>;
+public interface HasDatabase<RT> : Has<Eff<RT>, DatabaseIO>;
 
 public static class DatabaseEnv
 {

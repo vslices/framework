@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
-		<ProjectReference Include="..\VSlices.Domain\VSlices.Domain.csproj" />
+		<ProjectReference Include="..\VSlices\VSlices.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -11,9 +11,7 @@
 		<Using Include="LanguageExt.Effects" />
 		<Using Include="LanguageExt.Pretty" />
 		<Using Include="LanguageExt.Traits.Domain" />
-
 		<Using Include="LanguageExt.Prelude" Static="true" />
-
 	</ItemGroup>
 
 </Project>
