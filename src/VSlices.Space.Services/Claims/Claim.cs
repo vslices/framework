@@ -1,8 +1,9 @@
 using System.Collections.Concurrent;
+using VSlices.Space;
 
 namespace VSlices.Services;
 
-public sealed class ServiceClaim
+public sealed class ServiceClaim : DiscreteSpace<ServiceClaim>
 {
     private sealed record Registration(
         ServiceClaim Claim,
@@ -63,12 +64,21 @@ public sealed class ServiceClaim
     public override string ToString() =>
         UniqueName;
 
-    public override bool Equals(object? obj) =>
-        obj is ServiceClaim other &&
+    public bool Equals(ServiceClaim? other) =>
+        other is not null &&
         UniqueName.Equals(
             other.UniqueName,
             StringComparison.Ordinal);
 
+    public override bool Equals(object? obj) =>
+        obj is ServiceClaim other && Equals(other);
+
     public override int GetHashCode() =>
         StringComparer.Ordinal.GetHashCode(UniqueName);
+
+    public static bool operator ==(ServiceClaim? left, ServiceClaim? right) =>
+        EqualityComparer<ServiceClaim>.Default.Equals(left, right);
+
+    public static bool operator !=(ServiceClaim? left, ServiceClaim? right) =>
+        !(left == right);
 }
