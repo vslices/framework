@@ -22,10 +22,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.MapPost("/todos", async (CreateTodoBody body, ApiRuntime runtime) =>
 {
-    var detail = TodoDetail.Transformation.RunFin(
-        new TodoDetail.Input(
-            body.Title,
-            body.Completed));
+    var detail = TodoDetail.Transformation.RunFin(body.Detail);
 
     return await detail.Match<Task<IResult>>(
         Succ: async semanticDetail =>
@@ -34,7 +31,9 @@ app.MapPost("/todos", async (CreateTodoBody body, ApiRuntime runtime) =>
                 .Get()
                 .RunFlow(
                     runtime,
-                    new CreateTodo<ApiRuntime>.Request(semanticDetail))
+                    new CreateTodo<ApiRuntime>.Request(
+                        semanticDetail,
+                        body.Completed))
                 .RunAsync();
 
             return response.Todo.Match<IResult>(
@@ -78,10 +77,7 @@ app.MapPut("/todos/{id:guid}", async (
 {
     var input =
         from semanticId in TodoId.Transformation.RunFin(id)
-        from detail in TodoDetail.Transformation.RunFin(
-            new TodoDetail.Input(
-                body.Title,
-                body.Completed))
+        from detail in TodoDetail.Transformation.RunFin(body.Detail)
         select (semanticId, detail);
 
     return await input.Match<Task<IResult>>(
@@ -93,12 +89,17 @@ app.MapPut("/todos/{id:guid}", async (
                     runtime,
                     new UpdateTodo<ApiRuntime>.Request(
                         semantic.semanticId,
-                        semantic.detail))
+                        semantic.detail,
+                        body.Completed))
                 .RunAsync();
 
             return response.Todo.Match<IResult>(
-                todo => Results.Ok(TodoDto.From(todo)),
-                () => Results.NotFound());
+                Left: error =>
+                    Results.BadRequest(new { error = error.Message }),
+                Right: todo =>
+                    todo.Match<IResult>(
+                        value => Results.Ok(TodoDto.From(value)),
+                        () => Results.NotFound()));
         },
         Fail: error =>
             Task.FromResult<IResult>(
@@ -148,21 +149,21 @@ public sealed record ApiRuntime(
 }
 
 public sealed record CreateTodoBody(
-    string Title,
+    string Detail,
     bool Completed);
 
 public sealed record UpdateTodoBody(
-    string Title,
+    string Detail,
     bool Completed);
 
 public sealed record TodoDto(
     Guid Id,
-    string Title,
+    string Detail,
     bool Completed)
 {
     public static TodoDto From(Todo todo) =>
         new(
             todo.Id.Value,
-            todo.Detail.Title,
-            todo.Detail.Completed);
+            todo.Detail.Value,
+            todo.Completed);
 }

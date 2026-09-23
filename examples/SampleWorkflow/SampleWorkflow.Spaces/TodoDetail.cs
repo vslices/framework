@@ -5,31 +5,21 @@ using VSlices.Space.Traits;
 namespace SampleWorkflow.Spaces;
 
 /// <summary>
-/// Semantic detail carried by a Todo.
+/// Semantic textual detail carried by a Todo.
 /// </summary>
 public sealed record TodoDetail :
     DiscreteSpace<TodoDetail>,
-    Transformable<TodoDetail.Input, TodoDetail>
+    Transformable<string, TodoDetail>
 {
-    public readonly record struct Input(
-        string Title,
-        bool Completed);
+    private TodoDetail(string value) =>
+        Value = value;
 
-    private TodoDetail(
-        string title,
-        bool completed)
-    {
-        Title = title;
-        Completed = completed;
-    }
+    public string Value { get; }
 
-    public string Title { get; }
+    public static Req<string, TodoDetail>.Full Transformation =>
+        Req<string, TodoDetail>.Transform<string, TodoDetail>(
+            value => new TodoDetail(value));
 
-    public bool Completed { get; }
-
-    public static Req<Input, TodoDetail>.Full Transformation =>
-        Req<Input, TodoDetail>.Transform<Input, TodoDetail>(
-            input => new TodoDetail(
-                input.Title,
-                input.Completed));
+    public override string ToString() =>
+        Value;
 }

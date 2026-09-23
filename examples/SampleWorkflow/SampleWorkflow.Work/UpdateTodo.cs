@@ -12,17 +12,18 @@ public sealed class UpdateTodo<RT> :
 {
     public sealed record Request(
         TodoId Id,
-        TodoDetail Detail);
+        TodoDetail Detail,
+        bool Completed);
 
-    public sealed record Response(Option<Todo> Todo);
+    public sealed record Response(
+        Either<Error, Option<Todo>> Todo);
 
     public static Flow<RT, Request, Response> Get() =>
         Flow<RT, Request>.Asks(static request => request) >>
-        (request => Todo.Transformation.RunFin(
-            new Todo.Input(
+        (request => AlgebraEnv<TodoAlgebra, RT>
+            .run(TodoPrograms.Update(
                 request.Id,
-                request.Detail))) >>
-        (todo => AlgebraEnv<TodoAlgebra, RT>
-            .run(TodoPrograms.Update(todo))
+                request.Detail,
+                request.Completed))
             .Map(value => new Response(value)));
 }

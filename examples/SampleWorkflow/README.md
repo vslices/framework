@@ -8,7 +8,7 @@ The concept is `Todo` and is split into the current architecture:
 SampleWorkflow.Spaces
     TodoId
     TodoDetail
-    Todo
+    Todo : Evolvable<Todo, Todo.State>
 
 SampleWorkflow.Work
     TodoId generation capability
@@ -38,27 +38,66 @@ Guid
     -> TodoId
 ```
 
-`TodoDetail` is a separate semantic space rather than treating a Todo as an incidental tuple of primitive values:
+`TodoDetail` gives semantic meaning only to the textual detail:
 
 ```text
-TodoDetail.Input
-    Title
-    Completed
-        -> TodoDetail.Transformation
-        -> TodoDetail
+string
+    -> TodoDetail.Transformation
+    -> TodoDetail
 ```
 
-`Todo` is then established from already-semantic values:
+The completion flag remains a `bool`; this example has no evidence that it requires a separate semantic space.
+
+`Todo` is established from already-semantic identity/detail plus the valid boolean state:
 
 ```text
 Todo.Input
     TodoId
     TodoDetail
+    bool Completed
         -> Todo.Transformation
         -> Todo
 ```
 
-Todo equality is owned by `TodoId`. Two Todo instances with the same semantic identity represent the same Todo point even when their detail differs.
+Todo equality is owned by `TodoId`.
+
+## Evolution
+
+`Todo` implements:
+
+```text
+Evolvable<Todo, Todo.State>
+```
+
+Its accepted state carries:
+
+```text
+TodoId Id          creation-fixed
+TodoDetail Detail  evolvable
+bool Completed     evolvable
+```
+
+The HTTP PUT does not construct a replacement Todo directly. Work first reads the current Todo point and then proposes:
+
+```csharp
+todo.Update(state => state with
+{
+    Detail = detail,
+    Completed = completed
+})
+```
+
+Only an accepted evolved point is passed to `PointWriter`.
+
+This keeps two statements separate:
+
+```text
+Todo.Transformation
+    establishes a Todo
+
+Todo.Evolution
+    establishes an admissible next Todo state
+```
 
 ## Identity generation
 
@@ -66,28 +105,9 @@ Creating a Todo does not accept an id from HTTP.
 
 Work requires a focused `TodoIdGenerationIO` capability. The current Grounding realizes it through `Guid.NewGuid()` and then establishes the generated value as a semantic `TodoId`.
 
-This keeps two different statements separate:
-
-```text
-TodoId.Transformation
-    defines how a Guid becomes a valid TodoId
-
-GuidTodoIdGeneration
-    defines one concrete mechanism for obtaining source Guids
-```
-
-The CreateTodo Feature composes both:
-
-```text
-TodoDetail
-    -> obtain TodoId
-    -> Todo.Transformation
-    -> TodoPrograms.Create
-```
-
 ## CRUD semantics
 
-The primitive point capabilities deliberately remain smaller than CRUD:
+The primitive point capabilities remain smaller than CRUD:
 
 ```text
 Read
@@ -99,14 +119,13 @@ Create
     read + write if absent
 
 Update
-    establish replacement Todo
-    read + write if present
+    read current Todo
+    Todo.Update(...)
+    write accepted evolved point
 
 Delete
     read + remove if present
 ```
-
-That means `Create` and `Update` are Feature semantics built from semantic construction plus the same `PointWriter` capability rather than separate persistence primitives.
 
 The CRUD operations are available as:
 
@@ -126,7 +145,7 @@ POST /todos
 Content-Type: application/json
 
 {
-  "title": "feel the semantics",
+  "detail": "feel the semantics",
   "completed": false
 }
 ```

@@ -1,5 +1,6 @@
 using LanguageExt;
 using SampleWorkflow.Spaces;
+using VSlices.Space;
 using VSlices.Work;
 using static LanguageExt.Prelude;
 
@@ -20,15 +21,28 @@ public static class TodoPrograms
     public static Free<TodoAlgebra, Option<Todo>> Read(TodoId id) =>
         PointReader.read<TodoAlgebra, Todo, TodoId>(id);
 
-    public static Free<TodoAlgebra, Option<Todo>> Update(Todo point) =>
-        from current in PointReader.read<TodoAlgebra, Todo, TodoId>(point.Id)
+    public static Free<TodoAlgebra, Either<Error, Option<Todo>>> Update(
+        TodoId id,
+        TodoDetail detail,
+        bool completed) =>
+        from current in PointReader.read<TodoAlgebra, Todo, TodoId>(id)
         from updated in current.Match(
-            Some: _ =>
-                from __ in PointWriter.write<TodoAlgebra, Todo>(point)
-                from value in PointReader.read<TodoAlgebra, Todo, TodoId>(point.Id)
-                select value,
+            Some: todo => todo
+                .Update(state => state with
+                {
+                    Detail = detail,
+                    Completed = completed
+                })
+                .Match(
+                    Succ: evolved =>
+                        from _ in PointWriter.write<TodoAlgebra, Todo>(evolved)
+                        select Either.Right<Error, Option<Todo>>(Some(evolved)),
+                    Fail: error =>
+                        Free.pure<TodoAlgebra, Either<Error, Option<Todo>>>(
+                            Either.Left<Error, Option<Todo>>(error))),
             None: static () =>
-                Free.pure<TodoAlgebra, Option<Todo>>(Option<Todo>.None))
+                Free.pure<TodoAlgebra, Either<Error, Option<Todo>>>(
+                    Either.Right<Error, Option<Todo>>(Option<Todo>.None)))
         select updated;
 
     public static Free<TodoAlgebra, Option<Todo>> Delete(TodoId id) =>

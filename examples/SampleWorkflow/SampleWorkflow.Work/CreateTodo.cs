@@ -12,14 +12,19 @@ public sealed class CreateTodo<RT> :
         HasAlgebra<TodoAlgebra, RT>,
         HasTodoIdGeneration<RT>
 {
-    public sealed record Request(TodoDetail Detail);
+    public sealed record Request(
+        TodoDetail Detail,
+        bool Completed);
 
     public sealed record Response(Option<Todo> Todo);
 
     public static Flow<RT, Request, Response> Get() =>
         Flow<RT, Request>.Asks(static request => request) >>
         (request => TodoIdGenerationEnv<RT>.next
-            .Map(id => new Todo.Input(id, request.Detail))) >>
+            .Map(id => new Todo.Input(
+                id,
+                request.Detail,
+                request.Completed))) >>
         (input => Todo.Transformation.RunFin(input)) >>
         (todo => AlgebraEnv<TodoAlgebra, RT>
             .run(TodoPrograms.Create(todo))
