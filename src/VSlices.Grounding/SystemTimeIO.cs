@@ -1,3 +1,4 @@
+using LanguageExt;
 using VSlices.Space.Quantities;
 using VSlices.Space.Temporal;
 using VSlices.Work;
