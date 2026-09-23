@@ -43,7 +43,7 @@ public sealed class EntityFrameworkRepository<TContext, A, TProjection>(
         from projection in IO.lift(() => toProjection(value))
         from _ in context.RemoveIO(projection)
         from __ in context.SaveChangesIO()
-        select unit;
+        select default(Unit);
 }
 
 /// <summary>
