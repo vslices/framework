@@ -3,11 +3,12 @@ using LanguageExt.Common;
 using SampleFileRepo;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
+using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
 using static LanguageExt.Prelude;
 using Algebra = VSlices.Work.AlgebraSum<
     SampleFileRepo.AddFile.Algebra,
-    SampleWorkflow.Work.AddAttachmentReference.Algebra>;
+    TodoAlgebra>;
 
 namespace SampleBFF;
 
