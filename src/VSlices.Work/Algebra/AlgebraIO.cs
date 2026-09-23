@@ -6,9 +6,6 @@ public interface AlgebraIO<ALG>
     IO<A> Interpret<A>(K<ALG, A> operation);
 }
 
-public interface HasAlgebra<ALG, RT> : Has<Eff<RT>, AlgebraIO<ALG>>
-    where ALG : Functor<ALG>;
-
 public static class FreeAlgebra
 {
     public static IO<A> interpret<ALG, A>(
@@ -44,15 +41,4 @@ public static class FreeAlgebra
 
             _ => throw new NotSupportedException()
         };
-}
-
-public static class AlgebraEnv<ALG, RT>
-    where ALG : Functor<ALG>
-    where RT : HasAlgebra<ALG, RT>
-{
-    private static Eff<RT, AlgebraIO<ALG>> accessIO =>
-        Has<Eff<RT>, RT, AlgebraIO<ALG>>.ask.As();
-
-    public static Eff<RT, A> run<A>(K<Free<ALG>, A> program) =>
-        accessIO.Bind(interpreter => FreeAlgebra.interpret(program, interpreter));
 }
