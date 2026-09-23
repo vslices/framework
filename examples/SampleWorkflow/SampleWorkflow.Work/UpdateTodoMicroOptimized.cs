@@ -5,6 +5,7 @@ using LanguageExt.Traits;
 using SampleWorkflow.Spaces;
 using VSlices.Space;
 using VSlices.Work;
+using static LanguageExt.Prelude;
 
 namespace SampleWorkflow.Work;
 
