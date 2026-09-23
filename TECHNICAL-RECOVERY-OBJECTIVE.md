@@ -136,14 +136,17 @@ work
 + execution
 ```
 
-The current framework already contains useful pieces such as:
+The current framework now separates the first two temporal concerns explicitly:
 
-- `Feature`;
-- `ClockIO`;
-- `SystemClockIO`;
-- temporal spaces such as `Moment`.
+- `Feature` owns the executable WorkFlow;
+- `Clock<ALG>` expresses observation of the current semantic `Moment`;
+- `Delay<ALG>` expresses waiting for a `Duration<double>` or until a `Moment`;
+- `ClockIO` and `DelayIO` are reusable Grounding contracts;
+- `SystemTimeIO` realizes both through `TimeProvider`.
 
-The remaining abstractions should be discovered from real scheduling cases instead of introduced speculatively.
+The old `HasClock<RT>` / `ClockEnv<RT>` carrier has been removed.
+
+Scheduling, recurring invocation, and host lifecycle remain deliberately unresolved and should be discovered from real scheduling cases instead of introduced speculatively.
 
 A likely pressure point is the distinction between:
 
@@ -194,7 +197,7 @@ Reusable concrete realization is expressed independently through Grounding contr
 
 Entity Framework Core now realizes these capabilities through `EntityFrameworkPointIO` rather than through `DatabaseIO` or a Repository abstraction.
 
-`ClockIO` still exists as a transitional capability surface and should be reviewed independently rather than treated as evidence that the runtime-shaped model remains generally valid.
+Temporal Work now follows the same direction: Feature-owned algebras express `Clock` and `Delay`, while `ClockIO` and `DelayIO` belong to Grounding rather than an ambient runtime carrier.
 
 The recovery objective is to retain the expressive power of the old effectful runtime while making capability requirements and grounding boundaries smaller, explicit, and independently justified.
 
