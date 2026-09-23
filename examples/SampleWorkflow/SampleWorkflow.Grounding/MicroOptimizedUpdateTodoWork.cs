@@ -48,7 +48,7 @@ public sealed class MicroOptimizedUpdateTodoWork :
     private Either<Error, Option<Todo>> Execute<A>(
         UpdateTodoMicroOptimized.ExecuteLinePart<A> execute)
     {
-        var picostep =
+        var quectostep =
             execute.Line
                 .Process
                 .Flow
@@ -56,11 +56,17 @@ public sealed class MicroOptimizedUpdateTodoWork :
                 .Substep
                 .Microstep
                 .Nanostep
-                .Picostep;
+                .Picostep
+                .Femtostep
+                .Attostep
+                .Zeptostep
+                .Yoctostep
+                .Rontostep
+                .Quectostep;
 
         Lookups++;
 
-        var index = points.FindIndex(picostep.Id.Value);
+        var index = points.FindIndex(quectostep.Id.Value);
 
         if (index < 0)
         {
