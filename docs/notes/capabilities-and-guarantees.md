@@ -188,10 +188,10 @@ self-persisting mutation
 
 An external boundary may still coexist if it has a different scope.
 
-### Reading does not require persistence authority
+### Point reading does not require persistence authority
 
 ```text
-Reading
+PointReader
     => no commit authority required
 ```
 
