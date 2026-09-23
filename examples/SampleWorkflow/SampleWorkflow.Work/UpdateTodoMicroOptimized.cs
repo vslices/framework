@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using LanguageExt.Common;
 using LanguageExt.Traits;
@@ -75,25 +76,9 @@ public sealed class UpdateTodoMicroOptimized :
     public static Free<Algebra, Response> Get(Request request) =>
         Free.lift(
             Algebra.Execute(
-                ToLine(request)));
+                Describe(request)));
 
-    public static bool SatisfiedBy(
-        Todo todo,
-        Quectostep step) =>
-        todo.Detail == step.Detail &&
-        todo.Completed == step.Completed;
-
-    public static Fin<Todo> Evolve(
-        Todo todo,
-        Quectostep step) =>
-        todo.Update(
-            state => state with
-            {
-                Detail = step.Detail,
-                Completed = step.Completed
-            });
-
-    private static Line ToLine(Request request) =>
+    public static Line Describe(Request request) =>
         new(
             new Process(
                 new Flow(
@@ -111,4 +96,38 @@ public sealed class UpdateTodoMicroOptimized :
                                                                 request.Id,
                                                                 request.Detail,
                                                                 request.Completed))))))))))))));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Quectostep Lower(Line line) =>
+        line
+            .Process
+            .Flow
+            .Step
+            .Substep
+            .Microstep
+            .Nanostep
+            .Picostep
+            .Femtostep
+            .Attostep
+            .Zeptostep
+            .Yoctostep
+            .Rontostep
+            .Quectostep;
+
+    public static bool SatisfiedBy(
+        Todo todo,
+        Quectostep step) =>
+        todo.Detail == step.Detail &&
+        todo.Completed == step.Completed;
+
+    public static Fin<Todo> Evolve(
+        Todo todo,
+        Quectostep step) =>
+        todo.Update(
+            state => state with
+            {
+                Detail = step.Detail,
+                Completed = step.Completed
+            });
+
 }
