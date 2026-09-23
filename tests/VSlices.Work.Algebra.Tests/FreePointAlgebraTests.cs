@@ -20,7 +20,7 @@ public sealed class FreePointAlgebraTests
         Assert.Empty(grounding.Trace);
         Assert.Equal("before", grounding.Current(id).Match(static x => x.Name, static () => string.Empty));
 
-        var result = await Algebra.interpret(program, grounding).RunAsync();
+        var result = await FreeAlgebra.interpret(program, grounding).RunAsync();
 
         Assert.True(result.IsSome);
         Assert.Equal("after", result.Match(static x => x.Name, static () => string.Empty));
@@ -37,8 +37,8 @@ public sealed class FreePointAlgebraTests
         var existing = new InMemoryAccountAlgebra(new Account(id, "before"));
         var missing = new InMemoryAccountAlgebra();
 
-        var existingResult = await Algebra.interpret(program, existing).RunAsync();
-        var missingResult = await Algebra.interpret(program, missing).RunAsync();
+        var existingResult = await FreeAlgebra.interpret(program, existing).RunAsync();
+        var missingResult = await FreeAlgebra.interpret(program, missing).RunAsync();
 
         Assert.True(existingResult.IsSome);
         Assert.True(missingResult.IsNone);
