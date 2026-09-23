@@ -22,20 +22,16 @@ A Feature is not a controller, handler, service class, manager, presentation ada
 The current contract is:
 
 ```csharp
-public interface Feature<F, ALG, REQ, RES>
+public interface Feature<ALG, REQ, RES>
     where ALG : Functor<ALG>
-    where F : Feature<F, ALG, REQ, RES>
 {
-    static abstract Free<ALG, RES> Get(REQ request);
+    static abstract Free<ALG, RES> Describe(REQ request);
 }
 ```
 
 Conceptually:
 
 ```text
-F
-    nominal Feature identity / self type
-
 ALG
     Work vocabulary available to the Feature
 
@@ -46,7 +42,7 @@ RES
     result of this WorkFlow
 ```
 
-The Functor requirement belongs to `ALG`, not to the Feature self type.
+The base Feature contract does not require a self type. A specialization may add one when concrete type identity has an independent semantic role.
 
 ## Request and response ownership
 
@@ -55,8 +51,7 @@ A Feature should normally own its request and response nominally:
 ```csharp
 public sealed class CreateSomething :
     Feature<
-        CreateSomething,
-        CreateSomething.Algebra,
+        ModuleAlgebra,
         CreateSomething.Request,
         CreateSomething.Response>
 {
@@ -82,23 +77,31 @@ Feature Response
 
 A Feature may reuse semantic types directly inside its request or response when that preserves the intended meaning.
 
-## Feature-owned algebra
+## Algebra ownership
 
-Each Feature owns only the instruction vocabulary its WorkFlow requires.
+An algebra is the instruction language available to Work.
+
+The default for a coherent module is one module-owned algebra containing the valid operations of that module. Features describe different programs in that shared language.
+
+A Feature-specific algebra remains valid when a real case benefits from a smaller or distinct vocabulary; it is a specialization, not the default ownership rule.
 
 For example:
 
 ```text
-GetTodo.Algebra
-    PointReader<Todo, TodoId>
+TodoAlgebra
+    NextTodoId
+    ReadTodo
+    WriteTodo
+    RemoveTodo
 
-UpdateTodo.Algebra
-    PointReader<Todo, TodoId>
-    PointWriter<Todo>
+GetTodo
+    describes a program using ReadTodo
 
-DeleteTodo.Algebra
-    PointReader<Todo, TodoId>
-    PointRemover<Todo, TodoId>
+UpdateTodo
+    describes a program using ReadTodo + WriteTodo
+
+DeleteTodo
+    describes a program using ReadTodo + RemoveTodo
 ```
 
 The algebra describes available WorkParts. It does not select a concrete execution mechanism.
@@ -107,7 +110,7 @@ A pure semantic transformation need not become a WorkPart merely because it occu
 
 ## Free WorkFlow
 
-`Feature.Get(request)` returns an inert program:
+`Feature.Describe(request)` returns an inert description of Work:
 
 ```csharp
 Free<ALG, RES>
@@ -140,11 +143,10 @@ For example:
 ```csharp
 using Algebra = AlgebraSum<
     AddFile.Algebra,
-    AddAttachmentReference.Algebra>;
+    TodoAlgebra>;
 
 public sealed class AttachFileToTodo :
     Feature<
-        AttachFileToTodo,
         Algebra,
         AttachFileToTodo.Request,
         AttachFileToTodo.Response>
@@ -156,8 +158,8 @@ public sealed class AttachFileToTodo :
 Child Feature programs can be embedded through the positional algebra helpers:
 
 ```csharp
-Algebra.FromA(AddFile.Get(...))
-Algebra.FromB(AddAttachmentReference.Get(...))
+Algebra.FromA(AddFile.Describe(...))
+Algebra.FromB(AddAttachmentReference.Describe(...))
 ```
 
 The child Feature does not know which later Feature, product, or BFF may reuse it.
@@ -243,7 +245,7 @@ The current SampleWorkflow API performs direct interpretation explicitly:
 
 ```text
 HTTP
-    -> Feature.Get(request)
+    -> Feature.Describe(request)
     -> Free<ALG, RES>
     -> AlgebraIO<ALG>
     -> response mapping
