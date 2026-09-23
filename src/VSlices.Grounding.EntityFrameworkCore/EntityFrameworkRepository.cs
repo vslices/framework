@@ -12,93 +12,99 @@ namespace VSlices.Grounding.EntityFrameworkCore;
 /// <typeparam name="TContext">Entity Framework Core context.</typeparam>
 /// <typeparam name="A">Semantic value exposed by Work.</typeparam>
 /// <typeparam name="TProjection">Persistence representation owned by this Grounding.</typeparam>
-public abstract class EntityFrameworkRepository<TContext, A, TProjection>(TContext context)
+public sealed class EntityFrameworkRepository<TContext, A, TProjection>(
+    TContext context,
+    Func<A, TProjection> toProjection,
+    Func<TProjection, A> toValue)
     : Repository<A>
     where TContext : DbContext
     where TProjection : class
 {
-    protected TContext Context { get; } = context;
-
-    protected DbSet<TProjection> Set => Context.Set<TProjection>();
-
-    /// <summary>
-    /// Materializes the persistence representation for a semantic value.
-    /// </summary>
-    protected abstract TProjection ToProjection(A value);
-
-    /// <summary>
-    /// Reconstructs the semantic value from its persistence representation.
-    /// </summary>
-    protected abstract A ToValue(TProjection projection);
+    private readonly DbSet<TProjection> _set = context.Set<TProjection>();
 
     public IO<A> Create(A value) =>
-        from projection in IO.lift(() => ToProjection(value))
-        from entry in Context.AddIO(projection)
-        from _ in Context.SaveChangesIO()
-        select ToValue(entry.Entity);
+        from projection in IO.lift(() => toProjection(value))
+        from entry in context.AddIO(projection)
+        from _ in context.SaveChangesIO()
+        select toValue(entry.Entity);
 
     public IO<Seq<A>> Read() =>
-        Set.AsNoTracking()
-           .ToSeqIO()
-           .Map(values => values.Map(ToValue));
+        _set.AsNoTracking()
+            .ToSeqIO()
+            .Map(values => values.Map(toValue));
 
     public IO<A> Update(A value) =>
-        from projection in IO.lift(() => ToProjection(value))
-        from entry in Context.UpdateIO(projection)
-        from _ in Context.SaveChangesIO()
-        select ToValue(entry.Entity);
+        from projection in IO.lift(() => toProjection(value))
+        from entry in context.UpdateIO(projection)
+        from _ in context.SaveChangesIO()
+        select toValue(entry.Entity);
 
     public IO<Unit> Delete(A value) =>
-        from projection in IO.lift(() => ToProjection(value))
-        from _ in Context.RemoveIO(projection)
-        from __ in Context.SaveChangesIO()
+        from projection in IO.lift(() => toProjection(value))
+        from _ in context.RemoveIO(projection)
+        from __ in context.SaveChangesIO()
         select unit;
-}
-
-/// <summary>
-/// Direct Entity Framework Core grounding for semantic values that are themselves
-/// persistence entities.
-/// </summary>
-public abstract class EntityFrameworkRepository<TContext, A>(TContext context)
-    : EntityFrameworkRepository<TContext, A, A>(context)
-    where TContext : DbContext
-    where A : class
-{
-    protected sealed override A ToProjection(A value) => value;
-
-    protected sealed override A ToValue(A projection) => projection;
 }
 
 /// <summary>
 /// Grounds <see cref="Repository{A, ID}"/> on an Entity Framework Core projection
 /// using a storage-native identity predicate.
 /// </summary>
-public abstract class EntityFrameworkRepository<TContext, A, ID, TProjection>(TContext context)
-    : EntityFrameworkRepository<TContext, A, TProjection>(context),
-      Repository<A, ID>
+public sealed class EntityFrameworkRepository<TContext, A, ID, TProjection>(
+    TContext context,
+    Func<A, TProjection> toProjection,
+    Func<TProjection, A> toValue,
+    Func<ID, Expression<Func<TProjection, bool>>> byId)
+    : Repository<A, ID>
     where TContext : DbContext
     where TProjection : class
 {
-    /// <summary>
-    /// Defines how the semantic identifier is represented by the persistence model.
-    /// </summary>
-    protected abstract Expression<Func<TProjection, bool>> ById(ID id);
+    private readonly EntityFrameworkRepository<TContext, A, TProjection> _repository =
+        new(context, toProjection, toValue);
+
+    private readonly DbSet<TProjection> _set = context.Set<TProjection>();
+
+    public IO<A> Create(A value) =>
+        _repository.Create(value);
+
+    public IO<Seq<A>> Read() =>
+        _repository.Read();
+
+    public IO<A> Update(A value) =>
+        _repository.Update(value);
+
+    public IO<Unit> Delete(A value) =>
+        _repository.Delete(value);
 
     public OptionT<IO, A> Read(ID id) =>
-        Set.AsNoTracking()
-           .SingleOrNoneIO(ById(id))
-           .Map(ToValue);
+        _set.AsNoTracking()
+            .SingleOrNoneIO(byId(id))
+            .Map(toValue);
 
     public IO<bool> Any(ID id) =>
-        Set.AsNoTracking()
-           .AnyIO(ById(id));
+        _set.AsNoTracking()
+            .AnyIO(byId(id));
 }
 
-/// <summary>
-/// Direct Entity Framework Core grounding for identified semantic values that are
-/// themselves persistence entities.
-/// </summary>
-public abstract class EntityFrameworkRepository<TContext, A, ID>(TContext context)
-    : EntityFrameworkRepository<TContext, A, ID, A>(context)
-    where TContext : DbContext
-    where A : class;
+public static class EntityFrameworkRepository
+{
+    /// <summary>
+    /// Creates a repository when the semantic value is also the Entity Framework entity.
+    /// </summary>
+    public static EntityFrameworkRepository<TContext, A, A> Direct<TContext, A>(
+        TContext context)
+        where TContext : DbContext
+        where A : class =>
+        new(context, static value => value, static value => value);
+
+    /// <summary>
+    /// Creates an identified repository when the semantic value is also the
+    /// Entity Framework entity.
+    /// </summary>
+    public static EntityFrameworkRepository<TContext, A, ID, A> Direct<TContext, A, ID>(
+        TContext context,
+        Func<ID, Expression<Func<A, bool>>> byId)
+        where TContext : DbContext
+        where A : class =>
+        new(context, static value => value, static value => value, byId);
+}
