@@ -1,8 +1,19 @@
 <Solution>
   <Folder Name="/examples/" />
   <Folder Name="/examples/simple-workflow/">
-    <Project Path="examples/SampleWorkflow/SampleWorkflow.Core/SampleWorkflow.Core.csproj" />
-    <Project Path="examples/SampleWorkflow/SampleWorkflow.Domain/SampleWorkflow.Domain.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Spaces/SampleWorkflow.Spaces.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Work/SampleWorkflow.Work.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Process/SampleWorkflow.Process.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Grounding/SampleWorkflow.Grounding.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj" />
+  </Folder>
+  <Folder Name="/examples/sample-file-repo/">
+    <Project Path="examples/SampleFileRepo/SampleFileRepo/SampleFileRepo.csproj" />
+  </Folder>
+  <Folder Name="/examples/sample-bff/">
+    <Project Path="examples/SampleBFF/SampleBFF/SampleBFF.csproj" />
+    <Project Path="examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj" />
   </Folder>
   <Folder Name="/examples/space-modeling/">
     <Project Path="examples/VSlices.Space.Modeling/VSlices.Space.Modeling.csproj" />

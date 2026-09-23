@@ -1,0 +1,92 @@
+name: Simple Workflow CRUD
+
+on:
+  push:
+    branches:
+      - experiment/simple-workflow-point-crud
+      - experiment/cross-service-workprocess
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: simple-workflow-crud-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build Work
+        run: dotnet build src/VSlices.Work/VSlices.Work.csproj
+
+      - name: Build Work Services
+        run: dotnet build src/VSlices.Work.Services/VSlices.Work.Services.csproj
+
+      - name: Build Work Products
+        run: dotnet build src/VSlices.Work.Products/VSlices.Work.Products.csproj
+
+      - name: Run Work algebra tests
+        run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
+
+      - name: Build API
+        run: dotnet build examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj
+
+      - name: Run composed Feature tests
+        run: dotnet run --project examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj
+
+      - name: Build Sample File Repo
+        run: dotnet build examples/SampleFileRepo/SampleFileRepo/SampleFileRepo.csproj
+
+      - name: Run cross-service composed Feature tests
+        run: dotnet run --project examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj
+
+      - name: Smoke CRUD API
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ASPNETCORE_URLS=http://127.0.0.1:5099             dotnet run --no-build             --project examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj             > /tmp/simple-workflow.log 2>&1 &
+          api_pid=$!
+          trap 'kill $api_pid || true; cat /tmp/simple-workflow.log' EXIT
+
+          for _ in $(seq 1 30); do
+            if curl -sSf http://127.0.0.1:5099/health > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          status=$(curl -sS -o /tmp/create.json -w "%{http_code}"             -X POST http://127.0.0.1:5099/todos             -H 'Content-Type: application/json'             -d '{"detail":"first","completed":false}')
+          test "$status" = "201"
+
+          id=$(python3 -c 'import json; print(json.load(open("/tmp/create.json"))["id"])')
+
+          status=$(curl -sS -o /tmp/read.json -w "%{http_code}"             http://127.0.0.1:5099/todos/$id)
+          test "$status" = "200"
+
+          status=$(curl -sS -o /tmp/update.json -w "%{http_code}"             -X PUT http://127.0.0.1:5099/todos/$id             -H 'Content-Type: application/json'             -d '{"detail":"updated","completed":true}')
+          test "$status" = "200"
+
+          python3 -c 'import json; updated=json.load(open("/tmp/update.json")); assert updated["detail"] == "updated"; assert updated["completed"] is True'
+
+          status=$(curl -sS -o /tmp/delete.json -w "%{http_code}"             -X DELETE http://127.0.0.1:5099/todos/$id)
+          test "$status" = "200"
+
+          status=$(curl -sS -o /tmp/missing.json -w "%{http_code}"             http://127.0.0.1:5099/todos/$id)
+          test "$status" = "404"
