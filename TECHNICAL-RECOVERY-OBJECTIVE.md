@@ -80,7 +80,7 @@ input
 -> zero or more integrations
 ```
 
-The current `Feature<F, RT, REQ, RES>` and `Flow<RT, REQ, RES>` already recover the executable core more explicitly.
+The current `Feature<F, ALG, REQ, RES> -> Free<ALG, RES>` model recovers the executable core while making Work vocabulary explicit in the Feature algebra.
 
 The remaining problem is to rediscover the relation between executable work and the concrete mechanisms that make that work reachable.
 
@@ -174,7 +174,7 @@ A shared runtime exposed capabilities such as dependency resolution and file-sys
 
 This was technically expressive but allowed work to depend indirectly on broad runtime access.
 
-The current Work model has moved further away from broad runtime access:
+The current Work model no longer requires an ambient runtime carrier:
 
 ```text
 Feature<F, ALG, REQ, RES>
@@ -197,9 +197,11 @@ Reusable concrete realization is expressed independently through Grounding contr
 
 Entity Framework Core now realizes these capabilities through `EntityFrameworkPointIO` rather than through `DatabaseIO` or a Repository abstraction.
 
-Temporal Work now follows the same direction: Feature-owned algebras express `Clock` and `Delay`, while `ClockIO` and `DelayIO` belong to Grounding rather than an ambient runtime carrier.
+Temporal Work follows the same direction: Feature-owned algebras express `Clock` and `Delay`, while `ClockIO` and `DelayIO` belong to Grounding rather than an ambient runtime carrier.
 
-The recovery objective is to retain the expressive power of the old effectful runtime while making capability requirements and grounding boundaries smaller, explicit, and independently justified.
+`Flow<RT, REQ, RES>`, `HasAlgebra<ALG, RT>`, and `AlgebraEnv<ALG, RT>` were removed after the maintained Feature, point-grounding, composition, and temporal examples no longer required them.
+
+The recovery objective is to retain the useful expressive power of the old effectful runtime while making capability requirements and grounding boundaries smaller, explicit, and independently justified.
 
 ### 5. Host and lifecycle
 
