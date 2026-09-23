@@ -1,124 +1,222 @@
 # Feature Model
 
-Features are the main executable unit of application behavior in VSlices.
+Features are the main executable WorkFlow abstraction in VSlices.
 
-A Feature represents one explicit slice of behavior with:
+The current validated relationship is:
 
-- one feature-owned request type;
-- one feature-owned response type;
-- one runtime capability contract;
-- controlled effectful execution;
-- explicit failure propagation.
+```text
+Feature == WorkFlow == Free<ALG, Response>
+```
 
-A Feature is not a controller, handler, service class, manager, or presentation adapter.
+A Feature owns:
+
+- one nominal request type;
+- one nominal response type;
+- one algebra describing the WorkParts available to that WorkFlow;
+- the Free program that composes those WorkParts.
+
+A Feature is not a controller, handler, service class, manager, presentation adapter, runtime carrier, Entity, or Aggregate Root.
 
 ## Core shape
 
-C# does not currently expose associated types directly. VSlices therefore keeps the request and response as generic bindings while requiring the concrete Feature to own their nominal definitions.
-
-Canonical shape:
+The current contract is:
 
 ```csharp
-public sealed class SomeFeature<RT> :
-    Feature<SomeFeature<RT>, RT, SomeFeature<RT>.Request, SomeFeature<RT>.Response>
+public interface Feature<F, ALG, REQ, RES>
+    where ALG : Functor<ALG>
+    where F : Feature<F, ALG, REQ, RES>
 {
-    public sealed record Request(...);
-    public sealed record Response(...);
-
-    public static Flow<RT, Request, Response> Get() => ...;
+    static abstract Free<ALG, RES> Get(REQ request);
 }
 ```
 
 Conceptually:
 
-```txt
-Feature
-├── Request   associated contract
-├── Response  associated contract
-└── Get       RT + Request -> effectful Response
+```text
+F
+    nominal Feature identity / self type
+
+ALG
+    Work vocabulary available to the Feature
+
+REQ
+    request for this execution
+
+RES
+    result of this WorkFlow
 ```
 
-`Request` and `Response` belong nominally to the Feature even when they are composed almost entirely from domain types.
+The Functor requirement belongs to `ALG`, not to the Feature self type.
 
-Prefer:
+## Request and response ownership
+
+A Feature should normally own its request and response nominally:
 
 ```csharp
-public sealed record Request(SrvIdentity.Input Identity);
+public sealed class CreateSomething :
+    Feature<
+        CreateSomething,
+        CreateSomething.Algebra,
+        CreateSomething.Request,
+        CreateSomething.Response>
+{
+    public sealed record Request(...);
+    public sealed record Response(...);
+
+    // ...
+}
 ```
 
-over treating the domain input itself as the Feature request.
+Keep these meanings separate:
 
-This keeps two meanings separate:
+```text
+semantic input
+    data required to establish or transform a semantic value
 
-```txt
-Domain Input      data required to construct/refine a domain value
-Feature Request   data required to execute an application operation
-Feature Response  value produced by that application operation
+Feature Request
+    data required to execute one WorkFlow
+
+Feature Response
+    value explicitly returned by that WorkFlow
 ```
 
-`RT` remains part of the Feature type because runtime constraints belong to execution rather than to the request/response contract.
+A Feature may reuse semantic types directly inside its request or response when that preserves the intended meaning.
+
+## Feature-owned algebra
+
+Each Feature owns only the instruction vocabulary its WorkFlow requires.
+
+For example:
+
+```text
+GetTodo.Algebra
+    PointReader<Todo, TodoId>
+
+UpdateTodo.Algebra
+    PointReader<Todo, TodoId>
+    PointWriter<Todo>
+
+DeleteTodo.Algebra
+    PointReader<Todo, TodoId>
+    PointRemover<Todo, TodoId>
+```
+
+The algebra describes available WorkParts. It does not select a concrete execution mechanism.
+
+A pure semantic transformation need not become a WorkPart merely because it occurs during a WorkFlow.
+
+## Free WorkFlow
+
+`Feature.Get(request)` returns an inert program:
+
+```csharp
+Free<ALG, RES>
+```
+
+Constructing the Feature program performs no external effect.
+
+Grounding later interprets the program through:
+
+```csharp
+AlgebraIO<ALG>
+```
+
+This keeps:
+
+```text
+what the WorkFlow means
+!=
+how the external world realizes its WorkParts
+```
+
+## Feature composition
+
+A Feature that reuses other Features is still a normal Feature.
+
+Composition is represented by a richer algebra rather than by another executable abstraction.
+
+For example:
+
+```csharp
+using Algebra = AlgebraSum<
+    AddFile.Algebra,
+    AddAttachmentReference.Algebra>;
+
+public sealed class AttachFileToTodo :
+    Feature<
+        AttachFileToTodo,
+        Algebra,
+        AttachFileToTodo.Request,
+        AttachFileToTodo.Response>
+{
+    // ...
+}
+```
+
+Child Feature programs can be embedded through the positional algebra helpers:
+
+```csharp
+Algebra.FromA(AddFile.Get(...))
+Algebra.FromB(AddAttachmentReference.Get(...))
+```
+
+The child Feature does not know which later Feature, product, or BFF may reuse it.
+
+## Grounding
+
+Grounding owns concrete realization.
+
+A Feature-specific interpreter implements:
+
+```csharp
+AlgebraIO<Feature.Algebra>
+```
+
+and may delegate its WorkParts to smaller reusable Grounding contracts.
+
+For example:
+
+```text
+ReadTodoPart
+    -> PointReaderIO<Todo, TodoId>
+
+WriteTodoPart
+    -> PointWriterIO<Todo>
+
+ObserveNowPart
+    -> ClockIO
+
+DelayPart
+    -> DelayIO
+```
+
+A concrete mechanism such as Entity Framework Core or `TimeProvider` belongs below this boundary.
 
 ## Service specialization
 
 A service-owned Feature is modeled with:
 
 ```csharp
-ServiceFeature<F, RT, REQ, RES>
+ServiceFeature<F, ALG, REQ, RES>
 ```
 
-A concrete `ServiceFeature` must declare:
+A concrete `ServiceFeature` declares:
 
 ```csharp
 static abstract string UniqueName { get; }
 static abstract string Description { get; }
 ```
 
-and receives a default claim through:
+and receives a default `ServiceClaim` derived from that metadata.
 
-```csharp
-static virtual ServiceClaim Claim
-```
-
-The default Claim is derived from the Feature metadata. A concrete Feature may override `Claim` only when it intentionally represents an already-established claim or requires exceptional claim construction.
-
-`UniqueName` is the stable machine-facing identity of the service capability. `Description` is mandatory human/agent-facing metadata.
-
-## ServiceClaim
-
-`ServiceClaim` is a sealed value, not a subtype hierarchy.
-
-Its identity is:
-
-```txt
-UniqueName
-```
-
-Its descriptive metadata is:
-
-```txt
-Description
-```
-
-`Description` does not participate in equality or hashing. It can evolve without changing the authorization identity.
-
-Claims are created through:
-
-```csharp
-ServiceClaim.New<OWNER>(uniqueName, description)
-```
-
-The runtime registry is idempotent for the same owner and key, and throws when a different owner attempts to register the same `UniqueName` in the same process.
-
-For generic Features, ownership is normalized to the open generic type so different runtime instantiations of the same Feature share one claim.
-
-The runtime registry is a local safety mechanism. Global uniqueness across independently running services must eventually be validated by build/tooling that inspects the complete claim universe.
+`UniqueName` is the stable machine-facing capability identity. `Description` is human/agent-facing metadata and does not define equality.
 
 ## Product specialization
 
 A product behavior is modeled with:
 
 ```csharp
-ProductFeature<F, RT, REQ, RES>
+ProductFeature<F, ALG, REQ, RES>
 ```
 
 and exposes its product authorization through:
@@ -129,150 +227,116 @@ static abstract ProductRole ExecutableBy { get; }
 
 Service claims and product roles intentionally have different ownership semantics.
 
-## Request and runtime are different channels
-
-A `Flow` receives two independent inputs:
-
-```txt
-RT  = runtime capability carrier
-REQ = request for this execution
-```
-
-The current `Flow` reader keeps the request channel explicit:
-
-```csharp
-Flow<RT, REQ>.Asks(static request => request)
-```
-
-When an operation genuinely needs both channels, `Flow<RT, REQ>.Asks((request, runtime) => ...)` can project from both.
-
-Do not model the request as a runtime capability.
-
-## Runtime capabilities
-
-Features declare only the runtime capabilities they require.
-
-```csharp
-public sealed class CreateIdentity<RT> :
-    ServiceFeature<
-        CreateIdentity<RT>,
-        RT,
-        CreateIdentity<RT>.Request,
-        CreateIdentity<RT>.Response>
-    where RT : HasAlgebra<IdentityAlgebra, RT>
-```
-
-Capabilities remain type-level execution requirements.
-
-For point operations, a Feature can build a free program over a service-owned algebra and interpret it through:
-
-```csharp
-AlgebraEnv<IdentityAlgebra, RT>.run(program)
-```
-
-The algebra defines the operation vocabulary; the runtime provides the Grounding interpreter. See [Point Algebras](point-algebras.md).
-
-Prefer this explicit runtime requirement over constructor injection, service bags, or service-location patterns.
-
-## Feature body
-
-Prefer a small declarative pipeline:
-
-```csharp
-public static Flow<RT, Request, Response> Get() =>
-    Flow<RT, Request>.Asks(static request => request) >>
-    Validate >>
-    Persist;
-```
-
-Use `>>` for linear composition when each step naturally consumes the previous result. Use lambdas only when projection, matching, capture, or return adaptation is required.
-
-## Canonical service example
-
-```csharp
-public sealed class CreateIdentity<RT> :
-    ServiceFeature<
-        CreateIdentity<RT>,
-        RT,
-        CreateIdentity<RT>.Request,
-        CreateIdentity<RT>.Response>
-    where RT : HasAlgebra<IdentityAlgebra, RT>
-{
-    public sealed record Request(SrvIdentity.Input Identity);
-
-    public readonly record struct Response;
-
-    public static string UniqueName =>
-        "Identities.Create";
-
-    public static string Description =>
-        "Permite crear una identidad";
-
-    public static Flow<RT, Request, Response> Get() =>
-        Flow<RT, Request>.Asks(static request => request) >>
-        (request => request.Identity.Match(
-            Natural: n => CreateNatural<RT>.Invariants.RunEff(n).MapSuper(),
-            Legal: l => CreateLegal<RT>.Invariants.RunEff(l).MapSuper())) >>
-        (identity => AlgebraEnv<IdentityAlgebra, RT>
-            .run(IdentityPrograms.write(identity))
-            .Map(_ => new Response()));
-}
-```
-
-The default reading is:
-
-```txt
-Feature.Request
--> eliminate/adapt request structure
--> enforce contextual invariants
--> execute capability-backed effect
--> construct Feature.Response
-```
-
-## Closed domain variants
-
-When a request or domain type models a closed sum and provides `Match`, prefer it over a C# type switch.
-
-## ReqK execution
-
-When a completed `ReqK<Eff<RT>, ...>` is executed from application code, use:
-
-```csharp
-rules.RunEff(input)
-```
-
 ## Presentation adapters
 
 Presentation adapters should only:
 
 1. receive external input;
-2. refine/translate it into `Feature.Request`;
-3. execute the Feature;
-4. translate `Feature.Response` into the presentation response.
+2. refine or translate it into `Feature.Request`;
+3. obtain the Feature Free program;
+4. interpret it with the selected Grounding;
+5. translate `Feature.Response` into the presentation response.
 
-Features must not contain HTTP, UI, worker, or transport-specific concerns.
+Features must not contain HTTP, UI, worker, or transport-specific concerns merely because one presentation invokes them.
+
+The current SampleWorkflow API performs direct interpretation explicitly:
+
+```text
+HTTP
+    -> Feature.Get(request)
+    -> Free<ALG, RES>
+    -> AlgebraIO<ALG>
+    -> response mapping
+```
+
+Future invocation bindings may make this wiring reusable without changing Feature semantics.
 
 ## Side effects and failures
 
-Side effects occur through explicit runtime capabilities and effect values.
-Expected domain and application failures remain explicit values.
+External effects occur only when a Grounding interprets WorkParts.
 
-Do not throw exceptions for normal failure paths. The duplicate-claim exception is a framework configuration/programming error, not a domain failure.
+Expected domain or application failures should remain explicit values in the Feature response or semantic transformations.
+
+Do not use exceptions for expected control flow.
+
+Interpreter or host failures that are not modeled as expected outcomes may still surface through the effect runtime.
+
+## Retired execution model: Flow
+
+The historical `Flow<RT, REQ, RES>` abstraction was retained temporarily while Feature-as-Free was being validated.
+
+Subsequent evidence showed that:
+
+- Feature already owns the request;
+- `ALG` already expresses the Work vocabulary;
+- `Free<ALG, RES>` already expresses WorkFlow composition;
+- Grounding already owns concrete interpretation;
+- current Features, samples, persistence Grounding, and temporal Grounding require no `Flow` consumer.
+
+The executable trajectory is therefore:
+
+```text
+Feature + Flow<RT, REQ, RES>
+    -> Free point-algebra experiment
+    -> Feature owns Free<ALG, RES>
+    -> same-service composition
+    -> cross-service composition
+    -> point and temporal Groundings
+    -> no remaining Flow responsibility
+    -> Flow removed
+```
+
+Do not reintroduce `Flow` merely as a request/runtime wrapper. A future mechanism with genuinely new semantics should be named and justified from that pressure.
+
+## Retired semantic categories: Entity and Aggregate Root
+
+`Entity` and `AggregateRoot` are not current VSlices Framework semantic primitives.
+
+The current model uses smaller independently justified concepts such as:
+
+- semantic spaces;
+- explicit identity values where identity is meaningful;
+- `Evolvable` when accepted state evolution is meaningful;
+- Feature-owned Work vocabulary;
+- guarantees or consistency semantics only when independently established.
+
+Do not infer:
+
+```text
+has identity
+    => Entity
+
+coordinates related changes
+    => Aggregate Root
+```
+
+Those historical DDD labels bundled additional assumptions that are not justified by identity or state evolution alone.
+
+If future evidence requires a consistency boundary, authority boundary, lifecycle concept, or identity-continuity rule, model that concept directly rather than restoring `Entity` or `AggregateRoot`.
 
 ## Testing
 
-Test Features through the same `Flow` contract used in production and prefer test runtimes that implement the required capabilities.
+Test a Feature by:
+
+1. constructing its `Free<ALG, RES>` program;
+2. verifying that construction is inert where relevant;
+3. interpreting it through a suitable `AlgebraIO<ALG>`;
+4. asserting semantic results and meaningful observable effects.
+
+Use alternate Groundings when useful to verify that Work semantics do not depend on one realization.
 
 ## Rules
 
 A Feature must:
 
-- own nominal `Request` and `Response` types;
-- bind those types through the current generic interface until C# supports associated types;
-- use `Flow<RT, Request, Response>` as its execution model;
-- keep `RT` constraints explicit;
-- keep orchestration local and readable;
-- remain presentation-independent.
+- own or explicitly bind its request and response contracts;
+- use an algebra containing only the WorkParts it actually requires;
+- return `Free<ALG, RES>`;
+- remain presentation-independent;
+- keep semantic transformation and external acquisition/realization distinguishable;
+- make composition explicit through its algebra.
+
+A Feature must not require an ambient runtime carrier merely to access dependencies.
 
 A ServiceFeature must additionally:
 

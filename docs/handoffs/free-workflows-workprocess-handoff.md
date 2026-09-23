@@ -364,20 +364,24 @@ The next substantive design question is where stronger cross-WorkFlow guarantees
 
 Possible future concepts include compensation, retry, reconciliation, atomicity or another guarantee vocabulary, but none should be smuggled into the composition mechanism by default.
 
-## Flow remains unresolved
+## Flow was retired
 
-The relationship between:
+After the Free WorkFlow model survived same-service composition, cross-service composition, point Grounding, Entity Framework Core Grounding, and temporal Work pressure, no executable responsibility remained unique to `Flow<RT, REQ, RES>`.
+
+The resulting trajectory is:
 
 ```text
-Feature / Free WorkFlow
-Flow<RT, REQ, RES>
-presentation invocation
-runtime interpretation
+Feature + Flow
+    -> Free WorkFlow inside Feature
+    -> Feature directly owns Free<ALG, RES>
+    -> Grounding interprets ALG
+    -> runtime carriers become unused
+    -> Flow removed
 ```
 
-remains open.
+Presentation and invocation remain separate open concerns, but they do not justify retaining a generic request/runtime monad in the Framework.
 
-Do not restore `Flow` as the Feature boundary from historical documentation, and do not delete it merely because the current experiment uses Free directly.
+`HasAlgebra<ALG, RT>` and `AlgebraEnv<ALG, RT>` were removed with the same runtime-carrier surface.
 
 ## Ticket Support remains a real-world pressure case
 
@@ -406,7 +410,7 @@ When Ticket Support is revisited, migrate or recreate only enough of the real Wo
 - ordering;
 - stronger guarantees if actually required.
 
-Do not create a generic `Flow -> Free` adapter merely to make old Features participate.
+Do not create a generic `Flow -> Free` adapter merely to make historical Features participate. Migrate or recreate only the WorkFlow semantics actually required by the pressure case.
 
 ## Current evidence requirements
 
@@ -433,7 +437,6 @@ This experiment does not currently try to:
 - restore WorkProcess as a separate interface;
 - extend AlgebraSum past seven children;
 - settle compensation or transaction semantics;
-- settle the final role of Flow;
 - implement WorkLine;
 - generate composition from VSIR;
 - migrate all of Ticket Support;

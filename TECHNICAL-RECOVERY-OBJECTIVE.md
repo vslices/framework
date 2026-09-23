@@ -56,13 +56,24 @@ The `6.0.0-pre.6.5` line demonstrated a broad technical surface, including:
 - background execution through Hangfire;
 - persistence contracts;
 - Entity Framework Core realizations;
-- domain entities and aggregate roots;
+- historical entity / aggregate abstractions (retired as current semantic categories);
 - effectful execution through LanguageExt;
 - runtime-provided capabilities and dependencies.
 
 These capabilities are evidence of problems VSlices has already solved technically.
 
 They do not imply that the old ownership boundaries or names were semantically correct.
+
+Some historical abstractions have now been explicitly retired rather than migrated:
+
+```text
+Flow<RT, REQ, RES>
+Repository / DatabaseIO
+Entity
+AggregateRoot
+```
+
+Their former responsibilities are either represented by smaller current concepts or remain open as independently named semantic questions. They are not recovery targets.
 
 ---
 
@@ -80,7 +91,7 @@ input
 -> zero or more integrations
 ```
 
-The current `Feature<F, RT, REQ, RES>` and `Flow<RT, REQ, RES>` already recover the executable core more explicitly.
+The current `Feature<F, ALG, REQ, RES> -> Free<ALG, RES>` model now recovers the executable core without a separate runtime/request carrier.
 
 The remaining problem is to rediscover the relation between executable work and the concrete mechanisms that make that work reachable.
 
