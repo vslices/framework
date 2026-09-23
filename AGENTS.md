@@ -208,17 +208,53 @@ Do not introduce arities beyond seven or a different composition mechanism until
 
 ---
 
-## Flow Status
+## Retired Flow Surface
 
-`Flow<RT, REQ, RES>` still exists in the repository, but its final relationship to the current Free WorkFlow model is unresolved.
+`Flow<RT, REQ, RES>` has been removed.
 
-Do not:
+Its useful responsibilities were redistributed through stronger evidence:
 
-- restore `Flow` as the Feature boundary merely because older documentation says so;
-- delete or redesign `Flow` just to simplify the current experiment;
-- claim that its final role is settled.
+```text
+request
+    -> Feature.Request
 
-First preserve the validated Feature-as-Free and composed-algebra model. Let real cases determine whether `Flow` remains an execution carrier, presentation/runtime syntax, another abstraction, or is superseded on this path.
+Work vocabulary
+    -> ALG
+
+WorkFlow composition
+    -> Free<ALG, RES>
+
+external realization
+    -> AlgebraIO<ALG> / Grounding
+```
+
+No current Feature, sample, point Grounding, or temporal Grounding requires a separate `Flow` carrier.
+
+Do not reintroduce `Flow` merely as a request/runtime wrapper. A future abstraction must justify a genuinely distinct semantic responsibility.
+
+---
+
+## Retired Entity / AggregateRoot Semantics
+
+`Entity` and `AggregateRoot` are not current VSlices Framework semantic primitives.
+
+Do not infer either category from:
+
+- the existence of an identity value;
+- state evolution;
+- persistence;
+- coordination of several values;
+- a traditional DDD implementation shape.
+
+Use smaller explicit concepts instead:
+
+- semantic spaces;
+- identity values where identity is actually meaningful;
+- `Evolvable` for accepted state evolution;
+- Feature-owned Work vocabulary;
+- explicit authority, consistency, lifecycle, or guarantee concepts when evidence requires them.
+
+If a future case requires a consistency boundary or identity-continuity rule, model that concept directly rather than restoring the historical DDD labels.
 
 ---
 
