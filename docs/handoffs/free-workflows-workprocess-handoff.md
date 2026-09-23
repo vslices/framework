@@ -1,175 +1,134 @@
-# Handoff — Free WorkFlows and composed WorkProcess algebras
+# Handoff — Free WorkFlows and composed Feature algebras
 
 > Date: 2026-09-23
 >
-> Branch: `experiment/simple-workflow-point-crud`
+> Branch: `experiment/cross-service-workprocess`
 >
-> Validated miniature baseline: `6c951a2bcca5fef28c1a6a246ae9df6328df981d`
+> Original Free WorkFlow miniature baseline: `6c951a2bcca5fef28c1a6a246ae9df6328df981d`
 >
-> Documentation alignment: `2812b57877214e6acb2894327bc278e9c78b9237`
+> First successful cross-service composition: `ea9abe076fb4af42d47d1f759e61feb3c5b8e300`
 >
-> Status: the original miniature and a cross-service SampleBFF composition are implemented and green. Cross-service composition now has executable evidence with distinct Groundings; partial failure is the next observable semantic pressure.
+> Status: Feature-as-Free and cross-service algebra composition are executable. The temporary `WorkProcess` type has been removed because composition is already represented by `Feature<..., ALG, ...>` when `ALG` is a composed algebra.
 
-## Purpose
+## Current conclusion
 
-This handoff preserves the validated result of the `SampleWorkflow` experiment and the next concrete continuation path.
-
-The experiment now has executable evidence for:
+The current executable model is:
 
 ```text
-Feature == WorkFlow == Free<WorkFlowAlgebra, Response>
+Feature == WorkFlow == Free<ALG, Response>
 ```
 
-where each WorkFlow algebra contains only the WorkParts required by that Feature.
+where `ALG` is the language of WorkParts available to that Feature.
 
-It also has executable evidence for:
+A Feature may own a direct algebra:
 
 ```text
-WorkProcess
-    composes existing WorkFlows
-    by composing their algebras
-    and hoisting each WorkFlow into the composed algebra
+CreateTodo
+    ALG = CreateTodo.Algebra
 ```
 
-The miniature has done its job. Do not repeat it before moving to a real composition boundary.
-
-## Validated baseline
-
-The current sample contains:
+or a composed algebra:
 
 ```text
-SampleWorkflow.Spaces
-SampleWorkflow.Work
-SampleWorkflow.Grounding
-SampleWorkflow.Process
-SampleWorkflow.Process.Tests
-SampleWorkflow.Api
+CreateAndGetTodo
+    ALG = AlgebraSum<
+        CreateTodo.Algebra,
+        GetTodo.Algebra>
+
+AttachFileToTodo
+    ALG = AlgebraSum<
+        AddFile.Algebra,
+        AddAttachmentReference.Algebra>
 ```
 
-The branch CI verifies:
+No second executable abstraction is required.
 
-```text
-VSlices.Work build
-VSlices.Work.Services build
-VSlices.Work.Products build
-Work algebra tests
-SampleWorkflow API build
-WorkProcess hoist/composition tests
-CRUD smoke test
-```
+## Why WorkProcess was removed
 
-The current branch run at the documentation handoff is green.
-
-## Semantic model retained by the sample
-
-### TodoId
-
-`TodoId` is a semantic discrete space established from a `Guid`:
-
-```text
-Guid
-    -> TodoId.Transformation
-    -> TodoId
-```
-
-Identity generation is a realization concern distinct from the semantic transformation that establishes a valid `TodoId`.
-
-### TodoDetail
-
-`TodoDetail` covers only the textual value:
-
-```text
-string
-    -> TodoDetail.Transformation
-    -> TodoDetail
-```
-
-`Completed` remains a plain `bool`; the current experiment has not produced evidence requiring a separate semantic space.
-
-### Todo
-
-`Todo` is an evolvable semantic point established from:
-
-```text
-TodoId
-TodoDetail
-bool Completed
-```
-
-and implements:
-
-```text
-Evolvable<Todo, Todo.State>
-```
-
-The PUT path remains:
-
-```text
-read current Todo
-    -> Todo.Update(...)
-    -> accepted evolved Todo
-    -> write point
-```
-
-rather than constructing an unrelated replacement from HTTP input.
-
-## Validated Work hierarchy
-
-The current conceptual hierarchy remains:
-
-```text
-1 WorkLine    : N WorkProcess
-1 WorkProcess : M WorkFlow
-1 WorkFlow    : Q WorkPart
-```
-
-For the implemented experiment:
-
-```text
-WorkPart
-    specific instruction in a WorkFlow
-
-WorkFlow
-    Feature
-    Free Monad over its WorkPart algebra
-
-WorkProcess
-    composition of multiple existing WorkFlows
-
-WorkLine
-    still outside current implementation scope
-```
-
-Do not generalize WorkLine yet.
-
-## Feature is the WorkFlow
-
-The current Framework surface is already:
+The experiment originally introduced:
 
 ```csharp
-Feature<F, ALG, REQ, RES>
+WorkProcess<P, ALG, REQ, RES>
+```
+
+to represent a Work unit composed from several WorkFlows.
+
+That interface had the same executable shape as Feature:
+
+```text
+REQ -> Free<ALG, RES>
+```
+
+The first Todo miniature did not prove whether the distinction was meaningful because both child WorkFlows used one Grounding.
+
+The later cross-service sample provided stronger pressure:
+
+```text
+AttachFileToTodo
+    -> SampleFileRepo.AddFile
+       interpreted by InMemoryFileWork
+
+    -> SampleWorkflow.AddAttachmentReference
+       interpreted by InMemoryTodoWork
+```
+
+The existing Feature contract still represented the composed behavior without loss.
+
+The observed trajectory is therefore:
+
+```text
+Feature
+    -> discover child WorkFlow composition
+    -> introduce WorkProcess hypothesis
+    -> validate same-service composition
+    -> validate cross-service composition
+    -> observe identical executable contract
+    -> locate the real distinction in ALG
+    -> remove WorkProcess type
+```
+
+`WorkProcess` may remain useful as informal language for a process made from several WorkFlows, but it is not currently justified as a separate Framework interface.
+
+## Feature contract
+
+The current Framework surface is:
+
+```csharp
+public interface Feature<F, ALG, REQ, RES>
     where ALG : Functor<ALG>
+    where F : Feature<F, ALG, REQ, RES>
 {
     static abstract Free<ALG, RES> Get(REQ request);
 }
 ```
 
-The accepted experimental interpretation is:
+The Functor requirement belongs to `ALG`, not to the self type `F`.
+
+Conceptually:
 
 ```text
-Feature does not merely execute a WorkFlow.
-Feature is the WorkFlow.
+F
+    Feature identity / self type
+
+ALG
+    instruction language available to the Feature
+
+REQ
+    explicit request
+
+RES
+    explicit result
 ```
 
-Runtime and concrete realization are not required to define the semantic program.
+## WorkParts and Feature-owned algebras
 
-The previous parallel `TodoPrograms` ownership has been removed.
+A WorkPart remains:
 
-## WorkFlow algebras
+```text
+a specific instruction in a WorkFlow
+```
 
-Each Feature / WorkFlow owns the algebra required to express its WorkParts.
-
-The sample currently demonstrates:
+A direct Feature can own only the WorkParts it needs:
 
 ```text
 CreateTodo.Algebra
@@ -187,300 +146,177 @@ UpdateTodo.Algebra
 DeleteTodo.Algebra
     ReadTodo
     RemoveTodo
+
+AddAttachmentReference.Algebra
+    ReadTodo
+    WriteTodo
 ```
 
-Generic vocabulary such as:
+Pure semantic transformations such as `todo.Update(...)` do not become WorkParts merely because they occur inside a WorkFlow.
+
+## Composed Feature algebras
+
+When a Feature reuses child Feature programs, its `ALG` can be an `AlgebraSum`.
+
+The supported positional family follows the A..G convention:
 
 ```text
-PointReader
-PointWriter
-PointRemover
+AlgebraSum<A, B>
+AlgebraSum<A, B, C>
+AlgebraSum<A, B, C, D>
+AlgebraSum<A, B, C, D, E>
+AlgebraSum<A, B, C, D, E, F>
+AlgebraSum<A, B, C, D, E, F, G>
 ```
 
-can still be reused without moving WorkFlow ownership into a shared service algebra.
+This is intentionally finite for now. Do not extend beyond seven without pressure.
 
-The exact generated/handwritten split remains open. ADT cases and `Functor.Map` remain plausible Tooling-generation candidates, but that is not part of this experiment.
+The positions are mechanism, not semantic priority.
 
-## Grounding
+## Hoisting ergonomics
 
-A single service implementation may satisfy several WorkFlow algebras.
-
-The sample currently has:
-
-```csharp
-InMemoryTodoWork :
-    AlgebraIO<CreateTodo.Algebra>,
-    AlgebraIO<GetTodo.Algebra>,
-    AlgebraIO<UpdateTodo.Algebra>,
-    AlgebraIO<DeleteTodo.Algebra>
-```
-
-This does not make the algebras identical.
-
-It means one concrete realization knows how to interpret the WorkParts required by several independently owned WorkFlows.
-
-Normal service execution can receive:
+Each `AlgebraSum` exposes positional helpers:
 
 ```text
-AlgebraIO<CreateTodo.Algebra>
-AlgebraIO<GetTodo.Algebra>
-...
+FromA
+FromB
+FromC
+FromD
+FromE
+FromF
+FromG
 ```
 
-without exposing the concrete interpreter to the Feature.
-
-## WorkProcess composition
-
-The miniature now implements:
-
-```text
-CreateAndGetTodo
-    -> CreateTodo
-    -> GetTodo
-```
-
-using:
-
-```text
-AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
-```
-
-A WorkProcess algebra is the composition of the algebras of the WorkFlows it coordinates.
-
-For two WorkFlows:
-
-```text
-WorkflowAlgebraA --\
-                  +--> ProcessAlgebra
-WorkflowAlgebraB --/
-```
-
-Binary composition is sufficient for the current evidence and can be nested later if real pressure requires more.
-
-Do not introduce arbitrary-N machinery speculatively.
-
-## Hoisting and ownership
-
-Each WorkFlow is lifted into the Process algebra without changing its behavior:
-
-```text
-Free<A, X>
-    -> Free<ProcessAlgebra, X>
-
-Free<B, Y>
-    -> Free<ProcessAlgebra, Y>
-```
-
-VSlices currently uses external natural-transformation witnesses:
-
-```text
-InjectLeft<A,B>  : A ~> AlgebraSum<A,B>
-InjectRight<A,B> : B ~> AlgebraSum<A,B>
-```
-
-with:
-
-```csharp
-FreeAlgebra.hoist<N, F, G, A>(Free<F, A>)
-    where N : Natural<F, G>
-```
-
-The mathematical mechanism is hoisting.
-
-The important ownership decision is that the composing Process owns the injection into the larger algebra. A lower service WorkFlow does not know which future Process or BFF may compose it.
-
-## Process interpreter
-
-The Process does not reimplement child WorkParts.
-
-For the binary sum:
-
-```text
-Left operation
-    -> left interpreter
-
-Right operation
-    -> right interpreter
-```
-
-`AlgebraSumIO<L,R>` delegates to the existing interpreters.
-
-This preserves:
-
-```text
-WorkFlow owns its WorkParts.
-WorkProcess owns composition of WorkFlows.
-Grounding owns realization.
-A composing Process owns injection into its larger algebra.
-A lower WorkFlow does not know its future Process/BFF.
-```
-
-## Flow remains unresolved
-
-Do not delete or redesign `Flow` merely because Feature is now a Free WorkFlow.
-
-The relationship between:
-
-```text
-Feature / Free WorkFlow
-Flow<RT,REQ,RES>
-presentation invocation
-runtime interpretation
-```
-
-remains open.
-
-The miniature proves Feature-as-Free and WorkProcess hoisting. It does not prove the final role of `Flow`.
-
-## Guarantees remain out of scope
-
-The Work composition experiment still does not settle:
-
-```text
-Tracking
-Atomicity
-Isolation
-Durability
-staged vs autonomous persistence
-transaction boundaries
-law registration
-analyzers
-proof vocabulary
-guarantee-oriented VSIR
-```
-
-Do not smuggle stronger guarantees into WorkPart names, point capabilities, interpreters, or Process composition.
-
-## WorkPart classification remains partially open
-
-The current claim remains:
-
-```text
-WorkPart = specific instruction in a WorkFlow
-```
-
-Do not infer that every pure semantic calculation must become an explicit WorkPart.
+as applicable.
 
 For example:
 
 ```csharp
-todo.Update(...)
+using Algebra = AlgebraSum<
+    AddFile.Algebra,
+    AddAttachmentReference.Algebra>;
+
+var stored =
+    Algebra.FromA(
+        AddFile.Get(...));
+
+var associated =
+    Algebra.FromB(
+        AddAttachmentReference.Get(...));
 ```
 
-currently remains a pure semantic transformation inside a continuation.
-
-Real cases should decide whether some transformations need to become separately inspectable WorkParts.
-
-## Miniature success status
-
-The original success criteria are now materially satisfied:
+These helpers perform the same mathematical operation as:
 
 ```text
-1. A Feature directly is a Free WorkFlow.                         [validated]
-2. Its algebra contains only the WorkParts it requires.          [validated in sample]
-3. A default service interpreter can execute that Feature.       [validated]
-4. Two Features with different algebras compose into a Process.  [validated]
-5. Composition uses natural injection + hoist.                   [validated]
-6. The Process interpreter delegates to existing interpreters.   [validated]
-7. Existing CRUD behavior remains green.                         [validated]
-8. The model is clearer than the previous TodoPrograms model.    [accepted provisionally; keep testing against real cases]
+external natural transformation
+    +
+Free hoist
 ```
 
-Point 8 remains the reason to continue pressure against real software instead of declaring the taxonomy complete.
+without making every Feature call site spell the full witness type.
 
-## Current continuation plan
-
-Continue using the normal evidence-driven loop:
+The explicit witnesses remain available:
 
 ```text
-real artifact
-    -> first observable unsupported boundary
-    -> identify who owns that boundary
-    -> smallest coherent change
-    -> rerun
-    -> observe the next boundary
+InjectA
+InjectB
+InjectC
+InjectD
+InjectE
+InjectF
+InjectG
 ```
 
-### 1. Use Ticket Support as the next pressure case
+`InjectLeft` and `InjectRight` remain only as obsolete compatibility aliases for the binary form.
 
-Do not create another artificial miniature first.
+## Grounding
 
-Inspect the real Ticket Support BFF composition, especially:
+Grounding still owns concrete realization.
+
+A direct interpreter is:
 
 ```text
-AttachFile
-    -> Folders.AddFile
-    -> Tickets.AddAttachmentReference
-
-RemoveAttachment
-    -> Tickets.RemoveAttachmentReference
-    -> Folders.RemoveFile
+AlgebraIO<Feature.Algebra>
 ```
 
-Establish the existing behavior, failure semantics, service ownership, and current implementation before adapting anything.
+A composed algebra can combine independently owned interpreters:
 
-### 2. Map existing operations to WorkFlow ownership
+```csharp
+new AlgebraSumIO<
+    AddFile.Algebra,
+    AddAttachmentReference.Algebra>(
+        fileWork,
+        todoWork);
+```
 
-For each child operation, determine:
+The cross-service sample proves that the child Groundings do not need to be the same object or service boundary.
 
-- which service/product owns it;
-- whether it already corresponds to a Feature/WorkFlow;
-- what WorkParts its current behavior requires;
-- what errors/failures are semantically meaningful;
-- which effects are realization details;
-- which guarantees are currently implicit.
+The same A..G arity family is available for `AlgebraSumIO`.
 
-Do not rename or refactor until ownership is reconstructed from repository evidence.
+## Ownership rules
 
-### 3. Attempt the smallest faithful WorkProcess representation
-
-If both operations can be represented as independent WorkFlows, attempt Process composition using the existing mechanism:
+Preserve:
 
 ```text
-child algebra composition
-    + external natural injection
-    + Free hoist
-    + interpreter delegation
+Feature / WorkFlow owns its WorkParts.
+
+A composing Feature owns:
+    its composed ALG
+    ordering of child WorkFlows
+    integration mappings between child semantics
+    injection of child programs into its ALG
+
+Grounding owns realization.
+
+A child Feature does not know:
+    which later Feature reuses it
+    which BFF reuses it
+    which larger algebra it may be hoisted into
 ```
 
-Do not change `AlgebraSum` unless the real case exposes an actual limitation.
+For `SampleBFF.AttachFileToTodo`:
 
-### 4. Stop at the first unsupported boundary
+```text
+SampleFileRepo
+    owns SampleFileId + file behavior
 
-Likely pressure points may include, but are not assumed to include:
+SampleWorkflow
+    owns Todo + ResourceReference association
 
-- cross-service error propagation;
-- compensation/rollback behavior;
-- attachment identity flow;
-- ordering dependencies;
-- partial success semantics;
-- target/presentation mapping;
-- transaction or guarantee expectations;
-- more than two child WorkFlows;
-- service-specific grounding differences.
+SampleBFF
+    owns SampleFileId -> ResourceReference
+    owns AddFile -> AddAttachmentReference ordering
+```
 
-Classify the first real mismatch before changing Framework.
+Todo does not depend on SampleFileRepo.
 
-### 5. Change only the owner of the discovered limitation
+## AlgebraSum is mechanism
 
-If the gap is:
+Do not elevate the concrete coproduct representation into universal semantics.
 
-- semantic WorkFlow vocabulary -> change the owning WorkFlow;
-- composition mechanism -> change `VSlices.Work`;
-- concrete realization -> change Grounding;
-- product orchestration -> change the WorkProcess/product surface;
-- guarantee semantics -> record separately; do not fold them into point capabilities;
-- documentation-only mismatch -> update documentation without inventing code.
+The useful semantic statement is:
 
-### 6. Re-run both miniature and real evidence
+```text
+this Feature can express the WorkParts required by these child WorkFlows
+```
 
-Any Framework change discovered from Ticket Support must preserve the miniature unless the real evidence proves the miniature model itself invalid.
+The current .NET mechanism is:
 
-## Cross-service sample result
+```text
+AlgebraSum<A,...,G>
+    +
+InjectA...G
+    +
+Free hoist
+    +
+AlgebraSumIO<A,...,G>
+```
 
-After inspecting Ticket Support, the experiment deliberately reproduced the same composition geometry inside Framework samples rather than requiring an immediate migration of the Serviu consumer.
+If later evidence justifies a different representation, child Features should not need to change merely because the composition mechanism changes.
 
-The new scenario is:
+## Cross-service executable evidence
+
+The sample reproduces the Ticket Support attachment geometry:
 
 ```text
 SampleBFF.AttachFileToTodo
@@ -488,36 +324,7 @@ SampleBFF.AttachFileToTodo
     -> SampleWorkflow.AddAttachmentReference
 ```
 
-The two child WorkFlows are owned and interpreted independently:
-
-```text
-SampleFileRepo.AddFile
-    -> InMemoryFileWork
-
-SampleWorkflow.AddAttachmentReference
-    -> InMemoryTodoWork
-```
-
-The Process interpreter is:
-
-```text
-AlgebraSumIO<
-    AddFile.Algebra,
-    AddAttachmentReference.Algebra>(
-        fileWork,
-        todoWork)
-```
-
-The BFF alone knows the integration mapping:
-
-```text
-SampleFileId
-    -> ResourceReference
-```
-
-Todo stores only the opaque `ResourceReference` and has no dependency on `SampleFileRepo`.
-
-Executable evidence at:
+The first green cross-service run proved:
 
 ```text
 Branch: experiment/cross-service-workprocess
@@ -526,72 +333,53 @@ Run:    35857218289
 Result: success
 ```
 
-proves that the existing binary sum + external witness hoist mechanism composes WorkFlows across distinct service Groundings without a Framework change.
+Later commits remove `WorkProcess`, introduce the A..G API, and add direct arity-seven evidence. Current branch CI is authoritative for those later changes.
 
-This materially strengthens the earlier miniature:
+## Partial failure is the next semantic pressure
 
-```text
-CreateAndGetTodo
-    two WorkFlows
-    one Grounding
-
-AttachFileToTodo
-    two WorkFlows
-    two Groundings
-    one BFF-owned integration mapping
-```
-
-### Partial failure evidence
-
-The sample also records:
+The sample intentionally preserves this behavior:
 
 ```text
 AddFile succeeds
-AddAttachmentReference cannot find the Todo
+AddAttachmentReference cannot associate
     -> no Todo association
     -> file remains stored
 ```
 
-This is intentionally not compensated in the current experiment.
-
-The evidence establishes:
+Therefore:
 
 ```text
-WorkProcess composition
+Feature composition
 != atomicity
 != rollback
 != compensation
+!= reconciliation
 ```
 
-No change to `AlgebraSum` or hoisting is currently justified by this behavior.
+This does not currently justify changing `AlgebraSum`.
 
-The next question is no longer whether cross-service composition works. It is where stronger cross-WorkFlow guarantees, compensation, retry or reconciliation belong when a real product requires them.
+The next substantive design question is where stronger cross-WorkFlow guarantees belong when a real product requires them.
 
-## First real-world pressure result
+Possible future concepts include compensation, retry, reconciliation, atomicity or another guarantee vocabulary, but none should be smuggled into the composition mechanism by default.
 
-The first inspection of Ticket Support exposed a boundary before algebra composition itself.
+## Flow remains unresolved
 
-Current Ticket Support service and product Features still use the historical surface:
+The relationship between:
 
 ```text
-VSlices.Application
-ServiceFeature<F, RT, REQ, RES>
-Feature<F, RT, REQ, RES>
+Feature / Free WorkFlow
 Flow<RT, REQ, RES>
+presentation invocation
+runtime interpretation
 ```
 
-The concrete operations inspected are:
+remains open.
 
-```text
-Folders.AddFile
-Folders.RemoveFile
-Tickets.AddAttachmentReference
-Tickets.RemoveAttachmentReference
-TicketSupport.BFF.AttachFile
-TicketSupport.BFF.RemoveAttachment
-```
+Do not restore `Flow` as the Feature boundary from historical documentation, and do not delete it merely because the current experiment uses Free directly.
 
-Their ownership already matches the desired product geometry:
+## Ticket Support remains a real-world pressure case
+
+The real product geometry remains:
 
 ```text
 AttachFile
@@ -603,103 +391,59 @@ RemoveAttachment
     -> Folders.RemoveFile
 ```
 
-and the repository documentation explicitly preserves the cross-capability partial-failure problem instead of pretending that these writes form one distributed aggregate transaction.
+Its child Features still live on the historical `VSlices.Application` surface.
 
-However, the child service Features do not yet expose:
+The isolated samples deliberately avoid turning the composition experiment into a whole-repository Framework migration.
 
-```text
-Free<Child.Algebra, Response>
-```
+When Ticket Support is revisited, migrate or recreate only enough of the real WorkFlows to pressure:
 
-Therefore they cannot currently be hoisted into a composed Process algebra without first changing their semantic Feature representation.
+- cross-service failures;
+- compensation/retry/reconciliation;
+- authorization;
+- attachment identity mapping;
+- ordering;
+- stronger guarantees if actually required.
 
-Do not add a generic `Flow -> Free` adapter merely to make composition compile. Such an adapter would hide the missing WorkFlow algebra and would not establish who owns the WorkParts.
+Do not create a generic `Flow -> Free` adapter merely to make old Features participate.
 
-### Framework adoption boundary
+## Current evidence requirements
 
-The consumer repository currently pins the Framework submodule to:
-
-```text
-70df19c99183cd906d35770e291a1eba8121f72b
-```
-
-That baseline contains the historical `VSlices.Application*` surface and does not contain `VSlices.Space*` or `VSlices.Work*`.
-
-The current experimental Framework branch contains `Space` and `Work` but no longer contains `VSlices.Application*`.
-
-The separate `refactor/framework-surface-cut` branch shows the same deliberate cut.
-
-Therefore simply advancing the consumer submodule to the experimental Framework HEAD would turn the WorkProcess experiment into a broad Framework migration. That is not the smallest coherent test.
-
-Likewise, loading two independent Framework checkouts into the same application graph is not currently justified because both include the core `VSlices` assembly and may create conflicting realizations.
-
-### Newly discovered question
-
-The next design question is now:
+Keep green evidence for:
 
 ```text
-How can a real consumer migrate one WorkFlow at a time
-from the historical Application surface
-to the new Work surface
-without requiring a whole-repository migration?
+VSlices.Work build
+VSlices.Work.Services build
+VSlices.Work.Products build
+Work algebra tests
+AlgebraSum A..G test
+SampleWorkflow API build
+composed Feature hoist test
+SampleFileRepo build
+cross-service SampleBFF composition tests
+CRUD smoke test
 ```
-
-This is a continuity problem between Framework realizations, not yet evidence that the Free WorkFlow / WorkProcess model is wrong.
-
-The next change should therefore target staged adoption or migration continuity before changing `AlgebraSum`, hoisting, guarantees, or Ticket Support product semantics.
-
-Possible mechanisms must be evaluated rather than assumed. Examples include:
-
-- temporary coexistence inside one Framework revision;
-- a compatibility/migration surface owned by Framework;
-- a source-compatible transition path;
-- a deliberately bounded adapter whose semantics are explicit rather than inferred;
-- or another mechanism discovered from repository constraints.
-
-Do not choose among these only because it is easy to implement.
-
-The required property is that a consumer can migrate a real WorkFlow incrementally while preserving one authoritative core Framework realization and without silently changing the semantics of unmigrated Features.
-
-### Ticket Support failure semantics remain future pressure
-
-Once a real AttachFile WorkProcess can be represented, its next likely pressure is already visible:
-
-```text
-Folders.AddFile succeeds
-Tickets.AddAttachmentReference fails
-    -> stored file may require compensation or reconciliation
-```
-
-and:
-
-```text
-Tickets.RemoveAttachmentReference succeeds
-Folders.RemoveFile fails
-    -> Ticket no longer references a still-existing file
-```
-
-These are not reasons to add transaction guarantees now.
-
-They should become the next pressure only after staged adoption allows the real WorkFlows to participate in the new composition model.
 
 ## Explicit non-goals
 
-The next continuation is not automatically trying to:
+This experiment does not currently try to:
 
-- migrate all of Ticket Support;
-- introduce arbitrary-N algebra composition;
-- generate algebras from VSIR;
-- settle the final role of `Flow`;
+- create a separate ComposedFeature type;
+- restore WorkProcess as a separate interface;
+- extend AlgebraSum past seven children;
+- settle compensation or transaction semantics;
+- settle the final role of Flow;
 - implement WorkLine;
-- redesign guarantees;
-- remove historical Repository / DatabaseIO APIs globally;
-- claim that all WorkParts are persistence operations;
-- impose the sample naming or project layout onto Ticket Support.
+- generate composition from VSIR;
+- migrate all of Ticket Support;
+- claim that all WorkParts are persistence operations.
 
 ## Documentation rule
 
-Do not formalize a broader Framework rule merely because the Todo miniature supports it.
+The current conclusion is evidence-backed but still revisable:
 
-Promote a rule only after the real pressure case preserves the same ownership and composition semantics without distortion.
+```text
+Feature is the executable WorkFlow abstraction.
+Composition is represented in ALG.
+```
 
-If Ticket Support contradicts the miniature, preserve the contradiction as evidence and revise the model rather than forcing Ticket Support into it.
+If a later real case requires a distinct executable category, preserve the contradiction and reopen the model rather than forcing it into the current shape.
