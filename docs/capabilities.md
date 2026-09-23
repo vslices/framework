@@ -59,3 +59,13 @@ When deciding between:
 - expressing a requirement as a runtime capability
 
 prefer the runtime capability, unless there is a strong and explicit reason not to.
+
+## Capabilities and Guarantees
+
+Capabilities describe what Work requires the runtime to provide.
+
+Some realizations also need additional semantic guarantees such as tracking, atomicity, isolation, ordering, or durability. Those guarantees refine admissible realizations rather than becoming capabilities by themselves.
+
+The current exploration is preserved in [Capabilities and Guarantees](notes/capabilities-and-guarantees.md).
+
+That note is intentionally exploratory. It records the semantic direction without committing yet to a final C# API, VSIR syntax, analyzer model, or law system.
