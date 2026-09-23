@@ -3,6 +3,7 @@ using LanguageExt;
 using LanguageExt.Traits;
 using SampleWorkflow.Spaces;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using SampleWorkflow.Work.Algebras;
 using static LanguageExt.Prelude;
 
@@ -18,10 +19,11 @@ public sealed class InMemoryTodoWork : AlgebraIO<TodoAlgebra>
         {
             NextTodoIdPart<TodoAlgebra, A> next =>
                 IO.lift(Guid.NewGuid)
-                  .Bind(value => TodoId.Transformation
-                      .RunFin(value)
-                      .Match(Succ: id => IO.pure(next.Next(id)),
-                             Fail: IO.fail<A>)),
+                  .Bind(value => Transformable
+                      .Transform<Guid, TodoId>(value)
+                      .Match(
+                          Succ: id => IO.pure(next.Next(id)),
+                          Fail: IO.fail<A>)),
             ReadTodoPart<TodoAlgebra, A> read =>
                 IO.lift(() => read.Next(Read(read.Id))),
             WriteTodoPart<TodoAlgebra, A> write =>
