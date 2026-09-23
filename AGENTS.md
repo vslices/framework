@@ -77,21 +77,25 @@ second executable abstraction.
 
 ### Feature / WorkFlow
 
-A Feature directly owns the semantic program for one WorkFlow:
+A Feature directly owns the semantic description of one WorkFlow:
 
 ```csharp
-Feature<F, ALG, REQ, RES>
+Feature<ALG, REQ, RES>
     where ALG : Functor<ALG>
 {
-    static abstract Free<ALG, RES> Get(REQ request);
+    static abstract Free<ALG, RES> Describe(REQ request);
 }
 ```
+
+`Describe` is intentionally neutral about whether a future caller treats the described Work as a Flow, Process, Part, Step, or another composition level.
+
+The base Feature contract has no self type. Specializations may introduce one when concrete type identity has an independent semantic role, as `ServiceFeature` currently does for claim identity.
 
 The important ownership rule is:
 
 ```text
 Feature does not merely execute a WorkFlow.
-Feature is the WorkFlow.
+Feature describes the WorkFlow.
 ```
 
 A Feature must not delegate its real program to a parallel shared `*Programs` layer merely to keep the Feature thin.
@@ -102,33 +106,35 @@ A WorkPart is currently understood as a specific instruction in a WorkFlow.
 
 Do not infer that every pure semantic calculation must become a WorkPart. Pure transformations such as accepted state evolution may remain inside Free continuations unless real pressure shows that they need independent inspectability or execution semantics.
 
-### Feature-owned algebra
+### Algebra ownership
 
-Each WorkFlow owns only the instruction vocabulary it actually requires.
+The default is for a coherent module to own its instruction language.
 
 For example:
 
 ```text
-CreateTodo.Algebra
-    NextId
+TodoAlgebra
+    NextTodoId
     ReadTodo
     WriteTodo
-
-GetTodo.Algebra
-    ReadTodo
-
-UpdateTodo.Algebra
-    ReadTodo
-    WriteTodo
-
-DeleteTodo.Algebra
-    ReadTodo
     RemoveTodo
+
+CreateTodo / GetTodo / UpdateTodo / DeleteTodo
+    describe different Free programs in TodoAlgebra
 ```
 
-Generic vocabulary such as `PointReader`, `PointWriter`, and `PointRemover` may be reused to construct those algebras.
+Generic vocabulary such as `PointReader`, `PointWriter`, and `PointRemover` may be reused to construct that module language.
 
-Do not replace the per-Feature algebra with one broad shared service algebra merely because the same realization can interpret all operations.
+A Feature-specific algebra remains valid when a real case requires a smaller or semantically distinct language. Do not create one automatically merely because a new Feature exists.
+
+Prefer:
+
+```text
+Framework owns algebra machinery.
+Module owns algebra vocabulary.
+Feature owns a description written in that vocabulary.
+Grounding owns realization.
+```
 
 ---
 
@@ -142,21 +148,18 @@ The current interpreter boundary is:
 AlgebraIO<ALG>
 ```
 
-A single concrete service may implement several Feature algebras:
+A concrete Grounding commonly implements the module language directly:
 
 ```text
 InMemoryTodoWork
-    AlgebraIO<CreateTodo.Algebra>
-    AlgebraIO<GetTodo.Algebra>
-    AlgebraIO<UpdateTodo.Algebra>
-    AlgebraIO<DeleteTodo.Algebra>
+    AlgebraIO<TodoAlgebra>
 ```
 
-This does not make those algebras the same. It means one realization can interpret several independently owned WorkFlow vocabularies.
+Different Groundings may realize the same module language with different technical strategies.
 
 `HasAlgebra<ALG, RT>` and `AlgebraEnv<ALG, RT>` have been removed together with the retired runtime-carrier surface.
 
-Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historical APIs once used it.
+Do not reintroduce `RT` into `Feature<ALG, REQ, RES>` merely because historical APIs once used it.
 
 ---
 
@@ -164,7 +167,7 @@ Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historic
 
 A Feature can reuse already-existing WorkFlows by composing their algebras.
 
-The same `Feature<F, ALG, REQ, RES>` contract is used whether `ALG` is a Feature-owned algebra or a sum of several child algebras.
+The same `Feature<ALG, REQ, RES>` contract is used whether `ALG` is a Feature-owned algebra or a sum of several child algebras.
 
 For example:
 
