@@ -1,0 +1,35 @@
+name: Free Point Algebra Experiment
+
+on:
+  push:
+    branches:
+      - experiment/free-point-algebra
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: free-point-algebra-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-free-point-algebra:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run free point algebra tests
+        run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
