@@ -4,6 +4,7 @@ using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using Xunit;
 
 namespace SampleBFF.Tests;
@@ -16,8 +17,9 @@ public sealed class CrossServiceFeatureCompositionTests
         var todoWork = new InMemoryTodoWork();
         var fileWork = new InMemoryFileWork();
 
-        var detail = TodoDetail.Transformation
-            .RunFin("todo with external file")
+        var detail = Transformable
+            .Transform<string, TodoDetail>(
+                "todo with external file")
             .ThrowIfFail();
 
         var created = await FreeAlgebra
@@ -101,8 +103,8 @@ public sealed class CrossServiceFeatureCompositionTests
         var todoWork = new InMemoryTodoWork();
         var fileWork = new InMemoryFileWork();
 
-        var missingTodoId = TodoId.Transformation
-            .RunFin(Guid.NewGuid())
+        var missingTodoId = Transformable
+            .Transform<Guid, TodoId>(Guid.NewGuid())
             .ThrowIfFail();
 
         var processInterpreter =
