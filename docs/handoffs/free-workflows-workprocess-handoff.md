@@ -2,7 +2,9 @@
 
 > Date: 2026-09-23
 >
-> Branch: `experiment/cross-service-workprocess`
+> Origin branch: `experiment/cross-service-workprocess`
+>
+> Promoted to `master`: `83283716e2f4a4d98600bdc4ae0d805d7506838f`
 >
 > Original Free WorkFlow miniature baseline: `6c951a2bcca5fef28c1a6a246ae9df6328df981d`
 >
@@ -333,7 +335,7 @@ Run:    35857218289
 Result: success
 ```
 
-Later commits remove `WorkProcess`, introduce the A..G API, and add direct arity-seven evidence. Current branch CI is authoritative for those later changes.
+Later commits remove `WorkProcess`, introduce the A..G API, and add direct arity-seven evidence. After promotion, `master` CI is authoritative for the maintained state.
 
 ## Partial failure is the next semantic pressure
 
