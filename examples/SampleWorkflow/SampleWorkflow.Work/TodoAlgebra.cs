@@ -30,8 +30,22 @@ public sealed class TodoAlgebra :
     PointWriter<TodoAlgebra, Todo>,
     PointRemover<TodoAlgebra, Todo, TodoId>
 {
-    public static K<TodoAlgebra, TodoId> NextId() =>
-        new NextTodoIdPart<TodoAlgebra, TodoId>(static value => value);
+    public static Free<TodoAlgebra, TodoId> NextId() =>
+        Free.lift(
+            new NextTodoIdPart<TodoAlgebra, TodoId>(
+                static value => value));
+
+    public static Free<TodoAlgebra, Option<Todo>> Read(TodoId id) =>
+        PointReader.read<TodoAlgebra, Todo, TodoId>(id);
+
+    public static Free<TodoAlgebra, Unit> Write(Todo point) =>
+        PointWriter.write<TodoAlgebra, Todo>(point);
+
+    public static Free<TodoAlgebra, Unit> Remove(TodoId id) =>
+        PointRemover.remove<TodoAlgebra, Todo, TodoId>(id);
+
+    public static Free<TodoAlgebra, A> Pure<A>(A value) =>
+        Free.pure<TodoAlgebra, A>(value);
 
     static K<TodoAlgebra, Option<Todo>>
         PointReader<TodoAlgebra, Todo, TodoId>.Read(TodoId id) =>
