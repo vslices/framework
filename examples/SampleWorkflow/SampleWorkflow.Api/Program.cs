@@ -114,7 +114,7 @@ app.MapDelete("/todos/{id:guid}", async (
     Guid id,
     AlgebraIO<TodoAlgebra> interpreter) =>
 {
-    var semanticId = TodoId.Transformation.RunFin(id);
+    var semanticId = Transformable.Transform<Guid, TodoId>(id);
 
     return await semanticId.Match<Task<IResult>>(
         Succ: async todoId =>
