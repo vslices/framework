@@ -171,24 +171,32 @@ A shared runtime exposed capabilities such as dependency resolution and file-sys
 
 This was technically expressive but allowed work to depend indirectly on broad runtime access.
 
-The current model moves toward narrower requirements:
+The current Work model has moved further away from broad runtime access:
 
 ```text
-Feature<F, RT, REQ, RES>
+Feature<F, ALG, REQ, RES>
+    -> Free<ALG, RES>
 ```
 
-with explicit capabilities such as:
+Feature-owned algebras declare only the operations required by the WorkFlow.
 
-- `ClockIO`;
-- `DatabaseIO`;
-- `Repository`.
+For point-oriented external work, the validated vocabulary is:
 
-Concrete world contact is then implemented by Grounding, for example:
+- `PointReader<ALG, POINT, ID>`;
+- `PointWriter<ALG, POINT>`;
+- `PointRemover<ALG, POINT, ID>`.
 
-- `SystemClockIO`;
-- `EntityFrameworkDatabaseIO`.
+Reusable concrete realization is expressed independently through Grounding contracts such as:
 
-The recovery objective is to retain the expressive power of the old effectful runtime while making capability requirements and grounding boundaries more explicit.
+- `PointReaderIO<POINT, ID>`;
+- `PointWriterIO<POINT>`;
+- `PointRemoverIO<POINT, ID>`.
+
+Entity Framework Core now realizes these capabilities through `EntityFrameworkPointIO` rather than through `DatabaseIO` or a Repository abstraction.
+
+`ClockIO` still exists as a transitional capability surface and should be reviewed independently rather than treated as evidence that the runtime-shaped model remains generally valid.
+
+The recovery objective is to retain the expressive power of the old effectful runtime while making capability requirements and grounding boundaries smaller, explicit, and independently justified.
 
 ### 5. Host and lifecycle
 
