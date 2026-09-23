@@ -139,7 +139,7 @@ Run:    35857218289
 Result: success
 ```
 
-Later commits simplify the model by removing the redundant `WorkProcess` interface and extend `AlgebraSum` through arity seven. Current branch CI is the authoritative evidence for those changes.
+Later commits simplify the model by removing the redundant `WorkProcess` interface and extend `AlgebraSum` through arity seven. After promotion, `master` CI is the authoritative evidence for the maintained state.
 
 ## First guarantee pressure
 
