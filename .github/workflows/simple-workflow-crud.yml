@@ -61,12 +61,7 @@ jobs:
           status=$(curl -sS -o /tmp/update.json -w "%{http_code}"             -X PUT http://127.0.0.1:5099/todos/$id             -H 'Content-Type: application/json'             -d '{"detail":"updated","completed":true}')
           test "$status" = "200"
 
-          python3 - <<'PY'
-import json
-updated = json.load(open("/tmp/update.json"))
-assert updated["detail"] == "updated"
-assert updated["completed"] is True
-PY
+          python3 -c 'import json; updated=json.load(open("/tmp/update.json")); assert updated["detail"] == "updated"; assert updated["completed"] is True'
 
           status=$(curl -sS -o /tmp/delete.json -w "%{http_code}"             -X DELETE http://127.0.0.1:5099/todos/$id)
           test "$status" = "200"
