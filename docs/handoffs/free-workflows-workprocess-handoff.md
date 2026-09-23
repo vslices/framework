@@ -8,7 +8,7 @@
 >
 > Documentation alignment: `2812b57877214e6acb2894327bc278e9c78b9237`
 >
-> Status: the miniature Free WorkFlow / WorkProcess composition is implemented and green. The next step is real-world pressure against Ticket Support BFF composition.
+> Status: the original miniature and a cross-service SampleBFF composition are implemented and green. Cross-service composition now has executable evidence with distinct Groundings; partial failure is the next observable semantic pressure.
 
 ## Purpose
 
@@ -475,6 +475,97 @@ If the gap is:
 ### 6. Re-run both miniature and real evidence
 
 Any Framework change discovered from Ticket Support must preserve the miniature unless the real evidence proves the miniature model itself invalid.
+
+## Cross-service sample result
+
+After inspecting Ticket Support, the experiment deliberately reproduced the same composition geometry inside Framework samples rather than requiring an immediate migration of the Serviu consumer.
+
+The new scenario is:
+
+```text
+SampleBFF.AttachFileToTodo
+    -> SampleFileRepo.AddFile
+    -> SampleWorkflow.AddAttachmentReference
+```
+
+The two child WorkFlows are owned and interpreted independently:
+
+```text
+SampleFileRepo.AddFile
+    -> InMemoryFileWork
+
+SampleWorkflow.AddAttachmentReference
+    -> InMemoryTodoWork
+```
+
+The Process interpreter is:
+
+```text
+AlgebraSumIO<
+    AddFile.Algebra,
+    AddAttachmentReference.Algebra>(
+        fileWork,
+        todoWork)
+```
+
+The BFF alone knows the integration mapping:
+
+```text
+SampleFileId
+    -> ResourceReference
+```
+
+Todo stores only the opaque `ResourceReference` and has no dependency on `SampleFileRepo`.
+
+Executable evidence at:
+
+```text
+Branch: experiment/cross-service-workprocess
+Head:   ea9abe076fb4af42d47d1f759e61feb3c5b8e300
+Run:    35857218289
+Result: success
+```
+
+proves that the existing binary sum + external witness hoist mechanism composes WorkFlows across distinct service Groundings without a Framework change.
+
+This materially strengthens the earlier miniature:
+
+```text
+CreateAndGetTodo
+    two WorkFlows
+    one Grounding
+
+AttachFileToTodo
+    two WorkFlows
+    two Groundings
+    one BFF-owned integration mapping
+```
+
+### Partial failure evidence
+
+The sample also records:
+
+```text
+AddFile succeeds
+AddAttachmentReference cannot find the Todo
+    -> no Todo association
+    -> file remains stored
+```
+
+This is intentionally not compensated in the current experiment.
+
+The evidence establishes:
+
+```text
+WorkProcess composition
+!= atomicity
+!= rollback
+!= compensation
+```
+
+No change to `AlgebraSum` or hoisting is currently justified by this behavior.
+
+The next question is no longer whether cross-service composition works. It is where stronger cross-WorkFlow guarantees, compensation, retry or reconciliation belong when a real product requires them.
 
 ## First real-world pressure result
 
