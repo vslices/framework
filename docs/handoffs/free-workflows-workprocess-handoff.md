@@ -227,7 +227,7 @@ InjectF
 InjectG
 ```
 
-`InjectLeft` and `InjectRight` remain only as obsolete compatibility aliases for the binary form.
+No `InjectLeft` / `InjectRight` compatibility aliases are retained. `InjectA` through `InjectG` are the only supported injection witnesses.
 
 ## Grounding
 
