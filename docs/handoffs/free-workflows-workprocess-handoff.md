@@ -476,6 +476,121 @@ If the gap is:
 
 Any Framework change discovered from Ticket Support must preserve the miniature unless the real evidence proves the miniature model itself invalid.
 
+## First real-world pressure result
+
+The first inspection of Ticket Support exposed a boundary before algebra composition itself.
+
+Current Ticket Support service and product Features still use the historical surface:
+
+```text
+VSlices.Application
+ServiceFeature<F, RT, REQ, RES>
+Feature<F, RT, REQ, RES>
+Flow<RT, REQ, RES>
+```
+
+The concrete operations inspected are:
+
+```text
+Folders.AddFile
+Folders.RemoveFile
+Tickets.AddAttachmentReference
+Tickets.RemoveAttachmentReference
+TicketSupport.BFF.AttachFile
+TicketSupport.BFF.RemoveAttachment
+```
+
+Their ownership already matches the desired product geometry:
+
+```text
+AttachFile
+    -> Folders.AddFile
+    -> Tickets.AddAttachmentReference
+
+RemoveAttachment
+    -> Tickets.RemoveAttachmentReference
+    -> Folders.RemoveFile
+```
+
+and the repository documentation explicitly preserves the cross-capability partial-failure problem instead of pretending that these writes form one distributed aggregate transaction.
+
+However, the child service Features do not yet expose:
+
+```text
+Free<Child.Algebra, Response>
+```
+
+Therefore they cannot currently be hoisted into a composed Process algebra without first changing their semantic Feature representation.
+
+Do not add a generic `Flow -> Free` adapter merely to make composition compile. Such an adapter would hide the missing WorkFlow algebra and would not establish who owns the WorkParts.
+
+### Framework adoption boundary
+
+The consumer repository currently pins the Framework submodule to:
+
+```text
+70df19c99183cd906d35770e291a1eba8121f72b
+```
+
+That baseline contains the historical `VSlices.Application*` surface and does not contain `VSlices.Space*` or `VSlices.Work*`.
+
+The current experimental Framework branch contains `Space` and `Work` but no longer contains `VSlices.Application*`.
+
+The separate `refactor/framework-surface-cut` branch shows the same deliberate cut.
+
+Therefore simply advancing the consumer submodule to the experimental Framework HEAD would turn the WorkProcess experiment into a broad Framework migration. That is not the smallest coherent test.
+
+Likewise, loading two independent Framework checkouts into the same application graph is not currently justified because both include the core `VSlices` assembly and may create conflicting realizations.
+
+### Newly discovered question
+
+The next design question is now:
+
+```text
+How can a real consumer migrate one WorkFlow at a time
+from the historical Application surface
+to the new Work surface
+without requiring a whole-repository migration?
+```
+
+This is a continuity problem between Framework realizations, not yet evidence that the Free WorkFlow / WorkProcess model is wrong.
+
+The next change should therefore target staged adoption or migration continuity before changing `AlgebraSum`, hoisting, guarantees, or Ticket Support product semantics.
+
+Possible mechanisms must be evaluated rather than assumed. Examples include:
+
+- temporary coexistence inside one Framework revision;
+- a compatibility/migration surface owned by Framework;
+- a source-compatible transition path;
+- a deliberately bounded adapter whose semantics are explicit rather than inferred;
+- or another mechanism discovered from repository constraints.
+
+Do not choose among these only because it is easy to implement.
+
+The required property is that a consumer can migrate a real WorkFlow incrementally while preserving one authoritative core Framework realization and without silently changing the semantics of unmigrated Features.
+
+### Ticket Support failure semantics remain future pressure
+
+Once a real AttachFile WorkProcess can be represented, its next likely pressure is already visible:
+
+```text
+Folders.AddFile succeeds
+Tickets.AddAttachmentReference fails
+    -> stored file may require compensation or reconciliation
+```
+
+and:
+
+```text
+Tickets.RemoveAttachmentReference succeeds
+Folders.RemoveFile fails
+    -> Ticket no longer references a still-existing file
+```
+
+These are not reasons to add transaction guarantees now.
+
+They should become the next pressure only after staged adoption allows the real WorkFlows to participate in the new composition model.
+
 ## Explicit non-goals
 
 The next continuation is not automatically trying to:
