@@ -5,7 +5,7 @@ using VSlices.Services;
 namespace VSlices.Work;
 
 public interface ServiceFeature<F, ALG, REQ, RES> :
-    Feature<F, ALG, REQ, RES>
+    Feature<ALG, REQ, RES>
     where ALG : Functor<ALG>
     where F : ServiceFeature<F, ALG, REQ, RES>
 {
