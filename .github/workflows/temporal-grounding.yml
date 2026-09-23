@@ -1,0 +1,35 @@
+name: Temporal Grounding CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: temporal-grounding-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-temporal-grounding:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run temporal grounding tests
+        run: dotnet run --project tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj
