@@ -196,7 +196,7 @@ public sealed class CreateIdentity<RT> :
         RT,
         CreateIdentity<RT>.Request,
         CreateIdentity<RT>.Response>
-    where RT : HasRepositoryAccess<RT>
+    where RT : HasAlgebra<IdentityAlgebra, RT>
 {
     public sealed record Request(SrvIdentity.Input Identity);
 
