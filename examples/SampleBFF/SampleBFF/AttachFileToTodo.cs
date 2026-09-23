@@ -20,7 +20,6 @@ namespace SampleBFF;
 /// </summary>
 public sealed class AttachFileToTodo :
     Feature<
-        AttachFileToTodo,
         Algebra,
         AttachFileToTodo.Request,
         AttachFileToTodo.Response>
@@ -37,10 +36,10 @@ public sealed class AttachFileToTodo :
     public sealed record Response(
         Either<Error, Option<Attached>> Attachment);
 
-    public static Free<Algebra, Response> Get(Request request)
+    public static Free<Algebra, Response> Describe(Request request)
     {
         var addFile = Algebra.FromA(
-            AddFile.Get(
+            AddFile.Describe(
                 new AddFile.Request(
                     request.Name,
                     request.Content)));
@@ -53,7 +52,7 @@ public sealed class AttachFileToTodo :
                     Succ: resource =>
                     {
                         var associate = Algebra.FromB(
-                            AddAttachmentReference.Get(
+                            AddAttachmentReference.Describe(
                                 new AddAttachmentReference.Request(
                                     request.TodoId,
                                     resource)));
