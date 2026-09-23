@@ -107,7 +107,7 @@ app.MapPut("/todos/{id:guid}", async (
                 Right: todo =>
                     todo.Match<IResult>(
                         value => Results.Ok(TodoDto.From(value)),
-                        Results.NotFound));
+                        () => Results.NotFound()));
         },
         Fail: error =>
             Task.FromResult<IResult>(
