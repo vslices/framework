@@ -83,9 +83,9 @@ A feature should be understandable in isolation.
 
 ### Definition
 
-A Capability is a type-level requirement that describes something the runtime can do.
+A Capability is a typed description of an operation or behavior that Work may require.
 
-Capabilities are conceptually similar to LanguageExt typeclasses.
+Capabilities are conceptually similar to LanguageExt typeclasses. A runtime constraint provides evidence that the required capability or capability vocabulary can be supplied or interpreted.
 
 A Capability is NOT:
 
@@ -97,13 +97,15 @@ A Capability is NOT:
 
 A Capability IS:
 
-- a constraint on `RT`
-- a typed statement of required runtime behavior
-- a composable requirement that allows features to access effects safely
+- a typed statement of an operation or behavior available to Work
+- composable semantic vocabulary
+- something whose availability must remain explicit at the Feature boundary
 
-The runtime type `RT` is the carrier of capabilities.
+A capability requirement is expressed through constraints on `RT`.
 
-Features should express their requirements in terms of what `RT` must support.
+For direct capabilities, `RT` can expose the capability itself through `Has*`. For point algebras, atomic capabilities compose into an algebra and `RT` exposes the ability to interpret that algebra through `HasAlgebra<ALG, RT>`.
+
+The runtime type `RT` remains the compile-time evidence carrier for executable Work requirements.
 
 ### Examples
 
@@ -158,6 +160,22 @@ When multiple capabilities are needed:
 - do not introduce aggregate "application services" just to simplify signatures
 
 Prefer small, honest capability requirements over broad opaque dependencies.
+
+### Point Algebras
+
+When Work needs operations over points of semantic spaces:
+
+- prefer atomic point capabilities over importing historical infrastructure patterns;
+- use `PointReader<ALG, POINT, ID>` for point reading;
+- use `PointWriter<ALG, POINT>` for point writing;
+- let a service-owned algebra compose the point capabilities it actually needs;
+- build programs over that vocabulary with `Free<ALG, A>`;
+- require the interpreter through `HasAlgebra<ALG, RT>`;
+- let Grounding provide `AlgebraIO<ALG>` and decide the concrete realization;
+- keep the Feature execution boundary as `Flow<RT, REQ, RES>`;
+- do not infer Repository, Store, Unit of Work, tracking, transactions, or other stronger semantics from read/write capability alone.
+
+The free program describes operations; Grounding interprets them. Guarantees are a separate semantic layer and must not be smuggled into capability names or concrete mechanisms.
 
 ---
 

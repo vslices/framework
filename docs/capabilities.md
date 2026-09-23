@@ -2,9 +2,9 @@
 
 ## What is a Capability?
 
-A Capability is a type-level description of something the runtime can provide.
+A Capability is a typed description of an operation or behavior that Work may require.
 
-Capabilities are inspired by LanguageExt typeclasses.
+Capabilities are inspired by LanguageExt typeclasses. Runtime constraints provide compile-time evidence that the required capability vocabulary can be interpreted or supplied.
 
 They are used to express requirements like:
 - time access
@@ -25,9 +25,11 @@ A Capability is not:
 
 ## Main Rule
 
-A feature must declare the minimum capabilities required from `RT`.
+A feature must declare the minimum capability requirements it needs from `RT`.
 
-Capabilities should remain explicit in types.
+For simple capabilities this can be a direct `Has*` requirement. For point capabilities, atomic operations compose into a Work-owned algebra and the Feature requires `HasAlgebra<ALG, RT>` as evidence that the runtime can interpret that vocabulary.
+
+Capabilities and their runtime evidence should remain explicit in types.
 
 ## Why
 
@@ -60,12 +62,25 @@ When deciding between:
 
 prefer the runtime capability, unless there is a strong and explicit reason not to.
 
+## Point Algebras
+
+For Work operations over points of semantic spaces, the current capability model is based on atomic point capabilities composed by service-owned algebras.
+
+The first validated point capabilities are:
+
+- `PointReader<ALG, POINT, ID>`;
+- `PointWriter<ALG, POINT>`.
+
+A service-owned algebra composes only the operations it needs, `Free<ALG, A>` describes programs over that vocabulary without executing them, and `HasAlgebra<ALG, RT>` keeps the interpreter requirement explicit in the Feature runtime contract.
+
+See [Point Algebras](point-algebras.md).
+
 ## Capabilities and Guarantees
 
-Capabilities describe what Work requires the runtime to provide.
+Capabilities describe what Work can request.
 
-Some realizations also need additional semantic guarantees such as tracking, atomicity, isolation, ordering, or durability. Those guarantees refine admissible realizations rather than becoming capabilities by themselves.
+Guarantees describe additional semantic properties that an admissible realization must preserve. Tracking, atomicity, isolation, ordering, and durability are examples of potential guarantees rather than independent capabilities.
 
-The current exploration is preserved in [Capabilities and Guarantees](notes/capabilities-and-guarantees.md).
+The point-algebra capability substrate is now validated and implemented. The guarantee model remains exploratory and deliberately unimplemented while current delivery work has priority.
 
-That note is intentionally exploratory. It records the semantic direction without committing yet to a final C# API, VSIR syntax, analyzer model, or law system.
+See [Capabilities and Guarantees](notes/capabilities-and-guarantees.md).

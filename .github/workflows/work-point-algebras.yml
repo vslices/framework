@@ -1,0 +1,38 @@
+name: Work Point Algebras CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: work-point-algebras-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-work-point-algebras:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build Work
+        run: dotnet build src/VSlices.Work/VSlices.Work.csproj
+
+      - name: Run point algebra tests
+        run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
