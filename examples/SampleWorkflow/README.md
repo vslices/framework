@@ -2,18 +2,17 @@
 
 This example is a small CRUD API used to pressure the current VSlices Work model.
 
-The experiment now treats:
+The current experiment treats:
 
 ```text
-Feature == WorkFlow == Free<WorkFlowAlgebra, Response>
+Feature == WorkFlow == Free<ALG, Response>
 
-WorkFlowAlgebra
-    contains the WorkParts required by that Feature
-
-WorkProcess
-    composes existing WorkFlow algebras
-    hoists each Feature into the composed algebra
+ALG
+    contains the WorkParts that the Feature can express
+    and may itself be a composition of child Feature algebras
 ```
+
+There is no separate executable `WorkProcess` abstraction. A Feature that reuses other Features remains a normal Feature whose `ALG` is composed.
 
 ## Structure
 
@@ -40,14 +39,18 @@ SampleWorkflow.Work
         DeleteTodo.Algebra
         Read / Remove WorkParts
 
+    AddAttachmentReference Feature / WorkFlow
+        AddAttachmentReference.Algebra
+        Read / Write WorkParts
+
 SampleWorkflow.Grounding
     InMemoryTodoWork
-        interprets all four WorkFlow algebras
+        interprets the Todo-owned WorkFlow algebras
 
 SampleWorkflow.Process
-    CreateAndGetTodo WorkProcess
-        composes CreateTodo.Algebra + GetTodo.Algebra
-        hoists CreateTodo and GetTodo into that composed algebra
+    CreateAndGetTodo Feature
+        ALG = AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
+        reuses CreateTodo and GetTodo by hoisting both child programs
 
 SampleWorkflow.Api
     HTTP presentation
@@ -56,42 +59,77 @@ SampleWorkflow.Api
 
 ## Feature as Free Monad
 
-A Feature no longer owns a runtime `RT` or returns `Flow<RT, REQ, RES>`.
+A Feature does not own a runtime `RT` or return `Flow<RT, REQ, RES>`.
 
 Its semantic contract is:
 
 ```text
 Request
-    -> Free<Feature.Algebra, Response>
+    -> Free<ALG, Response>
 ```
 
-The Feature itself contains the composition. There is no parallel `TodoPrograms` layer.
+The Feature itself contains the WorkFlow. There is no parallel `TodoPrograms` layer.
 
-## WorkProcess through algebra composition
+## Feature composition through ALG
 
-`CreateAndGetTodo` demonstrates the next level:
+`CreateAndGetTodo` demonstrates that composition does not need another Feature category.
+
+Its contract is still:
 
 ```text
-CreateTodo
-    Free<CreateTodo.Algebra, ...>
-
-GetTodo
-    Free<GetTodo.Algebra, ...>
+Feature<CreateAndGetTodo, Algebra, Request, Response>
 ```
 
-The Process algebra is:
+with:
 
 ```text
-AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
+Algebra =
+    AlgebraSum<
+        CreateTodo.Algebra,
+        GetTodo.Algebra>
 ```
 
-Each Feature is lifted into that larger vocabulary with the same mathematical operation as `Free.hoist`.
+The child programs remain independently defined:
 
-VSlices uses an external natural-transformation witness so the composing Process owns the injection. A service WorkFlow algebra does not need to reference the BFF or Process that later composes it.
+```text
+CreateTodo.Get(...)
+    -> Free<CreateTodo.Algebra, ...>
+
+GetTodo.Get(...)
+    -> Free<GetTodo.Algebra, ...>
+```
+
+and the composing Feature embeds them into its larger vocabulary:
+
+```csharp
+Algebra.FromA(CreateTodo.Get(...))
+Algebra.FromB(GetTodo.Get(...))
+```
+
+`FromA` / `FromB` are ergonomic hoist helpers. The mathematical mechanism remains an external natural transformation plus `Free` hoisting.
+
+The child WorkFlows do not know which later Feature may reuse them.
+
+## AlgebraSum arities
+
+VSlices currently offers positional sums following the A..G convention:
+
+```text
+AlgebraSum<A, B>
+AlgebraSum<A, B, C>
+AlgebraSum<A, B, C, D>
+AlgebraSum<A, B, C, D, E>
+AlgebraSum<A, B, C, D, E, F>
+AlgebraSum<A, B, C, D, E, F, G>
+```
+
+Each arity exposes the corresponding `FromA` ... `FromG` helpers and `InjectA` ... `InjectG` natural transformations.
+
+The positional structure is mechanism. It does not imply semantic priority between child WorkFlows.
 
 ## Interpretation
 
-A service can provide one implementation that satisfies several WorkFlow algebras:
+A Grounding may provide one implementation that satisfies several independent WorkFlow algebras:
 
 ```text
 InMemoryTodoWork
@@ -99,19 +137,18 @@ InMemoryTodoWork
     AlgebraIO<GetTodo.Algebra>
     AlgebraIO<UpdateTodo.Algebra>
     AlgebraIO<DeleteTodo.Algebra>
+    AlgebraIO<AddAttachmentReference.Algebra>
 ```
 
-Normal service execution receives the appropriate interface from DI.
-
-A Process interpreter composes the already-existing interpreters:
+A composed algebra can combine the already-existing interpreters:
 
 ```text
-CreateTodo interpreter ─┐
-                        ├─ AlgebraSumIO<CreateTodo.Algebra, GetTodo.Algebra>
-GetTodo interpreter ────┘
+CreateTodo interpreter --\
+                        +--> AlgebraSumIO<CreateTodo.Algebra, GetTodo.Algebra>
+GetTodo interpreter ----/
 ```
 
-The composed interpreter only redirects. It does not reimplement either WorkFlow.
+The composed interpreter only redirects operations. It does not reimplement either WorkFlow.
 
 ## CRUD API
 
