@@ -4,7 +4,7 @@ using VSlices.Work;
 using Xunit;
 using static LanguageExt.Prelude;
 
-namespace VSlices.Work.FreeAlgebra.Tests;
+namespace VSlices.Work.Tests;
 
 public sealed class FreePointAlgebraTests
 {
