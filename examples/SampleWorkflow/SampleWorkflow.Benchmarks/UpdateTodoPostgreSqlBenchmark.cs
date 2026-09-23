@@ -27,7 +27,7 @@ namespace SampleWorkflow.Benchmarks;
 /// </summary>
 [MemoryDiagnoser]
 [ShortRunJob]
-public sealed class UpdateTodoPostgreSqlBenchmark
+public class UpdateTodoPostgreSqlBenchmark
 {
     private const int OperationsPerInvoke = 10;
 
