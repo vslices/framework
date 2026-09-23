@@ -7,10 +7,10 @@ using Xunit;
 
 namespace SampleBFF.Tests;
 
-public sealed class CrossServiceProcessTests
+public sealed class CrossServiceFeatureCompositionTests
 {
     [Fact]
-    public async Task BFF_composes_WorkFlows_owned_by_two_distinct_services()
+    public async Task BFF_Feature_composes_WorkFlows_owned_by_two_distinct_services()
     {
         var todoWork = new InMemoryTodoWork();
         var fileWork = new InMemoryFileWork();
