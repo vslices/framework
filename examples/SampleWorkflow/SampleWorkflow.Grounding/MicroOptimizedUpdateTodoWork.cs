@@ -75,9 +75,7 @@ public sealed class MicroOptimizedUpdateTodoWork :
 
         if (index < 0)
         {
-            return new UpdateTodoMicroOptimized.Response(
-                Either.Right<Error, Option<Todo>>(
-                    Option<Todo>.None));
+            return UpdateTodoMicroOptimized.Response.Missing;
         }
 
         var current = points.ValueAt(index);
@@ -88,9 +86,8 @@ public sealed class MicroOptimizedUpdateTodoWork :
         {
             SemanticShortCircuits++;
 
-            return new UpdateTodoMicroOptimized.Response(
-                Either.Right<Error, Option<Todo>>(
-                    Some(current)));
+            return UpdateTodoMicroOptimized.Response.Present(
+                current);
         }
 
         Evolutions++;
@@ -105,13 +102,12 @@ public sealed class MicroOptimizedUpdateTodoWork :
                     points.Replace(index, updated);
                     Writes++;
 
-                    return new UpdateTodoMicroOptimized.Response(
-                        Either.Right<Error, Option<Todo>>(
-                            Some(updated)));
+                    return UpdateTodoMicroOptimized.Response.Present(
+                        updated);
                 },
                 Fail: error =>
-                    new UpdateTodoMicroOptimized.Response(
-                        Either.Left<Error, Option<Todo>>(error)));
+                    UpdateTodoMicroOptimized.Response.FromError(
+                        error));
     }
 
     /// <summary>
