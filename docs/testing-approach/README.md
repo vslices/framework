@@ -850,8 +850,8 @@ If a domain IR already contains enough information, some verification can be der
 For example:
 
 ```txt
-ValueObject / Entity / AggregateRoot IR
-    -> declared invariants
+Semantic Space / transformation / evolution IR
+    -> declared invariants and laws
     -> default verification profile
     -> generated regression tests
 ```
@@ -870,6 +870,8 @@ Challenge Specification
 ```
 
 The test representation should reference the authoritative semantic source rather than duplicate its invariant definitions.
+
+Historical `Entity` and `AggregateRoot` classifications are not current Framework semantic categories and must not seed default verification profiles. If identity continuity, consistency boundaries, authority, or lifecycle become testable claims, derive them from explicit current semantics instead.
 
 This distinction should help avoid reproducing test source code or domain knowledge in another syntax.
 
@@ -1012,7 +1014,7 @@ Several existing techniques can serve the model without defining it.
 
 ### Property-based testing
 
-Especially useful for invariants, algebraic properties, transformations, Domain Types, Entities, Aggregate Roots, generated boundaries, and transition exploration.
+Especially useful for invariants, algebraic properties, transformations, semantic spaces, identity values, evolutions, generated boundaries, and transition exploration.
 
 It can serve both directions:
 
