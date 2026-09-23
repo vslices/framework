@@ -159,6 +159,22 @@ When multiple capabilities are needed:
 
 Prefer small, honest capability requirements over broad opaque dependencies.
 
+### Point Algebras
+
+When Work needs operations over points of semantic spaces:
+
+- prefer atomic point capabilities over importing historical infrastructure patterns;
+- use `PointReader<ALG, POINT, ID>` for point reading;
+- use `PointWriter<ALG, POINT>` for point writing;
+- let a service-owned algebra compose the point capabilities it actually needs;
+- build programs over that vocabulary with `Free<ALG, A>`;
+- require the interpreter through `HasAlgebra<ALG, RT>`;
+- let Grounding provide `AlgebraIO<ALG>` and decide the concrete realization;
+- keep the Feature execution boundary as `Flow<RT, REQ, RES>`;
+- do not infer Repository, Store, Unit of Work, tracking, transactions, or other stronger semantics from read/write capability alone.
+
+The free program describes operations; Grounding interprets them. Guarantees are a separate semantic layer and must not be smuggled into capability names or concrete mechanisms.
+
 ---
 
 ## Feature Execution Model

@@ -13,6 +13,7 @@
     <File Path="docs/capabilities.md" />
     <File Path="docs/do-not.md" />
     <File Path="docs/feature-model.md" />
+    <File Path="docs/point-algebras.md" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
@@ -31,5 +32,6 @@
     <Project Path="tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/VSlices.Space.Modeling.Tests/VSlices.Space.Modeling.Tests.csproj" />
     <Project Path="tests/VSlices.Space.Tests/VSlices.Space.Tests.csproj" />
+    <Project Path="tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj" />
   </Folder>
 </Solution>

@@ -1,8 +1,8 @@
 # Capabilities and Guarantees
 
-> Status: exploratory semantic model.
+> Status: capability substrate partially validated; guarantees remain exploratory.
 >
-> This note records a direction that is strong enough to preserve, but is intentionally **not** an implementation commitment yet. The immediate priority remains producing useful migration/refactoring material for the September 25 delivery. Implementation, analyzers, laws, and VSIR syntax should resume only when a real case creates enough pressure.
+> The Point Algebra experiment validated and implemented the capability side for reading and writing semantic points. Guarantee representation, analyzers, laws, and guarantee-oriented VSIR syntax remain intentionally deferred while the immediate priority is producing useful migration/refactoring material for the September 25 delivery.
 
 ## Motivation
 
@@ -107,91 +107,34 @@ A document may establish that a system **reads**, **manages**, **stages**, **per
 
 Atomic concepts allow knowledge to accumulate across Structure, Behavior, Consistency, and other documents without requiring premature pattern recognition.
 
-## Provisional persistence vocabulary
+## Validated capability substrate
 
-The following vocabulary is exploratory.
+The earlier provisional vocabulary based on `Reading` and `Managing` was refined by implementation pressure into point-oriented capabilities.
 
-### Reading<A, ID>
-
-Represents observable access to persisted `A`.
-
-It does not imply mutation, persistence authority, commit, tracking, or transactions.
-
-Examples of operations that may belong to this area include:
-
-- read by identity;
-- read many;
-- existence;
-- query.
-
-### Managing<A, ID>
-
-Represents persistent management intent over `A`.
-
-Creation and update currently appear to belong to the same broad case because both express an intention to establish or change persistent state.
-
-The persistence may be realized in different ways.
-
-#### Outsourced persistence
-
-The managing surface can stage a mutation, while another persistence authority materializes it.
-
-Conceptually:
+The current validated primitives are:
 
 ```text
-Managing<A, ID>
-    + staged persistence
-    + external persistence boundary
+PointReader<ALG, POINT, ID>
+PointWriter<ALG, POINT>
 ```
 
-#### Autonomous persistence
+A service-owned algebra composes these capabilities across the semantic spaces it needs and implements `Functor<ALG>`.
 
-The managing surface owns materialization of its own mutations.
+Operations are lifted into `Free<ALG, A>`, so a Feature can construct an inert program before any Grounding is chosen.
 
-Conceptually:
+Grounding supplies an `AlgebraIO<ALG>` interpreter, and Work requires it through:
 
 ```text
-Managing<A, ID>
-    + self persistence
+HasAlgebra<ALG, RT>
 ```
 
-The historical term "Store" may describe such a composition, but VSlices does not need to encode that name as a primitive.
+The experiment demonstrated that the same free program can be interpreted by different Groundings, that one algebra can span multiple point spaces, and that the resulting program composes inside the existing `Feature -> Flow` model.
 
-### Removing<A, ID>
+See [Point Algebras](../point-algebras.md).
 
-Deletion/removal remains an open question.
+Deletion/removal remains open. It has not been folded into `PointWriter` merely because CRUD traditionally groups those operations.
 
-It is structurally similar to management with respect to persistence, but its semantics may differ materially:
-
-- physical deletion;
-- logical deletion;
-- deactivation;
-- archival;
-- revocation;
-- expiration;
-- tombstoning.
-
-Do not fold it into `Managing` only because CRUD traditionally groups them.
-
-### Persistence context
-
-A persistence context provides contextual access to persistence-related surfaces.
-
-It does not necessarily own the persistence boundary.
-
-A context exposing only reading surfaces is semantically complete without commit authority.
-
-A context exposing staged mutations requires some reachable authority capable of materializing them.
-
-### Persistence boundary
-
-A persistence boundary owns the decision or mechanism by which staged persistence becomes materialized.
-
-The presence of a commit-like operation is a capability.
-
-The claim that all declared participants are coordinated by that operation is a guarantee.
-
-Historical "Unit of Work" semantics may emerge from this composition, but should not be treated as a primitive merely because the pattern is familiar.
+Persistence-boundary questions such as staged versus autonomous persistence also remain open because they depend on additional semantics and guarantees rather than on reading/writing capability alone.
 
 ## Tracking
 
@@ -387,47 +330,40 @@ A grounding may contribute laws for guarantees that VSlices.Grounding does not k
 
 ## Relationship to strong typing
 
-The likely C# direction remains to let Work expose capability requirements through `Has*` constraints while preserving a service-owned contract.
+The capability side now has a concrete typed shape.
 
-For example, a service may define a persistence contract used by its Features, while a concrete Grounding implements it.
+A service-owned algebra composes point capabilities and a Feature requires its interpreter through:
 
-The exact generic shape is deliberately not fixed here.
-
-Previous exploration considered forms analogous to:
-
-```text
-Has<service-owned-persistence-contract, RT>
+```csharp
+where RT : HasAlgebra<AppAlgebra, RT>
 ```
 
-with guarantees represented explicitly rather than by aliases such as `TrackingUnitOfWork`.
+Grounding supplies `AlgebraIO<AppAlgebra>`; the Feature never names the concrete Grounding implementation.
 
-The important requirement is that the Feature should not need to know the concrete Grounding implementation.
+This preserves the original goal of making runtime requirements explicit without introducing pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
 
-## Why no implementation yet
+The exact typed representation of guarantees remains intentionally open.
 
-This direction is promising, but it opens a large design surface:
+## Current scope decision
+
+The capability substrate required for point reading/writing and free algebra interpretation has been implemented because the experiment produced direct executable evidence for it.
+
+The following remain deliberately deferred:
 
 - guarantee representation;
-- capability scoping;
-- persistence primitives;
 - analyzer diagnostics;
 - law registration;
-- VSIR representation;
+- guarantee-oriented VSIR syntax;
 - extensible proof vocabulary;
-- grounding evidence;
-- code generation.
-
-Entering that design surface now would compete directly with the immediate need to produce useful Serviu migration/refactoring material for September 25.
+- persistence-boundary semantics beyond the currently demonstrated point operations.
 
 The current decision is therefore:
 
 ```text
-preserve the semantic model
-    -> do not implement it yet
-    -> return to the concrete delivery
-    -> resume when a real migration case creates pressure
+adopt the validated capability substrate
+    -> keep guarantees open
+    -> return to the September 25 delivery
+    -> resume guarantee work only under real pressure
 ```
 
-This is not a rejection of the direction.
-
-It is an explicit scope decision.
+This is a scope boundary, not a rejection of the guarantee model.

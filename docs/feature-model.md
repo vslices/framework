@@ -138,14 +138,15 @@ RT  = runtime capability carrier
 REQ = request for this execution
 ```
 
-Use the canonical readers:
+The current `Flow` reader keeps the request channel explicit:
 
 ```csharp
-Flow.runtime<RT, REQ>()
-Flow.request<RT, REQ>()
+Flow<RT, REQ>.Asks(static request => request)
 ```
 
-Do not obtain the request through `asks` or a runtime capability.
+When an operation genuinely needs both channels, `Flow<RT, REQ>.Asks((request, runtime) => ...)` can project from both.
+
+Do not model the request as a runtime capability.
 
 ## Runtime capabilities
 
@@ -158,16 +159,20 @@ public sealed class CreateIdentity<RT> :
         RT,
         CreateIdentity<RT>.Request,
         CreateIdentity<RT>.Response>
-    where RT : HasRepositoryAccess<RT>
+    where RT : HasAlgebra<IdentityAlgebra, RT>
 ```
 
-Capabilities remain type-level execution requirements. Prefer focused capability access such as:
+Capabilities remain type-level execution requirements.
+
+For point operations, a Feature can build a free program over a service-owned algebra and interpret it through:
 
 ```csharp
-RepositoryAccessEnv<RT>.identities
+AlgebraEnv<IdentityAlgebra, RT>.run(program)
 ```
 
-over constructor injection, service bags, or service-location patterns.
+The algebra defines the operation vocabulary; the runtime provides the Grounding interpreter. See [Point Algebras](point-algebras.md).
+
+Prefer this explicit runtime requirement over constructor injection, service bags, or service-location patterns.
 
 ## Feature body
 
@@ -175,7 +180,7 @@ Prefer a small declarative pipeline:
 
 ```csharp
 public static Flow<RT, Request, Response> Get() =>
-    Flow.request<RT, Request>() >>
+    Flow<RT, Request>.Asks(static request => request) >>
     Validate >>
     Persist;
 ```
@@ -204,12 +209,12 @@ public sealed class CreateIdentity<RT> :
         "Permite crear una identidad";
 
     public static Flow<RT, Request, Response> Get() =>
-        Flow.request<RT, Request>() >>
+        Flow<RT, Request>.Asks(static request => request) >>
         (request => request.Identity.Match(
             Natural: n => CreateNatural<RT>.Invariants.RunEff(n).MapSuper(),
             Legal: l => CreateLegal<RT>.Invariants.RunEff(l).MapSuper())) >>
-        (identity => RepositoryAccessEnv<RT>.identities
-            .Create(identity)
+        (identity => AlgebraEnv<IdentityAlgebra, RT>
+            .run(IdentityPrograms.write(identity))
             .Map(_ => new Response()));
 }
 ```

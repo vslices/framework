@@ -60,12 +60,25 @@ When deciding between:
 
 prefer the runtime capability, unless there is a strong and explicit reason not to.
 
+## Point Algebras
+
+For Work operations over points of semantic spaces, the current capability model is based on atomic point capabilities composed by service-owned algebras.
+
+The first validated point capabilities are:
+
+- `PointReader<ALG, POINT, ID>`;
+- `PointWriter<ALG, POINT>`.
+
+A service-owned algebra composes only the operations it needs, `Free<ALG, A>` describes programs over that vocabulary without executing them, and `HasAlgebra<ALG, RT>` keeps the interpreter requirement explicit in the Feature runtime contract.
+
+See [Point Algebras](point-algebras.md).
+
 ## Capabilities and Guarantees
 
-Capabilities describe what Work requires the runtime to provide.
+Capabilities describe what Work can request.
 
-Some realizations also need additional semantic guarantees such as tracking, atomicity, isolation, ordering, or durability. Those guarantees refine admissible realizations rather than becoming capabilities by themselves.
+Guarantees describe additional semantic properties that an admissible realization must preserve. Tracking, atomicity, isolation, ordering, and durability are examples of potential guarantees rather than independent capabilities.
 
-The current exploration is preserved in [Capabilities and Guarantees](notes/capabilities-and-guarantees.md).
+The point-algebra capability substrate is now validated and implemented. The guarantee model remains exploratory and deliberately unimplemented while current delivery work has priority.
 
-That note is intentionally exploratory. It records the semantic direction without committing yet to a final C# API, VSIR syntax, analyzer model, or law system.
+See [Capabilities and Guarantees](notes/capabilities-and-guarantees.md).

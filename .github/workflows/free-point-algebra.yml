@@ -1,4 +1,4 @@
-name: Free Point Algebra Experiment
+name: Work Point Algebras CI
 
 on:
   push:
@@ -31,5 +31,8 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Run free point algebra tests
+      - name: Build solution
+        run: dotnet build VSlices.slnx
+
+      - name: Run point algebra tests
         run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
