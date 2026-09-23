@@ -103,22 +103,28 @@ public sealed class MicroOptimizedUpdateTodoWork :
     {
         Evolutions++;
 
-        return UpdateTodoMicroOptimized
-            .Evolve(
+        var evolution =
+            UpdateTodoMicroOptimized.Evolve(
                 current,
-                quectostep)
-            .Match(
-                Succ: updated =>
-                {
-                    points.Replace(index, updated);
-                    Writes++;
+                quectostep);
 
-                    return UpdateTodoMicroOptimized.Response.Present(
-                        updated);
-                },
-                Fail: error =>
-                    UpdateTodoMicroOptimized.Response.FromError(
-                        error));
+        switch (evolution)
+        {
+            case Fin<Todo>.Succ(var updated):
+                points.Replace(index, updated);
+                Writes++;
+
+                return UpdateTodoMicroOptimized.Response.Present(
+                    updated);
+
+            case Fin<Todo>.Fail(var error):
+                return UpdateTodoMicroOptimized.Response.FromError(
+                    error);
+
+            default:
+                throw new NotSupportedException(
+                    $"Unknown {nameof(Fin<Todo>)} case.");
+        }
     }
 
     /// <summary>
