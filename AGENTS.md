@@ -191,7 +191,7 @@ AlgebraSum<A, B, C, D, E, F, G>
 
 Each sum exposes `FromA` through `FromG` as applicable. These helpers hoist an existing child Feature program into the larger algebra without exposing recursive `Left/Right` structure at the call site.
 
-The underlying natural transformations remain explicit as `InjectA` through `InjectG`. `InjectLeft` and `InjectRight` exist only as obsolete compatibility aliases for the binary form.
+The underlying natural transformations remain explicit as `InjectA` through `InjectG`. Positional A..G vocabulary is the only supported injection surface.
 
 Ownership rules:
 
