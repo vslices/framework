@@ -34,6 +34,15 @@ jobs:
       - name: Build Work
         run: dotnet build src/VSlices.Work/VSlices.Work.csproj
 
+      - name: Build Work Services
+        run: dotnet build src/VSlices.Work.Services/VSlices.Work.Services.csproj
+
+      - name: Build Work Products
+        run: dotnet build src/VSlices.Work.Products/VSlices.Work.Products.csproj
+
+      - name: Run Work algebra tests
+        run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
+
       - name: Build API
         run: dotnet build examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj
 
