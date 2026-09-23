@@ -1,7 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using VSlices.Monads;
-
 namespace VSlices.Arrows;
 
 /// <summary>

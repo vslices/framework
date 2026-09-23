@@ -122,13 +122,9 @@ A service-owned algebra composes these capabilities across the semantic spaces i
 
 Operations are lifted into `Free<ALG, A>`, so a Feature can construct an inert program before any Grounding is chosen.
 
-Grounding supplies an `AlgebraIO<ALG>` interpreter, and Work requires it through:
+Grounding supplies an `AlgebraIO<ALG>` interpreter outside the Feature contract.
 
-```text
-HasAlgebra<ALG, RT>
-```
-
-The experiment demonstrated that the same free program can be interpreted by different Groundings, that one algebra can span multiple point spaces, and that the resulting program composes inside the existing `Feature -> Flow` model.
+The experiment demonstrated that the same free program can be interpreted by different Groundings, that one algebra can span multiple point spaces, and that the Feature itself can remain an inert `Free<ALG, RES>` WorkFlow until interpretation.
 
 See [Point Algebras](../point-algebras.md).
 
@@ -332,15 +328,11 @@ A grounding may contribute laws for guarantees that VSlices.Grounding does not k
 
 The capability side now has a concrete typed shape.
 
-A service-owned algebra composes point capabilities and a Feature requires its interpreter through:
+A Feature-owned algebra composes point capabilities and exposes the exact Work vocabulary structurally.
 
-```csharp
-where RT : HasAlgebra<AppAlgebra, RT>
-```
+Grounding supplies `AlgebraIO<AppAlgebra>` when the WorkFlow is interpreted; the Feature never names the concrete Grounding implementation.
 
-Grounding supplies `AlgebraIO<AppAlgebra>`; the Feature never names the concrete Grounding implementation.
-
-This preserves the original goal of making runtime requirements explicit without introducing pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
+This preserves the goal of explicit capability requirements without introducing an ambient runtime carrier or pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
 
 The exact typed representation of guarantees remains intentionally open.
 

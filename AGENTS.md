@@ -154,9 +154,9 @@ InMemoryTodoWork
 
 This does not make those algebras the same. It means one realization can interpret several independently owned WorkFlow vocabularies.
 
-`HasAlgebra<ALG, RT>` and runtime carriers may remain useful execution mechanisms in contexts that need them, but they are not the current semantic boundary of `Feature`.
+`AlgebraIO<ALG>` is selected outside the Feature contract. Runtime carriers are not part of the current execution model.
 
-Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historical APIs or runtime helpers still exist.
+Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historical APIs or runtime helpers existed.
 
 ---
 
@@ -208,17 +208,26 @@ Do not introduce arities beyond seven or a different composition mechanism until
 
 ---
 
-## Flow Status
+## Flow Retirement
 
-`Flow<RT, REQ, RES>` still exists in the repository, but its final relationship to the current Free WorkFlow model is unresolved.
+`Flow<RT, REQ, RES>` was removed after the current Feature-as-Free model demonstrated that no maintained executable surface required it.
 
-Do not:
+The preserved trajectory is:
 
-- restore `Flow` as the Feature boundary merely because older documentation says so;
-- delete or redesign `Flow` just to simplify the current experiment;
-- claim that its final role is settled.
+```text
+Feature + RT + Flow
+    -> Free point-algebra experiment
+    -> Feature == WorkFlow == Free<ALG, RES>
+    -> direct AlgebraIO interpretation
+    -> Repository/runtime-carrier removal
+    -> temporal capabilities expressed in ALG
+    -> no remaining Flow consumer
+    -> Flow removed
+```
 
-First preserve the validated Feature-as-Free and composed-algebra model. Let real cases determine whether `Flow` remains an execution carrier, presentation/runtime syntax, another abstraction, or is superseded on this path.
+Do not restore `Flow`, `HasAlgebra<ALG, RT>`, or `AlgebraEnv<ALG, RT>` merely to recover ambient runtime lookup or request-reader syntax.
+
+If a future case requires a capability that the current model cannot express, pressure that case directly rather than assuming Flow is the missing abstraction.
 
 ---
 

@@ -364,20 +364,28 @@ The next substantive design question is where stronger cross-WorkFlow guarantees
 
 Possible future concepts include compensation, retry, reconciliation, atomicity or another guarantee vocabulary, but none should be smuggled into the composition mechanism by default.
 
-## Flow remains unresolved
+## Flow was retired after this handoff
 
-The relationship between:
+At the time of the original experiment, the relationship between `Free` WorkFlows and `Flow<RT, REQ, RES>` remained open.
+
+Subsequent pressure resolved that question.
+
+Point Grounding, cross-Feature composition, EF Core realization, and temporal Work were all expressed without a Flow consumer. The remaining Flow code was self-contained legacy execution machinery plus documentation references.
+
+The maintained model is now:
 
 ```text
-Feature / Free WorkFlow
-Flow<RT, REQ, RES>
-presentation invocation
-runtime interpretation
+Feature.Get(request)
+    -> Free<ALG, RES>
+
+AlgebraIO<ALG>
+    -> selected outside Feature
+
+FreeAlgebra.interpret(...)
+    -> IO<RES>
 ```
 
-remains open.
-
-Do not restore `Flow` as the Feature boundary from historical documentation, and do not delete it merely because the current experiment uses Free directly.
+`Flow`, `HasAlgebra<ALG, RT>`, and `AlgebraEnv<ALG, RT>` were therefore removed rather than assigned a speculative new role.
 
 ## Ticket Support remains a real-world pressure case
 

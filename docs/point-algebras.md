@@ -170,9 +170,9 @@ public interface AlgebraIO<ALG>
 
 `FreeAlgebra.interpret` folds the inert WorkFlow through this interpreter.
 
-`HasAlgebra<ALG, RT>` and `AlgebraEnv<ALG, RT>` still exist as execution helpers for runtime-shaped contexts, but they are not the semantic boundary of Feature and are not required by the current direct interpretation examples.
+`AlgebraIO<ALG>` is supplied directly by the caller, presentation, host, or test surface that interprets the Feature WorkFlow.
 
-Their long-term relationship to the remaining runtime/Flow surface is a separate migration question.
+The earlier `HasAlgebra<ALG, RT>` / `AlgebraEnv<ALG, RT>` runtime bridge was removed together with `Flow` after no maintained consumer remained.
 
 ## Point Grounding contracts
 
