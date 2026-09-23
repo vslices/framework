@@ -31,8 +31,8 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Build solution
-        run: dotnet build VSlices.slnx
+      - name: Build Work
+        run: dotnet build src/VSlices.Work/VSlices.Work.csproj
 
       - name: Run point algebra tests
         run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
