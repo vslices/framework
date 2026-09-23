@@ -1,302 +1,297 @@
 # AGENTS.md
 
 ## Purpose
-This repository contains a framework for building applications using:
 
-- Domain-Driven Design
-- Functional programming patterns inspired by LanguageExt
-- Vertical Slice Architecture
-- Progressive, composable, batteries-included design
+This repository contains the current .NET realization of VSlices Framework.
 
-The framework is not intended to be a general-purpose abstraction library.
-Its purpose is to provide strong, composable primitives and conventions for building application slices with high correctness and low accidental complexity.
+The Framework is being defined and validated through real implementation. Do not treat Domain-Driven Design, functional programming, LanguageExt, Vertical Slice Architecture, or the current .NET API as the universal ontology of VSlices Framework. They may be useful antecedents, techniques, or realization mechanisms.
 
-The main goal is to maximize:
+The current direction is semantic-first and is actively validating distinctions such as:
 
-- simplicity
-- explicitness
-- composability
-- compile-time guarantees
-- predictable feature construction
+- `Space`: semantic values, structure, admissibility, and pure transformations;
+- `Work`: executable behavior, coordination, WorkFlows, WorkProcesses, effects, and expected errors;
+- `Grounding`: acquisition or realization of facts and effects that are not derivable from pure semantics alone.
+
+These names and boundaries remain provisional. Prefer current repository evidence over remembered architecture.
+
+The main engineering goals remain:
+
+- simplicity;
+- explicit semantics and ownership;
+- composability;
+- meaningful compile-time guarantees where the target can provide them;
+- low accidental complexity;
+- and continuity between semantic intent, executable realization, and evidence.
 
 ---
 
 ## Core Philosophy
 
-This framework is based on four foundations:
+Preserve these distinctions:
 
-1. Domain-Driven Design recommendations
-2. Functional programming patterns inspired by LanguageExt
-3. Vertical Slice Architecture
-4. Batteries included, while remaining open to multiple interchangeable batteries
+```text
+semantic meaning
+!= execution mechanism
+!= concrete realization
+!= authorization
+!= guarantee
+```
 
 General principles:
 
-- No null values
-- No exceptions for control flow
-- Prefer composition over inheritance
-- Prefer compile-time safety over runtime safety
-- Prefer explicit dependencies over hidden dependencies
-- Follow SOLID, DRY, KISS
-- Avoid over-engineering
-- Keep abstractions honest and minimal
+- no null values in semantic APIs when an explicit alternative is available;
+- no exceptions for expected control flow;
+- prefer composition over inheritance;
+- prefer explicit dependencies and effects over hidden dependencies;
+- prefer pure transformations where the required evidence is already available;
+- make effectful acquisition and realization visible;
+- introduce stronger structure only when evidence justifies it;
+- do not infer semantics from convenient implementation mechanisms;
+- keep abstractions honest and minimal.
+
+A recurring factorization is:
+
+```text
+effectful acquisition -> explicit evidence -> pure transformation
+```
+
+Do not force this factorization when current evidence contradicts it, but do not hide acquisition inside a supposedly pure semantic transformation.
 
 ---
 
-## Functional Style
+## Current Work Model
 
-This project follows a functional-first style.
+The current `SampleWorkflow` experiment has executable evidence for the following model:
 
-Use these principles consistently:
+```text
+Feature == WorkFlow == Free<WorkFlowAlgebra, Response>
 
-- Use `Option` instead of null
-- Use `Either` or equivalent explicit result types for failures
-- Use `Eff`, `IO`, and related effect abstractions for side effects
-- Avoid unmodeled side effects
-- Prefer pure functions where possible
-- Make effectful boundaries explicit in types
-- Prefer composition of smaller operations over large mutable workflows
+1 WorkProcess : M WorkFlow
+1 WorkFlow    : Q WorkPart
+```
 
-Do not introduce imperative or object-oriented patterns when a simpler functional composition is available.
+`WorkLine` remains outside the current implemented scope.
+
+### Feature / WorkFlow
+
+A Feature directly owns the semantic program for one WorkFlow:
+
+```csharp
+Feature<F, ALG, REQ, RES>
+    where ALG : Functor<ALG>
+{
+    static abstract Free<ALG, RES> Get(REQ request);
+}
+```
+
+The important ownership rule is:
+
+```text
+Feature does not merely execute a WorkFlow.
+Feature is the WorkFlow.
+```
+
+A Feature must not delegate its real program to a parallel shared `*Programs` layer merely to keep the Feature thin.
+
+### WorkPart
+
+A WorkPart is currently understood as a specific instruction in a WorkFlow.
+
+Do not infer that every pure semantic calculation must become a WorkPart. Pure transformations such as accepted state evolution may remain inside Free continuations unless real pressure shows that they need independent inspectability or execution semantics.
+
+### Feature-owned algebra
+
+Each WorkFlow owns only the instruction vocabulary it actually requires.
+
+For example:
+
+```text
+CreateTodo.Algebra
+    NextId
+    ReadTodo
+    WriteTodo
+
+GetTodo.Algebra
+    ReadTodo
+
+UpdateTodo.Algebra
+    ReadTodo
+    WriteTodo
+
+DeleteTodo.Algebra
+    ReadTodo
+    RemoveTodo
+```
+
+Generic vocabulary such as `PointReader`, `PointWriter`, and `PointRemover` may be reused to construct those algebras.
+
+Do not replace the per-Feature algebra with one broad shared service algebra merely because the same realization can interpret all operations.
+
+---
+
+## Grounding and Interpretation
+
+`Grounding` owns concrete realization of WorkParts.
+
+The current interpreter boundary is:
+
+```csharp
+AlgebraIO<ALG>
+```
+
+A single concrete service may implement several Feature algebras:
+
+```text
+InMemoryTodoWork
+    AlgebraIO<CreateTodo.Algebra>
+    AlgebraIO<GetTodo.Algebra>
+    AlgebraIO<UpdateTodo.Algebra>
+    AlgebraIO<DeleteTodo.Algebra>
+```
+
+This does not make those algebras the same. It means one realization can interpret several independently owned WorkFlow vocabularies.
+
+`HasAlgebra<ALG, RT>` and runtime carriers may remain useful execution mechanisms in contexts that need them, but they are not the current semantic boundary of `Feature`.
+
+Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historical APIs or runtime helpers still exist.
+
+---
+
+## WorkProcess Composition
+
+A WorkProcess composes already-existing WorkFlows.
+
+The current validated miniature uses a binary algebra sum:
+
+```text
+WorkFlow A algebra --\
+                     +--> AlgebraSum<A,B>
+WorkFlow B algebra --/
+```
+
+Each child WorkFlow is hoisted into the Process algebra through an external natural-transformation witness:
+
+```text
+InjectLeft<A,B>  : A ~> AlgebraSum<A,B>
+InjectRight<A,B> : B ~> AlgebraSum<A,B>
+```
+
+and:
+
+```csharp
+FreeAlgebra.hoist<N, F, G, A>(Free<F, A>)
+```
+
+Ownership rules:
+
+```text
+WorkFlow owns its WorkParts.
+WorkProcess owns composition of WorkFlows.
+Grounding owns realization.
+A composing Process owns injection into its larger algebra.
+A lower WorkFlow does not know its future Process or BFF.
+```
+
+The Process interpreter must delegate each branch to the interpreter that already owns it. It must not reimplement child WorkParts.
+
+Do not introduce arbitrary-N algebra machinery until real cases require it. Binary composition can be nested while the model is still under pressure.
+
+---
+
+## Flow Status
+
+`Flow<RT, REQ, RES>` still exists in the repository, but its final relationship to the current Free WorkFlow model is unresolved.
+
+Do not:
+
+- restore `Flow` as the Feature boundary merely because older documentation says so;
+- delete or redesign `Flow` just to simplify the current experiment;
+- claim that its final role is settled.
+
+First preserve the validated Feature-as-Free and WorkProcess composition model. Let real cases determine whether `Flow` remains an execution carrier, presentation/runtime syntax, another abstraction, or is superseded on this path.
+
+---
+
+## Point Capabilities
+
+When Work needs operations over points of semantic spaces:
+
+- prefer small structural capabilities over importing historical infrastructure abstractions;
+- use `PointReader<ALG, POINT, ID>` for point reading where it fits;
+- use `PointWriter<ALG, POINT>` for point writing where it fits;
+- use `PointRemover<ALG, POINT, ID>` for point removal where it fits;
+- compose only the capabilities required by the owning Feature algebra;
+- build the WorkFlow as `Free<ALG, A>`;
+- let Grounding provide `AlgebraIO<ALG>`;
+- do not infer Repository, Store, Unit of Work, tracking, transactions, atomicity, or durability from read/write/remove capability alone.
+
+Read/write vocabulary describes instructions. Stronger guarantees are separate semantics.
+
+---
+
+## Guarantees
+
+The current Free WorkFlow / WorkProcess experiment does not settle the guarantee model.
+
+Still treat the following as separate, unresolved work unless current repository evidence says otherwise:
+
+- tracking;
+- atomicity;
+- isolation;
+- durability;
+- staged vs autonomous persistence;
+- transaction boundaries;
+- law registration;
+- proof vocabulary;
+- analyzers;
+- guarantee-oriented VSIR.
+
+Do not smuggle those guarantees into capability names, WorkPart names, interpreter classes, or Process composition.
+
+---
+
+## Error Handling
+
+Failures expected by the modeled Work must remain explicit.
+
+- do not throw exceptions for expected flows;
+- use explicit error values or typed alternatives;
+- preserve error information through WorkFlow and WorkProcess composition;
+- distinguish semantic rejection from interpreter/runtime failure;
+- do not collapse missing authority or unsupported semantics into a plausible default.
+
+---
+
+## Semantic Modeling
+
+Prefer explicit semantic spaces and transformations where they remove ambiguity or invalid states.
+
+Current examples include:
+
+- `TodoId` as a semantic discrete space established from `Guid`;
+- `TodoDetail` as the textual semantic value;
+- `Todo` as an evolvable semantic point;
+- `Todo.Update(...)` as accepted state evolution rather than unrelated replacement construction.
+
+Do not create a semantic type merely because a primitive exists. `Completed` remains a plain `bool` in the current experiment because no evidence yet requires a separate space.
 
 ---
 
 ## Architecture
 
-This framework uses Vertical Slice Architecture.
+Architecture should emerge from semantic ownership and real coordination boundaries.
 
 Rules:
 
-- Each feature is self-contained
-- Features are the main application boundary
-- Avoid shared service layers
-- Avoid central orchestration services unless strictly necessary
-- Domain logic belongs in the domain model or in focused domain behaviors
-- Infrastructure must remain behind explicit capabilities/effects
-- Application code should orchestrate, not hide dependencies
-
-A feature should be understandable in isolation.
-
----
-
-## Capability Model
-
-### Definition
-
-A Capability is a typed description of an operation or behavior that Work may require.
-
-Capabilities are conceptually similar to LanguageExt typeclasses. A runtime constraint provides evidence that the required capability or capability vocabulary can be supplied or interpreted.
-
-A Capability is NOT:
-
-- a service object
-- a helper
-- a manager
-- a static utility
-- a dependency to inject through constructors
-
-A Capability IS:
-
-- a typed statement of an operation or behavior available to Work
-- composable semantic vocabulary
-- something whose availability must remain explicit at the Feature boundary
-
-A capability requirement is expressed through constraints on `RT`.
-
-For direct capabilities, `RT` can expose the capability itself through `Has*`. For point algebras, atomic capabilities compose into an algebra and `RT` exposes the ability to interpret that algebra through `HasAlgebra<ALG, RT>`.
-
-The runtime type `RT` remains the compile-time evidence carrier for executable Work requirements.
-
-### Examples
-
-Examples of capabilities include:
-
-- current time access
-- id generation
-- persistence access
-- transaction execution
-- event dispatching
-- external API access
-- current user context
-- logging
-- configuration access
-
-These should be modeled as runtime capabilities, not as ad-hoc service dependencies.
-
-### Capability Usage Rules
-
-- Capabilities must be expressed through `RT` constraints
-- Capabilities must not be instantiated directly inside features
-- Capabilities must not be hidden behind generic service abstractions
-- Capabilities must not be resolved from a service locator
-- Capabilities must not be accessed through global state
-- Capabilities must remain explicit at the type level
-
-When implementing a feature, prefer:
-
-- explicit runtime constraints
-- explicit effect composition
-- explicit error propagation
-
-Avoid:
-
-- constructor injection for feature dependencies
-- service classes that merely wrap capabilities
-- indirect abstractions that obscure runtime requirements
-
-### Capability Composition
-
-Capabilities are meant to compose.
-
-A feature can require multiple capabilities through `RT`.
-
-The runtime acts as the composition point for available capabilities.
-
-When multiple capabilities are needed:
-
-- keep them explicit
-- require only the minimum needed
-- do not bundle unrelated capabilities into coarse abstractions
-- do not introduce aggregate "application services" just to simplify signatures
-
-Prefer small, honest capability requirements over broad opaque dependencies.
-
-### Point Algebras
-
-When Work needs operations over points of semantic spaces:
-
-- prefer atomic point capabilities over importing historical infrastructure patterns;
-- use `PointReader<ALG, POINT, ID>` for point reading;
-- use `PointWriter<ALG, POINT>` for point writing;
-- let a service-owned algebra compose the point capabilities it actually needs;
-- build programs over that vocabulary with `Free<ALG, A>`;
-- require the interpreter through `HasAlgebra<ALG, RT>`;
-- let Grounding provide `AlgebraIO<ALG>` and decide the concrete realization;
-- keep the Feature execution boundary as `Flow<RT, REQ, RES>`;
-- do not infer Repository, Store, Unit of Work, tracking, transactions, or other stronger semantics from read/write capability alone.
-
-The free program describes operations; Grounding interprets them. Guarantees are a separate semantic layer and must not be smuggled into capability names or concrete mechanisms.
-
----
-
-## Feature Execution Model
-
-Features are the main executable unit of application behavior.
-
-A feature should be modeled as a function from an input request to a `Flow<RT, REQ, RES>`.
-
-Conceptually:
-
-```txt
-REQ -> Flow<RT, REQ, RES>
-```
-
-`Flow<RT, REQ, RES>` is the primary execution abstraction of VSlices.
-
-A `Flow` represents an application behavior that:
-
-* receives an explicit input request through `REQ`;
-* depends on a runtime capability carrier through `RT`;
-* produces an explicit result through `RES`;
-* performs effectful execution in a controlled way;
-* models expected failures explicitly instead of using exceptions for control flow;
-* can be composed, adapted, tested, and executed by different presentation layers.
-
-In other words, a feature is not a service, handler, controller, or use-case class.
-
-A feature is a pure declaration of application behavior whose execution is delayed and interpreted through a runtime:
-
-```txt
-RT + REQ -> effectful result of RES
-```
-
-Presentation adapters such as Web APIs, workers, CLIs, event consumers, or UI integrations should not contain business behavior. They should only translate external input into `REQ`, execute the corresponding `Flow`, and translate the result back into the presentation-specific response.
-
-A feature should request only the minimum runtime capabilities it needs:
-
-```csharp
-where RT : HasClock<RT>, HasPersistence<RT>
-```
-
-Prefer minimal capability constraints over broad runtime bundles such as `ApplicationRuntime<RT>`, unless the feature truly depends on the full application runtime.
-
-### Feature Rules
-
-- Features must not execute uncontrolled side effects
-- Features must not depend on infrastructure concretions directly
-- Features must use capabilities through `RT`
-- Features must return explicit effectful values
-- Features must keep orchestration local and readable
-- Features should be small enough to reason about without scanning the whole codebase
-
-### Error Handling
-
-Failures must be modeled explicitly.
-
-- Do not throw exceptions for expected flows
-- Use explicit error types
-- Prefer domain-specific error values over generic exceptions
-- Preserve error information across compositions
-- Prefer typed failures over string-based conventions
-
----
-
-## Transactions
-
-Transactions are an execution concern, not business logic.
-
-If the framework provides a `TransactionRunner` capability, it should be treated as a runtime capability.
-
-Rules:
-
-- Do not manually control transaction mechanics inside features unless the abstraction explicitly requires it
-- Do not spread transaction semantics across unrelated code
-- Keep transaction boundaries explicit
-- Use the transaction capability as composition infrastructure, not as a service pattern
-
----
-
-## Events
-
-Domain events and integration events must remain explicit.
-
-Rules:
-
-- Do not dispatch events implicitly through hidden infrastructure
-- Do not mix domain mutation and event dispatch in opaque service methods
-- If event dispatch is effectful, model it through capabilities
-- Event buffering and dispatching should remain explicit execution concerns
-
-Prefer designs where:
-- events are collected intentionally
-- publication happens through explicit runtime capabilities
-- background or deferred dispatch remains modeled, not magical
-
----
-
-## Domain Modeling
-
-Prefer rich domain modeling where it reduces accidental complexity.
-
-### Value Objects
-
-- Must be immutable
-- Must validate on creation
-- Must not expose invalid states
-- Should avoid primitive obsession where meaningful domain concepts exist
-
-### Entities / Aggregates
-
-- Protect invariants explicitly
-- Keep mutation controlled
-- Emit events intentionally when appropriate
-- Avoid anemic modeling when behavior belongs in the domain
-
-### Domain Rules
-
-- Put business rules close to the domain concepts they govern
-- Avoid scattering domain decisions across handlers, repositories, and utilities
-- Prefer explicit domain language in names and types
+- keep Features understandable in isolation;
+- keep WorkFlow instruction vocabulary local to its owner;
+- avoid shared service/program layers that steal WorkFlow ownership;
+- keep concrete realization behind explicit interpreter boundaries;
+- keep presentation adapters thin;
+- let a WorkProcess coordinate existing WorkFlows without rewriting them;
+- do not assign semantic policy to persistence or transport components merely because they can execute an operation.
+
+Vertical slices, DDD patterns, functional programming, and other established approaches may be used where they fit; do not treat them as mandatory top-level taxonomy.
 
 ---
 
@@ -304,63 +299,46 @@ Prefer rich domain modeling where it reduces accidental complexity.
 
 When making changes:
 
-- Keep changes minimal and localized
-- Preserve the current architectural direction
-- Prefer improving composition over adding new layers
-- Do not modify multiple layers unless necessary
-- Do not introduce abstractions without at least two real use cases
-- Do not add new dependencies without strong justification
-- Do not "prepare for the future" unless the current code already demands it
-- Prefer extending existing primitives over inventing parallel ones
+- inspect current branch HEAD and nearby evidence first;
+- keep changes small and verifiable;
+- preserve the current ownership model unless evidence contradicts it;
+- prefer extending an existing mechanism over inventing a parallel one;
+- do not generalize from one unsupported case;
+- do not introduce abstractions only to prepare for hypothetical futures;
+- preserve human-editable and documented semantics when refactoring;
+- if implementation contradicts documentation, update the nearest authoritative documentation or record the discrepancy.
 
-When proposing a refactor:
+For new Work cases, prefer:
 
-- explain the current problem
-- explain why the new design is simpler
-- explain what complexity is being removed
-- explain what constraints are being preserved
+```text
+real case
+    -> first observable unsupported boundary
+    -> identify who owns that boundary
+    -> smallest coherent change
+    -> rerun
+    -> observe the next boundary
+```
+
+The next important pressure after the `SampleWorkflow` miniature is a real multi-service composition such as Ticket Support BFF `AttachFile` / `RemoveAttachment`.
 
 ---
 
 ## What To Avoid
 
-### Anti-Patterns
-
 Do NOT:
 
-- introduce null
-- throw exceptions for control flow
-- use exceptions as expected-domain-failure signaling
-- inject services into features through constructors
-- create "Manager", "Helper", "Utility", or "Service" classes without strong justification
-- hide runtime requirements behind façade objects
-- bypass `RT` with static/global access
-- create premature abstractions
-- generalize with no second real use case
-- introduce inheritance where composition is enough
-- centralize behavior that should remain inside slices
-- create thin wrappers that add indirection but no clarity
-- replace explicit capability constraints with vague object-oriented dependencies
-
-### Specific Capability Anti-Patterns
-
-Do NOT model capabilities as:
-
-- dependency injection services for feature classes
-- singleton objects accessed globally
-- bags of unrelated methods
-- infrastructure objects passed around without type-level meaning
-
-Do NOT say:
-- "inject the repository service"
-- "use a service layer to access runtime concerns"
-- "wrap all capabilities inside one application service"
-
-Instead, think in terms of:
-- runtime requirements
-- capability constraints
-- effect composition
-- explicit typed dependencies
+- introduce null where an explicit alternative belongs;
+- throw exceptions for expected control flow;
+- inject concrete service implementations into Feature definitions;
+- hide WorkParts behind vague helper/manager/service abstractions;
+- recreate a shared `TodoPrograms`-style layer that owns the real WorkFlow;
+- make a lower WorkFlow know the Process/BFF that may compose it later;
+- treat one concrete interpreter as the semantic owner of several WorkFlows;
+- infer transactions or stronger persistence guarantees from point read/write/remove;
+- restore historical `RT` constraints at the Feature boundary without new evidence;
+- force every pure semantic transformation into a WorkPart;
+- generalize `AlgebraSum` to arbitrary-N machinery without pressure;
+- use current implementation convenience as proof of universal Framework semantics.
 
 ---
 
@@ -368,51 +346,47 @@ Instead, think in terms of:
 
 Testing should preserve the same architectural model.
 
-Rules:
+Current evidence should include, where relevant:
 
-- Prefer testing features through their effectful API
-- Prefer fake/test runtimes over mocking service classes
-- Test capabilities through explicit runtime composition where possible
-- Prefer adding tests over rewriting stable production code
-- Do not distort production design only to satisfy test style preferences
+- direct tests of generic algebra/hoist mechanisms;
+- Feature WorkFlow interpretation through `AlgebraIO<Feature.Algebra>`;
+- WorkProcess composition and interpreter delegation;
+- compile/build evidence for dependent Framework surfaces;
+- presentation/API smoke behavior;
+- preservation of semantic state transitions.
 
-When tests require dependencies, prefer supplying an appropriate test `RT` rather than inventing service abstractions just for testability.
+Prefer fake or in-memory interpreters over mocking vague service layers.
+
+For the current miniature, the branch should remain green for:
+
+```text
+VSlices.Work build
+VSlices.Work.Services build
+VSlices.Work.Products build
+Work algebra tests
+SampleWorkflow API build
+WorkProcess hoist/composition tests
+CRUD smoke test
+```
+
+Do not treat green execution alone as proof that the semantic decomposition is correct. Readability and ownership remain part of the experiment.
 
 ---
 
-## Style Expectations for Code Changes
+## Style Expectations
 
 When generating or modifying code:
 
-- prefer small focused files
-- prefer intention-revealing names
-- prefer expressions over deeply nested statements
-- avoid hidden control flow
-- avoid ambient mutation
-- keep the execution path easy to follow
-- optimize for readability by a maintainer who values functional composition and DDD
+- prefer small focused files;
+- prefer intention-revealing names;
+- prefer expressions over deeply nested statements;
+- avoid hidden control flow;
+- avoid ambient mutation;
+- keep semantic ownership visible;
+- keep execution paths readable;
+- prefer the least-powerful sufficient mechanism.
 
-If a simpler solution exists, prefer it.
-
-If a proposed abstraction does not clearly remove duplication or complexity, do not introduce it.
-
----
-
-## Output Expectations for Proposed Changes
-
-When proposing changes, always provide:
-
-1. Summary of intent
-2. Files modified
-3. Reasoning
-4. Risks
-5. Why this design fits the framework philosophy
-
-If a change introduces a new abstraction, also explain:
-
-- why the existing design was insufficient
-- why this is not premature generalization
-- which concrete complexity it removes
+If a simpler honest solution exists, prefer it.
 
 ---
 
@@ -420,12 +394,13 @@ If a change introduces a new abstraction, also explain:
 
 When in doubt, prefer:
 
-- explicit over implicit
-- typed over ad-hoc
-- composable over centralized
-- local reasoning over framework magic
-- honest constraints over convenient hiding
-- compile-time guarantees over runtime conventions
-- minimal viable abstraction over speculative architecture
+- semantic ownership over namespace habit;
+- explicit over implicit;
+- typed over ad-hoc;
+- composable over centralized;
+- local reasoning over framework magic;
+- evidence over remembered architecture;
+- meaningful guarantees over decorative types;
+- minimal viable abstraction over speculative architecture.
 
-The framework should feel progressive, composable, and strict in the right places.
+The implementation is evidence about the design. If a real case contradicts this file, preserve the contradiction and revise the model rather than forcing the code to satisfy stale instructions.
