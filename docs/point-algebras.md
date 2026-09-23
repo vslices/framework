@@ -4,13 +4,15 @@
 
 Point algebras are the current validated model for Work capabilities that operate on points of semantic spaces.
 
-This model was adopted after an executable experiment demonstrated that:
+Executable evidence now demonstrates that:
 
-- atomic point capabilities can be composed by a service-owned algebra;
+- atomic point capabilities can be composed by a Feature-owned algebra;
 - one algebra can span multiple semantic spaces;
-- `Free<ALG, A>` can describe programs without executing them;
-- the same program can be interpreted by different Groundings;
-- a Feature can require the algebra through `RT` and execute the free program inside the existing `Flow` model.
+- `Free<ALG, A>` describes Work without executing it;
+- the same Feature program can be interpreted by different Groundings;
+- `PointReader`, `PointWriter`, and `PointRemover` can be expressed independently;
+- concrete Groundings can realize those point capabilities without introducing a Repository abstraction;
+- Entity Framework Core can realize point reading, writing, and removal while remaining a Grounding mechanism rather than Work vocabulary.
 
 Guarantees are intentionally outside this model for now. They remain a separate semantic layer.
 
@@ -44,16 +46,15 @@ Atomic operations require less inferred knowledge and are easier to trace back t
 
 A point capability contributes one kind of operation to an algebra.
 
-The point capability is the semantic operation vocabulary. `HasAlgebra<ALG, RT>` is the runtime evidence that a Feature can obtain an interpretation of the composed vocabulary. Keeping those roles distinct avoids making every atomic operation a separate runtime object.
-
-The first validated capabilities are:
+The current validated vocabulary is:
 
 ```text
 PointReader
 PointWriter
+PointRemover
 ```
 
-Deletion/removal is deliberately not part of the current vocabulary yet. Its semantics need additional real pressure before deciding whether it belongs to writing or deserves a distinct capability.
+These capabilities describe instructions available to Work. They do not determine how those instructions are realized.
 
 ### PointReader
 
@@ -89,89 +90,75 @@ public interface PointWriter<ALG, POINT>
 
 A write describes the operation. It does not by itself define when or under which guarantees that write becomes durable.
 
-Creation and update do not need separate primitive capabilities at this level: establishing a new point and overwriting the externally represented state of an existing point are both expressible as writing a point. If a future case requires a stronger semantic distinction, the vocabulary can grow from that evidence.
+Creation and update do not need separate primitive capabilities at this level. Establishing a new point and replacing the externally represented state of an existing point are both expressible as writing a point.
 
-## Service-owned algebras
+A Grounding may need an identity function or another storage-specific mechanism to realize that behavior. That mechanism belongs to Grounding rather than changing the Work vocabulary.
 
-A service or domain Work surface composes the point capabilities it actually needs into its own algebra.
+### PointRemover
 
-Conceptually:
-
-```text
-Account space
-Role space
-
-AppAlgebra
-    PointReader<Account, AccountId>
-    PointWriter<Account>
-    PointReader<Role, RoleId>
-```
-
-In C#:
+`PointRemover<ALG, POINT, ID>` states that an algebra can express removing a point by identity.
 
 ```csharp
-public sealed class AppAlgebra :
-    Functor<AppAlgebra>,
-    PointReader<AppAlgebra, Account, AccountId>,
-    PointWriter<AppAlgebra, Account>,
-    PointReader<AppAlgebra, Role, RoleId>
+public interface PointRemover<ALG, POINT, ID>
+    where ALG : Functor<ALG>, PointRemover<ALG, POINT, ID>
 {
-    // operation constructors + Functor.Map
+    static abstract K<ALG, Unit> Remove(ID id);
 }
 ```
 
-The algebra is a signature of operations known by Work. It is not the concrete execution mechanism.
+Removal is distinct from writing in the current vocabulary because real CRUD pressure required an independently expressible operation.
 
-The implementation of `Functor.Map` is mechanical over the operation cases and is therefore a strong candidate for future Tooling generation rather than handwritten application logic.
+Its existence still does not imply rollback, durability, atomicity, or any wider Repository semantics.
 
-## Free programs
+## Feature-owned algebras
+
+A Feature composes only the point capabilities its WorkFlow requires.
+
+For example:
+
+```text
+GetTodo.Algebra
+    PointReader<Todo, TodoId>
+
+UpdateTodo.Algebra
+    PointReader<Todo, TodoId>
+    PointWriter<Todo>
+
+DeleteTodo.Algebra
+    PointReader<Todo, TodoId>
+    PointRemover<Todo, TodoId>
+```
+
+The algebra is a signature of operations available to that WorkFlow. It is not the concrete execution mechanism.
+
+The implementation of `Functor.Map` and the operation cases is substantially mechanical and remains a strong candidate for future Tooling generation.
+
+## Free WorkFlows
 
 Point capability constructors return `Free<ALG, A>`.
 
-This gives Work an inert description of a program:
+This allows a Feature to describe a program such as:
 
 ```text
 read Account
--> read Role
--> transform points
+-> transform the semantic point
 -> write Account
 -> read Account
 ```
 
-Constructing the program performs no external effect.
+without performing external effects while the program is being built.
 
-The program can be composed with ordinary monadic syntax and interpreted later.
-
-A Feature is not replaced by `Free`. The current execution model remains:
+The current Feature boundary is:
 
 ```text
-Feature
-    -> Flow<RT, REQ, RES>
+Feature == WorkFlow == Free<ALG, Response>
 ```
 
-A Feature may construct a free algebra program as part of its Work and ask its runtime to interpret that program.
+The Feature owns the program directly. It does not require a parallel Repository or Programs layer merely to describe persistence-oriented work.
 
-## Runtime requirement
+## Algebra interpretation
 
-A Feature that uses an algebra declares that requirement through `RT`:
-
-```csharp
-where RT : HasAlgebra<AppAlgebra, RT>
-```
-
-This means the runtime can provide an interpreter for the service-owned algebra.
-
-The Feature does not know whether the Grounding is Entity Framework, an HTTP service, memory, an event store, or another mechanism.
-
-## Grounding and interpretation
-
-A current Grounding supplies:
-
-```csharp
-AlgebraIO<ALG>
-```
-
-which interprets one algebra operation into `IO`.
+A complete Feature algebra is interpreted through:
 
 ```csharp
 public interface AlgebraIO<ALG>
@@ -181,48 +168,125 @@ public interface AlgebraIO<ALG>
 }
 ```
 
-`FreeAlgebra.interpret` folds the complete free program through that interpreter.
+`FreeAlgebra.interpret` folds the inert WorkFlow through this interpreter.
 
-`AlgebraEnv<ALG, RT>` connects this interpreter to the runtime capability model and exposes the resulting `Eff<RT, A>` to Work.
+`HasAlgebra<ALG, RT>` and `AlgebraEnv<ALG, RT>` still exist as execution helpers for runtime-shaped contexts, but they are not the semantic boundary of Feature and are not required by the current direct interpretation examples.
 
-The current `IO` target is intentionally concrete. It matches the existing VSlices execution model and current evidence. Generalization to arbitrary target monads or monad-transformer stacks should happen only if a real use case requires it.
+Their long-term relationship to the remaining runtime/Flow surface is a separate migration question.
 
-## Feature integration
+## Point Grounding contracts
 
-A Feature remains a normal `Flow` while using a free point algebra:
+Reusable Groundings can realize point operations independently of a particular Feature algebra.
+
+The current contracts are:
 
 ```csharp
-public sealed class RenameAccount<RT> :
-    Feature<RenameAccount<RT>, RT, Request, Response>
-    where RT : HasAlgebra<AppAlgebra, RT>
-{
-    public static Flow<RT, Request, Response> Get() =>
-        Flow<RT, Request>.Asks(static request => request) >>
-        (request => AlgebraEnv<AppAlgebra, RT>
-            .run(AppPrograms.Rename(request.AccountId, request.Name))
-            .Map(account => new Response(account)));
-}
+PointReaderIO<POINT, ID>
+PointWriterIO<POINT>
+PointRemoverIO<POINT, ID>
 ```
 
-This preserves the existing Feature boundary while separating:
+These contracts express concrete world contact in `IO`.
+
+A Feature-specific `AlgebraIO<ALG>` can delegate its WorkParts to one or more of these point Groundings.
+
+Conceptually:
 
 ```text
-Space
-    what points mean
-
-Algebra
-    what operations Work can express over points
-
-Free program
-    how those operations are composed for an intention
-
-Grounding
-    how those operations are realized
+Feature-owned algebra
+    ReadTodoPart
+    WriteTodoPart
+    RemoveTodoPart
+        |
+        v
+AlgebraIO<Feature.Algebra>
+        |
+        +--> PointReaderIO<Todo, TodoId>
+        +--> PointWriterIO<Todo>
+        +--> PointRemoverIO<Todo, TodoId>
 ```
+
+This keeps two responsibilities separate:
+
+```text
+Feature algebra
+    owns the Work vocabulary
+
+Point Grounding
+    owns reusable realization of atomic point operations
+```
+
+## Entity Framework Core Grounding
+
+`EntityFrameworkPointIO<TContext, POINT, ID, TProjection>` realizes:
+
+```text
+PointReaderIO<POINT, ID>
+PointWriterIO<POINT>
+PointRemoverIO<POINT, ID>
+```
+
+against an Entity Framework Core projection.
+
+It receives explicit mappings for:
+
+- semantic point -> persistence projection;
+- persistence projection -> semantic point;
+- semantic point -> identity;
+- identity -> storage predicate.
+
+This allows the Grounding to support both:
+
+```text
+semantic point == EF entity
+```
+
+and:
+
+```text
+semantic point != EF projection
+```
+
+without exposing `DbContext`, tracking, or Repository semantics to Work.
+
+The current `Write` realization checks whether the identified projection already exists and uses EF add/update mechanisms accordingly. This is an implementation mechanism for the observed PointWriter semantics, not a new Create/Update distinction in Work.
+
+The current implementation performs `SaveChanges` during each write/remove realization. That is a property of this Grounding implementation. It must not be generalized into a universal durability or transaction guarantee of `PointWriter` or `PointRemover`.
+
+## Why Repository was removed
+
+The previous transitional surface exposed:
+
+```text
+Repository<A, ID>
+    Create
+    Read all
+    Read by id
+    Any
+    Update
+    Delete
+```
+
+That surface bundled operations merely because they are commonly grouped by a historical pattern.
+
+The current Work model has stronger evidence for smaller vocabulary:
+
+```text
+need to read one point
+    -> PointReader
+
+need to establish external point state
+    -> PointWriter
+
+need to remove one point
+    -> PointRemover
+```
+
+If a future Feature needs enumeration, existence probing, querying, staged mutation, or another persistence-oriented operation, that capability should be introduced from the actual pressure rather than restored implicitly through Repository.
 
 ## What this model intentionally does not say
 
-Point algebras do not currently define:
+Point algebras and point Groundings do not currently define:
 
 - tracking;
 - atomicity;
@@ -230,7 +294,7 @@ Point algebras do not currently define:
 - durability;
 - staged versus autonomous persistence;
 - transaction boundaries;
-- deletion semantics;
+- enumeration/query semantics;
 - a Repository / Store / Unit of Work taxonomy.
 
 Those questions are not rejected. They are separate questions whose answers require guarantees, laws, analyzers, or additional capability vocabulary.
@@ -239,12 +303,15 @@ See [Capabilities and Guarantees](notes/capabilities-and-guarantees.md).
 
 ## Validation evidence
 
-The initial implementation is covered by executable tests that demonstrate:
+Executable tests now demonstrate that:
 
-1. building a `Free` program does not execute its point operations;
-2. the same program can be interpreted by different Groundings;
-3. one service-owned algebra can compose point capabilities over multiple spaces;
-4. the algebra can be required through `RT`;
-5. the interpreted program composes inside the current `Feature -> Flow` execution model.
+1. building a Feature `Free` program does not execute point operations;
+2. the same Feature can be interpreted by different Groundings;
+3. one Feature-owned algebra can compose multiple point capabilities;
+4. point reading, writing, and removal are independently expressible;
+5. an Entity Framework Core Grounding can realize those operations without Repository;
+6. both direct EF entities and separate persistence projections can represent semantic points;
+7. `PointWriter` can establish a missing point and replace the represented state of an existing point;
+8. a Feature-owned algebra can delegate its point WorkParts to the reusable EF point Grounding.
 
-This is sufficient evidence to adopt the capability substrate while leaving guarantees and additional point operations open to future pressure.
+This is sufficient evidence to remove Repository and DatabaseIO from the current Work surface while leaving stronger persistence guarantees open to future pressure.
