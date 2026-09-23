@@ -2,6 +2,7 @@ using LanguageExt;
 using LanguageExt.Common;
 using SampleWorkflow.Spaces;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using SampleWorkflow.Work.Algebras;
 using static LanguageExt.Prelude;
 
@@ -15,8 +16,9 @@ public sealed class CreateTodo :
     
     public static Free<TodoAlgebra, Response> Describe(Request request) =>
         from id in TodoAlgebra.NextId()
-        from response in Todo.Transformation
-            .RunFin(new Todo.Input(id, request.Detail, request.Completed))
+        from response in Transformable
+            .Transform<Todo.Input, Todo>(
+                new Todo.Input(id, request.Detail, request.Completed))
             .Match(
                 Succ: todo =>
                     from current in TodoAlgebra.Read(todo.Id)
