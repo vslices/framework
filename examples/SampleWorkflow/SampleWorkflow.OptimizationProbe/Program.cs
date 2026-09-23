@@ -49,6 +49,14 @@ Console.WriteLine();
 Console.WriteLine($"=== stable intention ({iterations:N0} executions) ===");
 await MeasureStable();
 
+Console.WriteLine();
+Console.WriteLine($"=== stable intention / prebuilt program ({iterations:N0} executions) ===");
+await MeasureStablePrebuiltProgram();
+
+Console.WriteLine();
+Console.WriteLine($"=== stable intention / preinterpreted IO ({iterations:N0} executions) ===");
+await MeasureStablePreinterpreted();
+
 return;
 
 static void PrintSize<T>(string name)
@@ -196,6 +204,148 @@ async Task MeasureStable()
 
     Console.WriteLine(
         $"micro ops    : lookups={micro.Lookups:N0} short-circuits={micro.SemanticShortCircuits:N0} evolutions={micro.Evolutions:N0} writes={micro.Writes:N0}");
+}
+
+async Task MeasureStablePrebuiltProgram()
+{
+    var original = CreateTodo(id, detailA, completed: false);
+
+    var baseline = new ProbeBaselineUpdateTodoWork(original);
+    var optimized = new OptimizedUpdateTodoWork();
+    var micro = new MicroOptimizedUpdateTodoWork();
+
+    optimized.Seed(original);
+    micro.Seed(original);
+
+    var baselineProgram =
+        UpdateTodo.Get(
+            new UpdateTodo.Request(
+                id,
+                detailB,
+                Completed: true));
+
+    var optimizedProgram =
+        UpdateTodoOptimized.Get(
+            new UpdateTodoOptimized.Request(
+                id,
+                detailB,
+                Completed: true));
+
+    var microProgram =
+        UpdateTodoMicroOptimized.Get(
+            new UpdateTodoMicroOptimized.Request(
+                id,
+                detailB,
+                Completed: true));
+
+    await Measure(
+        "baseline",
+        async () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = await FreeAlgebra
+                    .interpret(baselineProgram, baseline)
+                    .RunAsync();
+            }
+        });
+
+    await Measure(
+        "optimized",
+        async () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = await FreeAlgebra
+                    .interpret(optimizedProgram, optimized)
+                    .RunAsync();
+            }
+        });
+
+    await Measure(
+        "micro",
+        async () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = await FreeAlgebra
+                    .interpret(microProgram, micro)
+                    .RunAsync();
+            }
+        });
+}
+
+async Task MeasureStablePreinterpreted()
+{
+    var original = CreateTodo(id, detailA, completed: false);
+
+    var baseline = new ProbeBaselineUpdateTodoWork(original);
+    var optimized = new OptimizedUpdateTodoWork();
+    var micro = new MicroOptimizedUpdateTodoWork();
+
+    optimized.Seed(original);
+    micro.Seed(original);
+
+    var baselineIO =
+        FreeAlgebra.interpret(
+            UpdateTodo.Get(
+                new UpdateTodo.Request(
+                    id,
+                    detailB,
+                    Completed: true)),
+            baseline);
+
+    var optimizedIO =
+        FreeAlgebra.interpret(
+            UpdateTodoOptimized.Get(
+                new UpdateTodoOptimized.Request(
+                    id,
+                    detailB,
+                    Completed: true)),
+            optimized);
+
+    var microIO =
+        FreeAlgebra.interpret(
+            UpdateTodoMicroOptimized.Get(
+                new UpdateTodoMicroOptimized.Request(
+                    id,
+                    detailB,
+                    Completed: true)),
+            micro);
+
+    _ = await baselineIO.RunAsync();
+    _ = await optimizedIO.RunAsync();
+    _ = await microIO.RunAsync();
+
+    await Measure(
+        "baseline",
+        async () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = await baselineIO.RunAsync();
+            }
+        });
+
+    await Measure(
+        "optimized",
+        async () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = await optimizedIO.RunAsync();
+            }
+        });
+
+    await Measure(
+        "micro",
+        async () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = await microIO.RunAsync();
+            }
+        });
 }
 
 static async Task Measure(
