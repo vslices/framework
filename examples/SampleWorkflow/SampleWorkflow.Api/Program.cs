@@ -44,7 +44,7 @@ app.MapGet("/todos/{id:guid}", async (Guid id, ApiRuntime runtime) =>
 
     return response.Todo.Match<IResult>(
         todo => Results.Ok(TodoDto.From(todo)),
-        Results.NotFound);
+        () => Results.NotFound());
 });
 
 app.MapPut("/todos/{id:guid}", async (
@@ -64,7 +64,7 @@ app.MapPut("/todos/{id:guid}", async (
 
     return response.Todo.Match<IResult>(
         todo => Results.Ok(TodoDto.From(todo)),
-        Results.NotFound);
+        () => Results.NotFound());
 });
 
 app.MapDelete("/todos/{id:guid}", async (Guid id, ApiRuntime runtime) =>
@@ -76,7 +76,7 @@ app.MapDelete("/todos/{id:guid}", async (Guid id, ApiRuntime runtime) =>
 
     return response.Todo.Match<IResult>(
         todo => Results.Ok(TodoDto.From(todo)),
-        Results.NotFound);
+        () => Results.NotFound());
 });
 
 app.Run();
