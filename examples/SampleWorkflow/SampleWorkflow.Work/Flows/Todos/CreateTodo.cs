@@ -14,22 +14,22 @@ public sealed class CreateTodo :
     public sealed record Response(Either<Error, Option<Todo>> Todo);
     
     public static Free<TodoAlgebra, Response> Get(Request request) =>
-        from id in Free.lift(TodoAlgebra.NextId())
+        from id in TodoAlgebra.NextId()
         from response in Todo.Transformation
             .RunFin(new Todo.Input(id, request.Detail, request.Completed))
             .Match(
                 Succ: todo =>
-                    from current in PointReader.read<TodoAlgebra, Todo, TodoId>(todo.Id)
+                    from current in TodoAlgebra.Read(todo.Id)
                     from created in current.Match(
                         Some: static _ =>
-                            Free.pure<TodoAlgebra, Option<Todo>>(Option<Todo>.None),
+                            TodoAlgebra.Pure(Option<Todo>.None),
                         None: () =>
-                            from _ in PointWriter.write<TodoAlgebra, Todo>(todo)
+                            from _ in TodoAlgebra.Write(todo)
                             select Some(todo))
                     select new Response(
                         Either.Right<Error, Option<Todo>>(created)),
                 Fail: error =>
-                    Free.pure<TodoAlgebra, Response>(
+                    TodoAlgebra.Pure(
                         new Response(
                             Either.Left<Error, Option<Todo>>(error))))
         select response;
