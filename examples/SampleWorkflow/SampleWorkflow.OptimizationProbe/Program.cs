@@ -421,6 +421,54 @@ void MeasureCompiledMicro()
 
     Console.WriteLine(
         $"micro-stable ops: lookups={stableGrounding.Lookups:N0} short-circuits={stableGrounding.SemanticShortCircuits:N0} evolutions={stableGrounding.Evolutions:N0} writes={stableGrounding.Writes:N0}");
+
+    var stableTodo =
+        stableGrounding
+            .Current(id)
+            .IfNone(
+                () => throw new InvalidOperationException(
+                    "Expected compiled stable Todo."));
+
+    var stableStep =
+        UpdateTodoMicroOptimized.Lower(
+            UpdateTodoMicroOptimized.Describe(
+                new UpdateTodoMicroOptimized.Request(
+                    id,
+                    detailB,
+                    Completed: true)));
+
+    MeasureSync(
+        "lookup-only",
+        () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = stableGrounding.Current(id);
+            }
+        });
+
+    MeasureSync(
+        "predicate",
+        () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = UpdateTodoMicroOptimized.SatisfiedBy(
+                    stableTodo,
+                    stableStep);
+            }
+        });
+
+    MeasureSync(
+        "response",
+        () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = UpdateTodoMicroOptimized.Response.Present(
+                    stableTodo);
+            }
+        });
 }
 
 static void MeasureSync(
