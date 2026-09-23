@@ -50,10 +50,10 @@ jobs:
             sleep 1
           done
 
-          id=11111111-1111-1111-1111-111111111111
-
-          status=$(curl -sS -o /tmp/create.json -w "%{http_code}"             -X POST http://127.0.0.1:5099/todos             -H 'Content-Type: application/json'             -d "{\"id\":\"$id\",\"title\":\"first\",\"completed\":false}")
+          status=$(curl -sS -o /tmp/create.json -w "%{http_code}"             -X POST http://127.0.0.1:5099/todos             -H 'Content-Type: application/json'             -d '{"title":"first","completed":false}')
           test "$status" = "201"
+
+          id=$(python3 -c 'import json; print(json.load(open("/tmp/create.json"))["id"])')
 
           status=$(curl -sS -o /tmp/read.json -w "%{http_code}"             http://127.0.0.1:5099/todos/$id)
           test "$status" = "200"

@@ -9,8 +9,12 @@ using static LanguageExt.Prelude;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<InMemoryTodoAlgebra>();
+builder.Services.AddSingleton<GuidTodoIdGeneration>();
+
 builder.Services.AddSingleton<ApiRuntime>(services =>
-    new ApiRuntime(services.GetRequiredService<InMemoryTodoAlgebra>()));
+    new ApiRuntime(
+        services.GetRequiredService<InMemoryTodoAlgebra>(),
+        services.GetRequiredService<GuidTodoIdGeneration>()));
 
 var app = builder.Build();
 
@@ -18,33 +22,53 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.MapPost("/todos", async (CreateTodoBody body, ApiRuntime runtime) =>
 {
-    var point = new Todo(
-        new TodoId(body.Id),
-        body.Title,
-        body.Completed);
+    var detail = TodoDetail.Transformation.RunFin(
+        new TodoDetail.Input(
+            body.Title,
+            body.Completed));
 
-    var response = await CreateTodo<ApiRuntime>
-        .Get()
-        .RunFlow(runtime, new CreateTodo<ApiRuntime>.Request(point))
-        .RunAsync();
+    return await detail.Match<Task<IResult>>(
+        Succ: async semanticDetail =>
+        {
+            var response = await CreateTodo<ApiRuntime>
+                .Get()
+                .RunFlow(
+                    runtime,
+                    new CreateTodo<ApiRuntime>.Request(semanticDetail))
+                .RunAsync();
 
-    return response.Todo.Match<IResult>(
-        todo => Results.Created(
-            $"/todos/{todo.Id.Value}",
-            TodoDto.From(todo)),
-        () => Results.Conflict());
+            return response.Todo.Match<IResult>(
+                todo => Results.Created(
+                    $"/todos/{todo.Id.Value}",
+                    TodoDto.From(todo)),
+                () => Results.Conflict());
+        },
+        Fail: error =>
+            Task.FromResult<IResult>(
+                Results.BadRequest(new { error = error.Message })));
 });
 
 app.MapGet("/todos/{id:guid}", async (Guid id, ApiRuntime runtime) =>
 {
-    var response = await GetTodo<ApiRuntime>
-        .Get()
-        .RunFlow(runtime, new GetTodo<ApiRuntime>.Request(new TodoId(id)))
-        .RunAsync();
+    var semanticId = TodoId.Transformation.RunFin(id);
 
-    return response.Todo.Match<IResult>(
-        todo => Results.Ok(TodoDto.From(todo)),
-        () => Results.NotFound());
+    return await semanticId.Match<Task<IResult>>(
+        Succ: async todoId =>
+        {
+            var response = await GetTodo<ApiRuntime>
+                .Get()
+                .RunFlow(
+                    runtime,
+                    new GetTodo<ApiRuntime>.Request(todoId))
+                .RunAsync();
+
+            return response.Todo.Match<IResult>(
+                todo => Results.Ok(TodoDto.From(todo)),
+                () => Results.NotFound());
+        },
+        Fail: error =>
+            Task.FromResult<IResult>(
+                Results.BadRequest(new { error = error.Message })));
 });
 
 app.MapPut("/todos/{id:guid}", async (
@@ -52,45 +76,78 @@ app.MapPut("/todos/{id:guid}", async (
     UpdateTodoBody body,
     ApiRuntime runtime) =>
 {
-    var point = new Todo(
-        new TodoId(id),
-        body.Title,
-        body.Completed);
+    var input =
+        from semanticId in TodoId.Transformation.RunFin(id)
+        from detail in TodoDetail.Transformation.RunFin(
+            new TodoDetail.Input(
+                body.Title,
+                body.Completed))
+        select (semanticId, detail);
 
-    var response = await UpdateTodo<ApiRuntime>
-        .Get()
-        .RunFlow(runtime, new UpdateTodo<ApiRuntime>.Request(point))
-        .RunAsync();
+    return await input.Match<Task<IResult>>(
+        Succ: async semantic =>
+        {
+            var response = await UpdateTodo<ApiRuntime>
+                .Get()
+                .RunFlow(
+                    runtime,
+                    new UpdateTodo<ApiRuntime>.Request(
+                        semantic.semanticId,
+                        semantic.detail))
+                .RunAsync();
 
-    return response.Todo.Match<IResult>(
-        todo => Results.Ok(TodoDto.From(todo)),
-        () => Results.NotFound());
+            return response.Todo.Match<IResult>(
+                todo => Results.Ok(TodoDto.From(todo)),
+                () => Results.NotFound());
+        },
+        Fail: error =>
+            Task.FromResult<IResult>(
+                Results.BadRequest(new { error = error.Message })));
 });
 
 app.MapDelete("/todos/{id:guid}", async (Guid id, ApiRuntime runtime) =>
 {
-    var response = await DeleteTodo<ApiRuntime>
-        .Get()
-        .RunFlow(runtime, new DeleteTodo<ApiRuntime>.Request(new TodoId(id)))
-        .RunAsync();
+    var semanticId = TodoId.Transformation.RunFin(id);
 
-    return response.Todo.Match<IResult>(
-        todo => Results.Ok(TodoDto.From(todo)),
-        () => Results.NotFound());
+    return await semanticId.Match<Task<IResult>>(
+        Succ: async todoId =>
+        {
+            var response = await DeleteTodo<ApiRuntime>
+                .Get()
+                .RunFlow(
+                    runtime,
+                    new DeleteTodo<ApiRuntime>.Request(todoId))
+                .RunAsync();
+
+            return response.Todo.Match<IResult>(
+                todo => Results.Ok(TodoDto.From(todo)),
+                () => Results.NotFound());
+        },
+        Fail: error =>
+            Task.FromResult<IResult>(
+                Results.BadRequest(new { error = error.Message })));
 });
 
 app.Run();
 
-public sealed record ApiRuntime(AlgebraIO<TodoAlgebra> Todo)
-    : HasAlgebra<TodoAlgebra, ApiRuntime>
+public sealed record ApiRuntime(
+    AlgebraIO<TodoAlgebra> Todo,
+    TodoIdGenerationIO TodoIds)
+    : HasAlgebra<TodoAlgebra, ApiRuntime>,
+      HasTodoIdGeneration<ApiRuntime>
 {
     static K<Eff<ApiRuntime>, AlgebraIO<TodoAlgebra>>
         Has<Eff<ApiRuntime>, AlgebraIO<TodoAlgebra>>.Ask { get; } =
-        liftEff<ApiRuntime, AlgebraIO<TodoAlgebra>>(runtime => runtime.Todo);
+        liftEff<ApiRuntime, AlgebraIO<TodoAlgebra>>(
+            runtime => runtime.Todo);
+
+    static K<Eff<ApiRuntime>, TodoIdGenerationIO>
+        Has<Eff<ApiRuntime>, TodoIdGenerationIO>.Ask { get; } =
+        liftEff<ApiRuntime, TodoIdGenerationIO>(
+            runtime => runtime.TodoIds);
 }
 
 public sealed record CreateTodoBody(
-    Guid Id,
     string Title,
     bool Completed);
 
@@ -104,5 +161,8 @@ public sealed record TodoDto(
     bool Completed)
 {
     public static TodoDto From(Todo todo) =>
-        new(todo.Id.Value, todo.Title, todo.Completed);
+        new(
+            todo.Id.Value,
+            todo.Detail.Title,
+            todo.Detail.Completed);
 }

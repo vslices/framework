@@ -8,15 +8,20 @@ namespace SampleWorkflow.Work;
 
 public sealed class CreateTodo<RT> :
     Feature<CreateTodo<RT>, RT, CreateTodo<RT>.Request, CreateTodo<RT>.Response>
-    where RT : HasAlgebra<TodoAlgebra, RT>
+    where RT :
+        HasAlgebra<TodoAlgebra, RT>,
+        HasTodoIdGeneration<RT>
 {
-    public sealed record Request(Todo Todo);
+    public sealed record Request(TodoDetail Detail);
 
     public sealed record Response(Option<Todo> Todo);
 
     public static Flow<RT, Request, Response> Get() =>
         Flow<RT, Request>.Asks(static request => request) >>
-        (request => AlgebraEnv<TodoAlgebra, RT>
-            .run(TodoPrograms.Create(request.Todo))
-            .Map(todo => new Response(todo)));
+        (request => TodoIdGenerationEnv<RT>.next
+            .Map(id => new Todo.Input(id, request.Detail))) >>
+        (input => Todo.Transformation.RunFin(input)) >>
+        (todo => AlgebraEnv<TodoAlgebra, RT>
+            .run(TodoPrograms.Create(todo))
+            .Map(value => new Response(value)));
 }
