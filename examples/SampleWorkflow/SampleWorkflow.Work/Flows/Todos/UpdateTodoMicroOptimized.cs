@@ -9,8 +9,7 @@ using SampleWorkflow.Work.Algebras;
 namespace SampleWorkflow.Work;
 
 public sealed class UpdateTodoMicroOptimized :
-    Feature<UpdateTodoMicroOptimized,
-        TodoAlgebraMicroOptimized,
+    Feature<TodoAlgebraMicroOptimized,
         UpdateTodoMicroOptimized.Request,
         UpdateTodoMicroOptimized.Response>
 {
@@ -18,7 +17,7 @@ public sealed class UpdateTodoMicroOptimized :
 
     public sealed record Response(Either<Error, Option<Todo>> Todo);
 
-    public static Free<TodoAlgebraMicroOptimized, Response> Get(Request request) =>
+    public static Free<TodoAlgebraMicroOptimized, Response> Describe(Request request) =>
         from current in PointReader.read<TodoAlgebraMicroOptimized, Todo, TodoId>(request.Id)
         from response in current.Match(
             Some: todo =>
