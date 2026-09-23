@@ -16,7 +16,7 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
-    <Project Path="src/VSlices.EntityFrameworkCore/VSlices.EntityFrameworkCore.csproj" />
+    <Project Path="src/VSlices.Grounding.EntityFrameworkCore/VSlices.Grounding.EntityFrameworkCore.csproj" />
     <Project Path="src/VSlices.Grounding/VSlices.Grounding.csproj" />
     <Project Path="src/VSlices.Space.Products/VSlices.Space.Products.csproj" />
     <Project Path="src/VSlices.Space.Services/VSlices.Space.Services.csproj" />
