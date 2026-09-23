@@ -93,4 +93,39 @@ public sealed class CrossServiceProcessTests
         Assert.Equal("evidence.txt", rereadFile.Name);
         Assert.Equal([1, 2, 3, 4], rereadFile.Content);
     }
+
+    [Fact]
+    public async Task BFF_currently_leaves_the_file_stored_when_the_second_WorkFlow_cannot_associate()
+    {
+        var todoWork = new InMemoryTodoWork();
+        var fileWork = new InMemoryFileWork();
+
+        var missingTodoId = TodoId.Transformation
+            .RunFin(Guid.NewGuid())
+            .ThrowIfFail();
+
+        var processInterpreter =
+            new AlgebraSumIO<
+                AddFile.Algebra,
+                AddAttachmentReference.Algebra>(
+                fileWork,
+                todoWork);
+
+        var response = await FreeAlgebra
+            .interpret(
+                AttachFileToTodo.Get(
+                    new AttachFileToTodo.Request(
+                        missingTodoId,
+                        "orphan.txt",
+                        [9, 8, 7])),
+                processInterpreter)
+            .RunAsync();
+
+        var attachment = response.Attachment.Match(
+            Left: error => throw error.ToException(),
+            Right: maybe => maybe);
+
+        Assert.True(attachment.IsNone);
+        Assert.Equal(1, fileWork.Count);
+    }
 }
