@@ -9,6 +9,7 @@ using SampleWorkflow.Work.Algebras;
 using Testcontainers.PostgreSql;
 using VSlices.Grounding.EntityFrameworkCore;
 using VSlices.Work;
+using VSlices.Space.Traits;
 
 namespace SampleWorkflow.Benchmarks;
 
@@ -60,20 +61,21 @@ public class UpdateTodoPostgreSqlBenchmark
 
         await context.Database.EnsureCreatedAsync();
 
-        id = TodoId.Transformation
-            .RunFin(Guid.Parse("7cb513f6-9e70-42ff-8568-62210c33d0cb"))
+        id = Transformable
+            .Transform<Guid, TodoId>(
+                Guid.Parse("7cb513f6-9e70-42ff-8568-62210c33d0cb"))
             .ThrowIfFail();
 
-        detailA = TodoDetail.Transformation
-            .RunFin("benchmark-a")
+        detailA = Transformable
+            .Transform<string, TodoDetail>("benchmark-a")
             .ThrowIfFail();
 
-        detailB = TodoDetail.Transformation
-            .RunFin("benchmark-b")
+        detailB = Transformable
+            .Transform<string, TodoDetail>("benchmark-b")
             .ThrowIfFail();
 
-        var initial = Todo.Transformation
-            .RunFin(
+        var initial = Transformable
+            .Transform<Todo.Input, Todo>(
                 new Todo.Input(
                     id,
                     detailA,
@@ -198,24 +200,24 @@ public sealed class TodoProjection
 
     public static Todo ToSemantic(TodoProjection projection)
     {
-        var semanticId = TodoId.Transformation
-            .RunFin(projection.Id)
+        var semanticId = Transformable
+            .Transform<Guid, TodoId>(projection.Id)
             .ThrowIfFail();
 
-        var detail = TodoDetail.Transformation
-            .RunFin(projection.Detail)
+        var detail = Transformable
+            .Transform<string, TodoDetail>(projection.Detail)
             .ThrowIfFail();
 
         var attachments = projection.Attachments
             .Select(
                 static value =>
-                    ResourceReference.Transformation
-                        .RunFin(value)
+                    Transformable
+                        .Transform<string, ResourceReference>(value)
                         .ThrowIfFail())
             .ToArray();
 
-        return Todo.Transformation
-            .RunFin(
+        return Transformable
+            .Transform<Todo.Input, Todo>(
                 new Todo.Input(
                     semanticId,
                     detail,
@@ -243,8 +245,8 @@ public sealed class PostgreSqlTodoWork(
                 IO.lift(
                     () =>
                         next.Next(
-                            TodoId.Transformation
-                                .RunFin(Guid.NewGuid())
+                            Transformable
+                                .Transform<Guid, TodoId>(Guid.NewGuid())
                                 .ThrowIfFail())),
 
             ReadTodoPart<TodoAlgebra, A> read =>
