@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using LanguageExt;
 using LanguageExt.Traits;
 using SampleWorkflow.Spaces;
-using SampleWorkflow.Work;
 using VSlices.Work;
 using SampleWorkflow.Work.Algebras;
 using static LanguageExt.Prelude;

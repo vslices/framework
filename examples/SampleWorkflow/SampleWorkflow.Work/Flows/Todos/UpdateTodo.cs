@@ -1,6 +1,5 @@
 using LanguageExt;
 using LanguageExt.Common;
-using LanguageExt.Traits;
 using SampleWorkflow.Spaces;
 using VSlices.Space;
 using VSlices.Work;
