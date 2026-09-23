@@ -33,8 +33,14 @@ public sealed class UpdateTodoMicroOptimized :
     public readonly record struct Substep(Microstep Microstep);
     public readonly record struct Microstep(Nanostep Nanostep);
     public readonly record struct Nanostep(Picostep Picostep);
+    public readonly record struct Picostep(Femtostep Femtostep);
+    public readonly record struct Femtostep(Attostep Attostep);
+    public readonly record struct Attostep(Zeptostep Zeptostep);
+    public readonly record struct Zeptostep(Yoctostep Yoctostep);
+    public readonly record struct Yoctostep(Rontostep Rontostep);
+    public readonly record struct Rontostep(Quectostep Quectostep);
 
-    public readonly record struct Picostep(
+    public readonly record struct Quectostep(
         TodoId Id,
         TodoDetail Detail,
         bool Completed);
@@ -90,9 +96,15 @@ public sealed class UpdateTodoMicroOptimized :
                                 new Microstep(
                                     new Nanostep(
                                         new Picostep(
-                                            request.Id,
-                                            request.Detail,
-                                            request.Completed))))))));
+                                            new Femtostep(
+                                                new Attostep(
+                                                    new Zeptostep(
+                                                        new Yoctostep(
+                                                            new Rontostep(
+                                                                new Quectostep(
+                                                                    request.Id,
+                                                                    request.Detail,
+                                                                    request.Completed))))))))))))));
 
         Func<Todo, bool> satisfiedBy =
             todo =>
