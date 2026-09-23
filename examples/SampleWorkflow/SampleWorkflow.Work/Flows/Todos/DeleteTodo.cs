@@ -14,12 +14,12 @@ public sealed class DeleteTodo :
     public sealed record Response(Option<Todo> Todo);
 
     public static Free<TodoAlgebra, Response> Get(Request request) =>
-        from current in PointReader.read<TodoAlgebra, Todo, TodoId>(request.Id)
+        from current in TodoAlgebra.Read(request.Id)
         from deleted in current.Match(
             Some: point =>
-                from _ in PointRemover.remove<TodoAlgebra, Todo, TodoId>(request.Id)
+                from _ in TodoAlgebra.Remove(request.Id)
                 select Some(point),
             None: static () =>
-                Free.pure<TodoAlgebra, Option<Todo>>(Option<Todo>.None))
+                TodoAlgebra.Pure(Option<Todo>.None))
         select new Response(deleted);
 }
