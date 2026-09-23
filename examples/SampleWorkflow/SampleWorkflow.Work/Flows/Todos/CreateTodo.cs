@@ -8,12 +8,12 @@ using static LanguageExt.Prelude;
 namespace SampleWorkflow.Work;
 
 public sealed class CreateTodo :
-    Feature<CreateTodo, TodoAlgebra, CreateTodo.Request, CreateTodo.Response>
+    Feature<TodoAlgebra, CreateTodo.Request, CreateTodo.Response>
 {
     public sealed record Request(TodoDetail Detail, bool Completed);
     public sealed record Response(Either<Error, Option<Todo>> Todo);
     
-    public static Free<TodoAlgebra, Response> Get(Request request) =>
+    public static Free<TodoAlgebra, Response> Describe(Request request) =>
         from id in TodoAlgebra.NextId()
         from response in Todo.Transformation
             .RunFin(new Todo.Input(id, request.Detail, request.Completed))
