@@ -1,39 +1,62 @@
 # Architecture
 
-VSlices is split by responsibility, not by technical fashion.
+VSlices is split by semantic responsibility rather than by traditional application layers.
 
-## VSlices
+## VSlices.Space
 
-Core primitives shared by the rest of the framework.
+Semantic values, structure, admissibility, identity where explicitly meaningful, and pure transformation.
 
-Includes:
-- errors
-- literals
-- monads
-- base traits
+Examples include:
 
-## VSlices.Domain
+- discrete spaces;
+- affine and vector spaces;
+- quantities;
+- `Transformable` / `Validatable`;
+- `Evolvable` when accepted state evolution is meaningful.
 
-Domain modeling primitives.
+`Entity` and `AggregateRoot` are not framework semantic categories.
 
-Includes:
-- value objects
-- repositories contracts
-- domain environments
-- domain runtime capabilities
+## VSlices.Work
 
-## VSlices.Application
+Executable behavior and WorkFlow vocabulary.
 
-Application behavior and feature execution.
+The current executable boundary is:
 
-Includes:
-- features
-- flows
-- observability
-- orchestration
+```text
+Feature == WorkFlow == Free<ALG, Response>
+```
 
-## VSlices.Infrastructure
+A Feature owns its request, response, WorkParts, algebra, and Free program.
 
-Concrete technical implementations and batteries.
+Reusable capability vocabulary currently includes examples such as:
 
-Infrastructure implements capabilities, but does not define the framework mental model.
+- point reading, writing, and removal;
+- clock observation;
+- temporal delay;
+- algebra composition.
+
+`Flow<RT, REQ, RES>`, Repository, and ambient runtime carriers are not part of the current Work model.
+
+## VSlices.Grounding
+
+Concrete realization of WorkParts against an external world.
+
+Examples include:
+
+- Entity Framework Core point grounding;
+- `TimeProvider` temporal grounding;
+- in-memory interpreters used by executable examples.
+
+Grounding may use technical mechanisms such as EF entities, projections, clocks, transports, or hosts without turning those mechanisms into semantic vocabulary.
+
+## Presentation and invocation
+
+HTTP, CLI, scheduled, message-driven, and other invocation mechanisms are presentation/invocation concerns.
+
+The current HTTP sample interprets a Feature program explicitly. Reusable invocation bindings remain a future pressure point.
+
+## Core VSlices
+
+The `VSlices` project still hosts lower-level reusable implementation machinery such as arrows, literals, errors, and category-related abstractions.
+
+Those mechanisms do not define the semantic ontology of the Framework by themselves.
