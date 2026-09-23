@@ -4,6 +4,7 @@ using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using Xunit;
 
 namespace SampleWorkflow.Process.Tests;
@@ -13,8 +14,9 @@ public sealed class ComposedFeatureModuleAlgebraTests
     [Fact]
     public async Task Feature_composes_child_WorkFlows_in_the_shared_module_algebra()
     {
-        var detail = TodoDetail.Transformation
-            .RunFin("composed through shared module algebra")
+        var detail = Transformable
+            .Transform<string, TodoDetail>(
+                "composed through shared module algebra")
             .ThrowIfFail();
 
         var service = new InMemoryTodoWork();
