@@ -26,7 +26,8 @@ public sealed class EntityFrameworkRepository<TContext, A, TProjection>(
         from projection in IO.lift(() => toProjection(value))
         from entry in context.AddIO(projection)
         from _ in context.SaveChangesIO()
-        select toValue(entry.Entity);
+        from persisted in Detach(entry)
+        select toValue(persisted);
 
     public IO<Seq<A>> Read() =>
         _set.AsNoTracking()
@@ -37,13 +38,24 @@ public sealed class EntityFrameworkRepository<TContext, A, TProjection>(
         from projection in IO.lift(() => toProjection(value))
         from entry in context.UpdateIO(projection)
         from _ in context.SaveChangesIO()
-        select toValue(entry.Entity);
+        from persisted in Detach(entry)
+        select toValue(persisted);
 
     public IO<Unit> Delete(A value) =>
         from projection in IO.lift(() => toProjection(value))
-        from _ in context.RemoveIO(projection)
-        from __ in context.SaveChangesIO()
+        from entry in context.RemoveIO(projection)
+        from _ in context.SaveChangesIO()
+        from __ in Detach(entry)
         select default(Unit);
+
+    private static IO<TProjection> Detach(
+        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TProjection> entry) =>
+        IO.lift(() =>
+        {
+            entry.State = EntityState.Detached;
+
+            return entry.Entity;
+        });
 }
 
 /// <summary>
