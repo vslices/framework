@@ -16,21 +16,21 @@ public sealed class InMemoryTodoWork : AlgebraIO<TodoAlgebra>
         K<TodoAlgebra, A> operation) =>
         operation switch
         {
-            NextTodoIdPart<A> next =>
+            NextTodoIdPart<TodoAlgebra, A> next =>
                 IO.lift(Guid.NewGuid)
                   .Bind(value => TodoId.Transformation
                       .RunFin(value)
                       .Match(Succ: id => IO.pure(next.Next(id)),
                              Fail: IO.fail<A>)),
-            ReadTodoPart<A> read =>
+            ReadTodoPart<TodoAlgebra, A> read =>
                 IO.lift(() => read.Next(Read(read.Id))),
-            WriteTodoPart<A> write =>
+            WriteTodoPart<TodoAlgebra, A> write =>
                 IO.lift(() =>
                 {
                     points[write.Point.Id] = write.Point;
                     return write.Next(unit);
                 }),
-            RemoveTodoPart<A> remove =>
+            RemoveTodoPart<TodoAlgebra, A> remove =>
                 IO.lift(() =>
                 {
                     points.TryRemove(remove.Id, out _);
