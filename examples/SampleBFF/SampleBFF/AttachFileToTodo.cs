@@ -5,20 +5,23 @@ using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using VSlices.Work;
 using static LanguageExt.Prelude;
+using Algebra = VSlices.Work.AlgebraSum<
+    SampleFileRepo.AddFile.Algebra,
+    SampleWorkflow.Work.AddAttachmentReference.Algebra>;
 
 namespace SampleBFF;
 
 /// <summary>
-/// Cross-service product process.
+/// Cross-service Feature.
 ///
 /// SampleFileRepo owns the stored file.
 /// SampleWorkflow owns the Todo-to-resource association.
 /// SampleBFF alone knows that a SampleFileId can be represented as a Todo ResourceReference.
 /// </summary>
 public sealed class AttachFileToTodo :
-    WorkProcess<
+    Feature<
         AttachFileToTodo,
-        AlgebraSum<AddFile.Algebra, AddAttachmentReference.Algebra>,
+        Algebra,
         AttachFileToTodo.Request,
         AttachFileToTodo.Response>
 {
@@ -34,19 +37,13 @@ public sealed class AttachFileToTodo :
     public sealed record Response(
         Either<Error, Option<Attached>> Attachment);
 
-    public static Free<
-        AlgebraSum<AddFile.Algebra, AddAttachmentReference.Algebra>,
-        Response> Get(Request request)
+    public static Free<Algebra, Response> Get(Request request)
     {
-        var addFile = FreeAlgebra.hoist<
-            InjectLeft<AddFile.Algebra, AddAttachmentReference.Algebra>,
-            AddFile.Algebra,
-            AlgebraSum<AddFile.Algebra, AddAttachmentReference.Algebra>,
-            AddFile.Response>(
-                AddFile.Get(
-                    new AddFile.Request(
-                        request.Name,
-                        request.Content)));
+        var addFile = Algebra.FromA(
+            AddFile.Get(
+                new AddFile.Request(
+                    request.Name,
+                    request.Content)));
 
         return
             from stored in addFile
@@ -55,68 +52,48 @@ public sealed class AttachFileToTodo :
                 .Match(
                     Succ: resource =>
                     {
-                        var associate = FreeAlgebra.hoist<
-                            InjectRight<AddFile.Algebra, AddAttachmentReference.Algebra>,
-                            AddAttachmentReference.Algebra,
-                            AlgebraSum<AddFile.Algebra, AddAttachmentReference.Algebra>,
-                            AddAttachmentReference.Response>(
-                                AddAttachmentReference.Get(
-                                    new AddAttachmentReference.Request(
-                                        request.TodoId,
-                                        resource)));
+                        var associate = Algebra.FromB(
+                            AddAttachmentReference.Get(
+                                new AddAttachmentReference.Request(
+                                    request.TodoId,
+                                    resource)));
 
                         return
                             from associated in associate
                             from mapped in associated.Todo.Match(
                                 Left: error =>
-                                    Free.pure<
-                                        AlgebraSum<
-                                            AddFile.Algebra,
-                                            AddAttachmentReference.Algebra>,
-                                        Response>(
-                                            new Response(
-                                                Either.Left<
-                                                    Error,
-                                                    Option<Attached>>(error))),
+                                    Free.pure<Algebra, Response>(
+                                        new Response(
+                                            Either.Left<
+                                                Error,
+                                                Option<Attached>>(error))),
                                 Right: maybe =>
                                     maybe.Match(
                                         Some: todo =>
-                                            Free.pure<
-                                                AlgebraSum<
-                                                    AddFile.Algebra,
-                                                    AddAttachmentReference.Algebra>,
-                                                Response>(
-                                                    new Response(
-                                                        Either.Right<
-                                                            Error,
-                                                            Option<Attached>>(
-                                                                Some(
-                                                                    new Attached(
-                                                                        todo,
-                                                                        stored.File))))),
+                                            Free.pure<Algebra, Response>(
+                                                new Response(
+                                                    Either.Right<
+                                                        Error,
+                                                        Option<Attached>>(
+                                                            Some(
+                                                                new Attached(
+                                                                    todo,
+                                                                    stored.File))))),
                                         None: () =>
-                                            Free.pure<
-                                                AlgebraSum<
-                                                    AddFile.Algebra,
-                                                    AddAttachmentReference.Algebra>,
-                                                Response>(
-                                                    new Response(
-                                                        Either.Right<
-                                                            Error,
-                                                            Option<Attached>>(
-                                                                Option<Attached>.None)))))
+                                            Free.pure<Algebra, Response>(
+                                                new Response(
+                                                    Either.Right<
+                                                        Error,
+                                                        Option<Attached>>(
+                                                            Option<Attached>.None)))))
                             select mapped;
                     },
                     Fail: error =>
-                        Free.pure<
-                            AlgebraSum<
-                                AddFile.Algebra,
-                                AddAttachmentReference.Algebra>,
-                            Response>(
-                                new Response(
-                                    Either.Left<
-                                        Error,
-                                        Option<Attached>>(error))))
+                        Free.pure<Algebra, Response>(
+                            new Response(
+                                Either.Left<
+                                    Error,
+                                    Option<Attached>>(error))))
             select response;
     }
 }
