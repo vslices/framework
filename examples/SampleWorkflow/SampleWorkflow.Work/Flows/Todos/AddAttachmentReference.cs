@@ -15,7 +15,6 @@ namespace SampleWorkflow.Work;
 /// </summary>
 public sealed class AddAttachmentReference :
     Feature<
-        AddAttachmentReference,
         TodoAlgebra,
         AddAttachmentReference.Request,
         AddAttachmentReference.Response>
@@ -27,7 +26,7 @@ public sealed class AddAttachmentReference :
     public sealed record Response(
         Either<Error, Option<Todo>> Todo);
     
-    public static Free<TodoAlgebra, Response> Get(Request request) =>
+    public static Free<TodoAlgebra, Response> Describe(Request request) =>
         from current in PointReader.read<TodoAlgebra, Todo, TodoId>(request.Id)
         from response in current.Match(
             Some: todo =>
