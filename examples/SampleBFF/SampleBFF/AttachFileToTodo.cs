@@ -5,6 +5,7 @@ using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using static LanguageExt.Prelude;
 using Algebra = VSlices.Work.AlgebraSum<
     SampleFileRepo.AddFile.Algebra,
@@ -47,8 +48,9 @@ public sealed class AttachFileToTodo :
 
         return
             from stored in addFile
-            from response in ResourceReference.Transformation
-                .RunFin(stored.File.Id.ToString())
+            from response in Transformable
+                .Transform<string, ResourceReference>(
+                    stored.File.Id.ToString())
                 .Match(
                     Succ: resource =>
                     {
