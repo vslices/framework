@@ -64,17 +64,26 @@ public sealed class OptimizedUpdateTodoWork :
 
         Evolutions++;
 
-        return execute.Evolve(current)
+        Todo? accepted = null;
+
+        var result = execute.Evolve(current)
             .Match<Either<Error, Option<Todo>>>(
                 Succ: updated =>
                 {
-                    current = updated;
-                    Writes++;
+                    accepted = updated;
 
                     return Either.Right<Error, Option<Todo>>(
                         Some(updated));
                 },
                 Fail: error =>
                     Either.Left<Error, Option<Todo>>(error));
+
+        if (accepted is not null)
+        {
+            current = accepted;
+            Writes++;
+        }
+
+        return result;
     }
 }
