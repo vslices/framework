@@ -7,10 +7,10 @@ using Xunit;
 
 namespace SampleWorkflow.Process.Tests;
 
-public sealed class ProcessHoistTests
+public sealed class ComposedFeatureHoistTests
 {
     [Fact]
-    public async Task WorkProcess_composes_WorkFlow_algebras_by_hoisting_each_Feature()
+    public async Task Feature_composes_WorkFlow_algebras_by_hoisting_child_Features()
     {
         var detail = TodoDetail.Transformation
             .RunFin("composed through hoist")
