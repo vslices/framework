@@ -24,6 +24,12 @@ var detailB = TodoDetail.Transformation
     .ThrowIfFail();
 
 Console.WriteLine("=== structural size probe ===");
+PrintSize<UpdateTodoMicroOptimized.Quectostep>("Quectostep");
+PrintSize<UpdateTodoMicroOptimized.Rontostep>("Rontostep");
+PrintSize<UpdateTodoMicroOptimized.Yoctostep>("Yoctostep");
+PrintSize<UpdateTodoMicroOptimized.Zeptostep>("Zeptostep");
+PrintSize<UpdateTodoMicroOptimized.Attostep>("Attostep");
+PrintSize<UpdateTodoMicroOptimized.Femtostep>("Femtostep");
 PrintSize<UpdateTodoMicroOptimized.Picostep>("Picostep");
 PrintSize<UpdateTodoMicroOptimized.Nanostep>("Nanostep");
 PrintSize<UpdateTodoMicroOptimized.Microstep>("Microstep");
