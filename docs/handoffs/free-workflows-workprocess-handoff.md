@@ -96,22 +96,18 @@ Feature
 The current Framework surface is:
 
 ```csharp
-public interface Feature<F, ALG, REQ, RES>
+public interface Feature<ALG, REQ, RES>
     where ALG : Functor<ALG>
-    where F : Feature<F, ALG, REQ, RES>
 {
-    static abstract Free<ALG, RES> Get(REQ request);
+    static abstract Free<ALG, RES> Describe(REQ request);
 }
 ```
 
-The Functor requirement belongs to `ALG`, not to the self type `F`.
+The Functor requirement belongs to `ALG`. The base Feature contract no longer carries a self type.
 
 Conceptually:
 
 ```text
-F
-    Feature identity / self type
-
 ALG
     instruction language available to the Feature
 
@@ -200,11 +196,11 @@ using Algebra = AlgebraSum<
 
 var stored =
     Algebra.FromA(
-        AddFile.Get(...));
+        AddFile.Describe(...));
 
 var associated =
     Algebra.FromB(
-        AddAttachmentReference.Get(...));
+        AddAttachmentReference.Describe(...));
 ```
 
 These helpers perform the same mathematical operation as:
