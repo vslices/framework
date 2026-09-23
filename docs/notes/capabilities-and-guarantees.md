@@ -6,7 +6,7 @@
 
 ## Motivation
 
-VSlices currently models runtime requirements primarily through capabilities.
+VSlices currently models Work requirements through capabilities contributed to Feature-owned algebras.
 
 That is useful, but it is not sufficient to describe cases where Work needs not only that an operation exists, but that the realization of that operation preserves additional observable properties.
 
@@ -116,23 +116,20 @@ The current validated primitives are:
 ```text
 PointReader<ALG, POINT, ID>
 PointWriter<ALG, POINT>
+PointRemover<ALG, POINT, ID>
 ```
 
-A service-owned algebra composes these capabilities across the semantic spaces it needs and implements `Functor<ALG>`.
+A Feature-owned algebra composes only the capabilities required by that WorkFlow and implements `Functor<ALG>`.
 
 Operations are lifted into `Free<ALG, A>`, so a Feature can construct an inert program before any Grounding is chosen.
 
-Grounding supplies an `AlgebraIO<ALG>` interpreter, and Work requires it through:
+Grounding supplies an `AlgebraIO<ALG>` interpreter. No ambient runtime carrier is required by the Feature contract.
 
-```text
-HasAlgebra<ALG, RT>
-```
-
-The experiment demonstrated that the same free program can be interpreted by different Groundings, that one algebra can span multiple point spaces, and that the resulting program composes inside the existing `Feature -> Flow` model.
+The experiments demonstrated that the same Free WorkFlow can be interpreted by different Groundings, that one algebra can span multiple point spaces, and that point capabilities can be realized through Entity Framework Core without Repository semantics.
 
 See [Point Algebras](../point-algebras.md).
 
-Deletion/removal remains open. It has not been folded into `PointWriter` merely because CRUD traditionally groups those operations.
+Removal is now an independently validated capability rather than an implicit branch of `PointWriter`.
 
 Persistence-boundary questions such as staged versus autonomous persistence also remain open because they depend on additional semantics and guarantees rather than on reading/writing capability alone.
 
@@ -295,11 +292,12 @@ Types express structural requirements and declarations.
 
 They can establish that:
 
-- a Feature requires a capability;
-- a runtime exposes that capability;
+- a Feature algebra includes a capability vocabulary;
+- a WorkPart has a structurally valid operation shape;
+- a Grounding declares an interpreter or realization contract;
 - a realization declares that it provides a guarantee.
 
-They cannot prove arbitrary runtime behavior.
+They cannot prove arbitrary execution behavior.
 
 ### Analyzer
 
@@ -332,15 +330,15 @@ A grounding may contribute laws for guarantees that VSlices.Grounding does not k
 
 The capability side now has a concrete typed shape.
 
-A service-owned algebra composes point capabilities and a Feature requires its interpreter through:
+A Feature-owned algebra composes point capabilities directly in the `ALG` parameter of:
 
 ```csharp
-where RT : HasAlgebra<AppAlgebra, RT>
+Feature<F, ALG, REQ, RES>
 ```
 
-Grounding supplies `AlgebraIO<AppAlgebra>`; the Feature never names the concrete Grounding implementation.
+The Feature returns `Free<ALG, RES>`. Grounding supplies `AlgebraIO<ALG>`; the Feature never names the concrete Grounding implementation.
 
-This preserves the original goal of making runtime requirements explicit without introducing pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
+This preserves the original goal of making Work requirements explicit without an ambient runtime carrier and without introducing pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
 
 The exact typed representation of guarantees remains intentionally open.
 
