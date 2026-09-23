@@ -1,10 +1,10 @@
-# SampleBFF — cross-service WorkProcess experiment
+# SampleBFF — cross-service Feature composition experiment
 
 ## Purpose
 
-This sample pressures the Free WorkFlow / WorkProcess model across two independently owned service surfaces.
+This sample pressures the Free WorkFlow model across two independently owned service surfaces.
 
-It deliberately recreates the attachment geometry observed in Ticket Support without requiring a migration of the Serviu consumer repository.
+It deliberately recreates the attachment geometry observed in Ticket Support without requiring an immediate migration of the Serviu consumer repository.
 
 The scenario is:
 
@@ -14,7 +14,7 @@ SampleBFF.AttachFileToTodo
     -> SampleWorkflow.AddAttachmentReference
 ```
 
-The important property is that the two child WorkFlows are not interpreted by the same Grounding.
+`AttachFileToTodo` is not a special WorkProcess type. It is an ordinary Feature whose `ALG` is the sum of the two child Feature algebras.
 
 ## Ownership
 
@@ -26,7 +26,7 @@ SampleWorkflow
     owns Todo semantics and the association to an opaque ResourceReference
 
 SampleBFF
-    owns the product-level composition
+    owns the composed Feature
     owns SampleFileId -> ResourceReference interpretation for this integration
     owns ordering between the child WorkFlows
 
@@ -49,34 +49,41 @@ SampleFileId
     <=> ResourceReference
 ```
 
-## Process algebra
+## Composed Feature algebra
 
-`AttachFileToTodo` composes:
-
-```text
-AddFile.Algebra
-    +
-AddAttachmentReference.Algebra
-```
-
-through:
+`AttachFileToTodo` is:
 
 ```text
-AlgebraSum<AddFile.Algebra, AddAttachmentReference.Algebra>
+Feature<
+    AttachFileToTodo,
+    AlgebraSum<
+        AddFile.Algebra,
+        AddAttachmentReference.Algebra>,
+    Request,
+    Response>
 ```
 
-Each child program is hoisted using the existing external natural-transformation witnesses:
+The implementation aliases the composed vocabulary locally as `Algebra` and embeds each child WorkFlow with:
+
+```csharp
+Algebra.FromA(AddFile.Get(...))
+Algebra.FromB(AddAttachmentReference.Get(...))
+```
+
+This keeps the call site independent of the internal natural-transformation details.
+
+The underlying witnesses remain:
 
 ```text
-InjectLeft
-InjectRight
+InjectA<A, B>
+InjectB<A, B>
 ```
 
-No Framework change was required for cross-service composition.
+and the mathematical operation remains Free hoisting.
 
 ## Grounding
 
-The composed Process interpreter is constructed from two different realizations:
+The composed interpreter is constructed from two different realizations:
 
 ```csharp
 new AlgebraSumIO<
@@ -95,18 +102,35 @@ todoWork : AlgebraIO<AddAttachmentReference.Algebra>
 
 This is stronger evidence than the earlier `CreateAndGetTodo` miniature, where both child algebras were interpreted by the same `InMemoryTodoWork`.
 
+## AlgebraSum arities
+
+The generic mechanism is available through seven positional children:
+
+```text
+AlgebraSum<A, B>
+AlgebraSum<A, B, C>
+AlgebraSum<A, B, C, D>
+AlgebraSum<A, B, C, D, E>
+AlgebraSum<A, B, C, D, E, F>
+AlgebraSum<A, B, C, D, E, F, G>
+```
+
+Each arity supplies matching `FromA` ... `FromG`, `InjectA` ... `InjectG`, and `AlgebraSumIO<...>` support.
+
+The A..G positions are composition mechanics; they do not encode semantic ordering or authority.
+
 ## Executable evidence
 
 The cross-service test proves that:
 
 1. a Todo can be created through its own WorkFlow and Grounding;
 2. a file can be stored through an independent WorkFlow and Grounding;
-3. the BFF can hoist and compose both child programs;
+3. the BFF Feature can hoist and compose both child programs;
 4. the resulting Todo persists the opaque resource association;
 5. the file remains persisted in the file service;
-6. both sides can be re-read independently after the Process completes.
+6. both sides can be re-read independently after the composed Feature completes.
 
-GitHub Actions:
+The earlier successful evidence was:
 
 ```text
 Branch: experiment/cross-service-workprocess
@@ -115,11 +139,11 @@ Run:    35857218289
 Result: success
 ```
 
-The previous SampleWorkflow CRUD smoke test remains green in the same run.
+Later commits simplify the model by removing the redundant `WorkProcess` interface and extend `AlgebraSum` through arity seven. Current branch CI is the authoritative evidence for those changes.
 
 ## First guarantee pressure
 
-The sample also intentionally captures the current partial-failure behavior.
+The sample intentionally captures the current partial-failure behavior.
 
 If:
 
@@ -131,7 +155,7 @@ SampleWorkflow.AddAttachmentReference cannot find the Todo
 then:
 
 ```text
-the Process returns no association
+the Feature returns no association
 the file remains stored
 ```
 
@@ -140,7 +164,7 @@ The test records this behavior instead of hiding it.
 This is evidence that:
 
 ```text
-WorkFlow composition
+Feature composition
 != atomic composition
 ```
 
@@ -163,8 +187,8 @@ This sample does not settle:
 - atomicity;
 - durability;
 - explicit guarantee vocabulary;
-- arbitrary-N algebra composition;
 - the final role of `Flow`;
-- whether partial failure should become a first-class WorkPart, WorkProcess policy, guarantee, or another concept.
+- whether partial failure should become a first-class WorkPart, Feature policy, guarantee, or another concept;
+- whether composition beyond A..G deserves a different representation.
 
 Those questions should be pressured independently rather than folded into `AlgebraSum`.
