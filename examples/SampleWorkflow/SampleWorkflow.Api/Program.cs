@@ -2,19 +2,14 @@ using LanguageExt;
 using SampleWorkflow.Grounding;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
+using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<InMemoryTodoWork>();
 
-builder.Services.AddSingleton<AlgebraIO<CreateTodo.Algebra>>(services =>
-    services.GetRequiredService<InMemoryTodoWork>());
-builder.Services.AddSingleton<AlgebraIO<GetTodo.Algebra>>(services =>
-    services.GetRequiredService<InMemoryTodoWork>());
-builder.Services.AddSingleton<AlgebraIO<UpdateTodo.Algebra>>(services =>
-    services.GetRequiredService<InMemoryTodoWork>());
-builder.Services.AddSingleton<AlgebraIO<DeleteTodo.Algebra>>(services =>
+builder.Services.AddSingleton<AlgebraIO<TodoAlgebra>>(services =>
     services.GetRequiredService<InMemoryTodoWork>());
 
 var app = builder.Build();
@@ -23,7 +18,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.MapPost("/todos", async (
     CreateTodoBody body,
-    AlgebraIO<CreateTodo.Algebra> interpreter) =>
+    AlgebraIO<TodoAlgebra> interpreter) =>
 {
     var detail = TodoDetail.Transformation.RunFin(body.Detail);
 
@@ -32,7 +27,7 @@ app.MapPost("/todos", async (
         {
             var response = await FreeAlgebra
                 .interpret(
-                    CreateTodo.Get(
+                    CreateTodo.Describe(
                         new CreateTodo.Request(
                             semanticDetail,
                             body.Completed)),
@@ -56,7 +51,7 @@ app.MapPost("/todos", async (
 
 app.MapGet("/todos/{id:guid}", async (
     Guid id,
-    AlgebraIO<GetTodo.Algebra> interpreter) =>
+    AlgebraIO<TodoAlgebra> interpreter) =>
 {
     var semanticId = TodoId.Transformation.RunFin(id);
 
@@ -65,7 +60,7 @@ app.MapGet("/todos/{id:guid}", async (
         {
             var response = await FreeAlgebra
                 .interpret(
-                    GetTodo.Get(new GetTodo.Request(todoId)),
+                    GetTodo.Describe(new GetTodo.Request(todoId)),
                     interpreter)
                 .RunAsync();
 
@@ -81,7 +76,7 @@ app.MapGet("/todos/{id:guid}", async (
 app.MapPut("/todos/{id:guid}", async (
     Guid id,
     UpdateTodoBody body,
-    AlgebraIO<UpdateTodo.Algebra> interpreter) =>
+    AlgebraIO<TodoAlgebra> interpreter) =>
 {
     var input =
         from semanticId in TodoId.Transformation.RunFin(id)
@@ -93,7 +88,7 @@ app.MapPut("/todos/{id:guid}", async (
         {
             var response = await FreeAlgebra
                 .interpret(
-                    UpdateTodo.Get(
+                    UpdateTodo.Describe(
                         new UpdateTodo.Request(
                             semantic.semanticId,
                             semantic.detail,
@@ -116,7 +111,7 @@ app.MapPut("/todos/{id:guid}", async (
 
 app.MapDelete("/todos/{id:guid}", async (
     Guid id,
-    AlgebraIO<DeleteTodo.Algebra> interpreter) =>
+    AlgebraIO<TodoAlgebra> interpreter) =>
 {
     var semanticId = TodoId.Transformation.RunFin(id);
 
@@ -125,7 +120,7 @@ app.MapDelete("/todos/{id:guid}", async (
         {
             var response = await FreeAlgebra
                 .interpret(
-                    DeleteTodo.Get(new DeleteTodo.Request(todoId)),
+                    DeleteTodo.Describe(new DeleteTodo.Request(todoId)),
                     interpreter)
                 .RunAsync();
 
