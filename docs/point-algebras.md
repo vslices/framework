@@ -44,6 +44,8 @@ Atomic operations require less inferred knowledge and are easier to trace back t
 
 A point capability contributes one kind of operation to an algebra.
 
+The point capability is the semantic operation vocabulary. `HasAlgebra<ALG, RT>` is the runtime evidence that a Feature can obtain an interpretation of the composed vocabulary. Keeping those roles distinct avoids making every atomic operation a separate runtime object.
+
 The first validated capabilities are:
 
 ```text
