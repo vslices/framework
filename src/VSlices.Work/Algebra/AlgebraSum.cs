@@ -1067,21 +1067,3 @@ public sealed class AlgebraSumIO<A, B, C, D, E, F, G>(
             _ => throw new NotSupportedException()
         };
 }
-
-[Obsolete("Use InjectA<A, B>.")]
-public readonly struct InjectLeft<A, B> : Natural<A, AlgebraSum<A, B>>
-    where A : Functor<A>
-    where B : Functor<B>
-{
-    public static K<AlgebraSum<A, B>, T> Transform<T>(K<A, T> value) =>
-        InjectA<A, B>.Transform(value);
-}
-
-[Obsolete("Use InjectB<A, B>.")]
-public readonly struct InjectRight<A, B> : Natural<B, AlgebraSum<A, B>>
-    where A : Functor<A>
-    where B : Functor<B>
-{
-    public static K<AlgebraSum<A, B>, T> Transform<T>(K<B, T> value) =>
-        InjectB<A, B>.Transform(value);
-}
