@@ -203,7 +203,7 @@ Candidate obligations include:
 - declared expected errors are produced for known failing conditions;
 - repository observations are interpreted by the invariant rather than being mistaken for the invariant itself;
 - an invariant requiring external capabilities can be exercised across relevant environment states;
-- an invariant does not persist use-case state changes, because persistence belongs to Feature Flow.
+- an invariant does not persist use-case state changes, because persistence belongs to the Feature WorkFlow.
 
 The last point implies a useful infrastructure-backed verification: an invariant that reads a database can be executed against a real database while asserting that the observable database state remains unchanged.
 
