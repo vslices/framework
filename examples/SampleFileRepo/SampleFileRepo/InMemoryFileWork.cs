@@ -12,6 +12,9 @@ public sealed class InMemoryFileWork :
 {
     private readonly ConcurrentDictionary<SampleFileId, SampleFile> files = new();
 
+    public int Count =>
+        files.Count;
+
     IO<A> AlgebraIO<AddFile.Algebra>.Interpret<A>(
         K<AddFile.Algebra, A> operation) =>
         operation switch
