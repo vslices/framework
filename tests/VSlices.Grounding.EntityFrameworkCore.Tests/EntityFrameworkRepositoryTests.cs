@@ -42,7 +42,7 @@ public sealed class EntityFrameworkRepositoryTests(PostgreSqlFixture database)
 
         var all = await repository.Read().RunAsync();
         Assert.Single(all);
-        Assert.Equal("updated", all.Head.Name);
+        Assert.Equal("updated", all.Head.IfNone(new DirectRecord()).Name);
 
         await repository.Delete(updated).RunAsync();
 
@@ -94,7 +94,7 @@ public sealed class EntityFrameworkRepositoryTests(PostgreSqlFixture database)
 
         var all = await repository.Read().RunAsync();
         Assert.Single(all);
-        Assert.Equal(new Record(id, "updated"), all.Head);
+        Assert.Equal(new Record(id, "updated"), all.Head.IfNone(new Record(Guid.Empty, string.Empty)));
 
         await repository.Delete(updated).RunAsync();
 
