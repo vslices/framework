@@ -19,7 +19,7 @@ public interface HasAlgebra<ALG, RT> : Has<Eff<RT>, AlgebraIO<ALG>>
 /// <summary>
 /// Functions for interpreting free programs over an algebra.
 /// </summary>
-public static class Algebra
+public static class FreeAlgebra
 {
     public static IO<A> interpret<ALG, A>(
         K<Free<ALG>, A> program,
@@ -51,5 +51,5 @@ public static class AlgebraEnv<ALG, RT>
         Has<Eff<RT>, RT, AlgebraIO<ALG>>.ask.As();
 
     public static Eff<RT, A> run<A>(K<Free<ALG>, A> program) =>
-        accessIO.Bind(interpreter => Algebra.interpret(program, interpreter));
+        accessIO.Bind(interpreter => FreeAlgebra.interpret(program, interpreter));
 }
