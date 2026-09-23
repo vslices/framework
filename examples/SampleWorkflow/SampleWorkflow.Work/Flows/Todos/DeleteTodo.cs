@@ -8,12 +8,12 @@ using static LanguageExt.Prelude;
 namespace SampleWorkflow.Work;
 
 public sealed class DeleteTodo :
-    Feature<DeleteTodo, TodoAlgebra, DeleteTodo.Request, DeleteTodo.Response>
+    Feature<TodoAlgebra, DeleteTodo.Request, DeleteTodo.Response>
 {
     public sealed record Request(TodoId Id);
     public sealed record Response(Option<Todo> Todo);
 
-    public static Free<TodoAlgebra, Response> Get(Request request) =>
+    public static Free<TodoAlgebra, Response> Describe(Request request) =>
         from current in TodoAlgebra.Read(request.Id)
         from deleted in current.Match(
             Some: point =>
