@@ -8,7 +8,7 @@ using VSlices.Work;
 using static LanguageExt.Prelude;
 using Algebra = VSlices.Work.AlgebraSum<
     SampleFileRepo.AddFile.Algebra,
-    TodoAlgebra>;
+    SampleWorkflow.Work.Algebras.TodoAlgebra>;
 
 namespace SampleBFF;
 
