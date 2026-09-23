@@ -2,9 +2,9 @@
 
 ## What is a Capability?
 
-A Capability is a type-level description of something the runtime can provide.
+A Capability is a typed description of an operation or behavior that Work may require.
 
-Capabilities are inspired by LanguageExt typeclasses.
+Capabilities are inspired by LanguageExt typeclasses. Runtime constraints provide compile-time evidence that the required capability vocabulary can be interpreted or supplied.
 
 They are used to express requirements like:
 - time access
@@ -25,9 +25,11 @@ A Capability is not:
 
 ## Main Rule
 
-A feature must declare the minimum capabilities required from `RT`.
+A feature must declare the minimum capability requirements it needs from `RT`.
 
-Capabilities should remain explicit in types.
+For simple capabilities this can be a direct `Has*` requirement. For point capabilities, atomic operations compose into a Work-owned algebra and the Feature requires `HasAlgebra<ALG, RT>` as evidence that the runtime can interpret that vocabulary.
+
+Capabilities and their runtime evidence should remain explicit in types.
 
 ## Why
 
