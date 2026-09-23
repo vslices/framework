@@ -1,8 +1,21 @@
 # Simple Workflow
 
-This example is intentionally a very small CRUD API built with the current VSlices semantic-space and point-algebra model.
+This example is a small CRUD API used to pressure the current VSlices Work model.
 
-The concept is `Todo` and is split into the current architecture:
+The experiment now treats:
+
+```text
+Feature == WorkFlow == Free<WorkFlowAlgebra, Response>
+
+WorkFlowAlgebra
+    contains the WorkParts required by that Feature
+
+WorkProcess
+    composes existing WorkFlow algebras
+    hoists each Feature into the composed algebra
+```
+
+## Structure
 
 ```text
 SampleWorkflow.Spaces
@@ -11,123 +24,96 @@ SampleWorkflow.Spaces
     Todo : Evolvable<Todo, Todo.State>
 
 SampleWorkflow.Work
-    TodoId generation capability
-    TodoAlgebra
-    PointReader<Todo>
-    PointWriter<Todo>
-    PointRemover<Todo>
-    CRUD Features
+    CreateTodo Feature / WorkFlow
+        CreateTodo.Algebra
+        NextId / Read / Write WorkParts
+
+    GetTodo Feature / WorkFlow
+        GetTodo.Algebra
+        Read WorkPart
+
+    UpdateTodo Feature / WorkFlow
+        UpdateTodo.Algebra
+        Read / Write WorkParts
+
+    DeleteTodo Feature / WorkFlow
+        DeleteTodo.Algebra
+        Read / Remove WorkParts
 
 SampleWorkflow.Grounding
-    GuidTodoIdGeneration
-    InMemoryTodoAlgebra
+    InMemoryTodoWork
+        interprets all four WorkFlow algebras
+
+SampleWorkflow.Process
+    CreateAndGetTodo WorkProcess
+        composes CreateTodo.Algebra + GetTodo.Algebra
+        hoists CreateTodo and GetTodo into that composed algebra
 
 SampleWorkflow.Api
-    HTTP presentation + runtime composition
+    HTTP presentation
+    DI supplies the default interpreter for each WorkFlow algebra
 ```
 
-## Semantic construction
+## Feature as Free Monad
 
-The example does not expose public constructors for semantic points.
+A Feature no longer owns a runtime `RT` or returns `Flow<RT, REQ, RES>`.
 
-`TodoId` is a discrete semantic space established from a `Guid`:
+Its semantic contract is:
 
 ```text
-Guid
-    -> TodoId.Transformation
-    -> TodoId
+Request
+    -> Free<Feature.Algebra, Response>
 ```
 
-`TodoDetail` gives semantic meaning only to the textual detail:
+The Feature itself contains the composition. There is no parallel `TodoPrograms` layer.
+
+## WorkProcess through algebra composition
+
+`CreateAndGetTodo` demonstrates the next level:
 
 ```text
-string
-    -> TodoDetail.Transformation
-    -> TodoDetail
+CreateTodo
+    Free<CreateTodo.Algebra, ...>
+
+GetTodo
+    Free<GetTodo.Algebra, ...>
 ```
 
-The completion flag remains a `bool`; this example has no evidence that it requires a separate semantic space.
-
-`Todo` is established from already-semantic identity/detail plus the valid boolean state:
+The Process algebra is:
 
 ```text
-Todo.Input
-    TodoId
-    TodoDetail
-    bool Completed
-        -> Todo.Transformation
-        -> Todo
+AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
 ```
 
-Todo equality is owned by `TodoId`.
+Each Feature is lifted into that larger vocabulary with the same mathematical operation as `Free.hoist`.
 
-## Evolution
+VSlices uses an external natural-transformation witness so the composing Process owns the injection. A service WorkFlow algebra does not need to reference the BFF or Process that later composes it.
 
-`Todo` implements:
+## Interpretation
+
+A service can provide one implementation that satisfies several WorkFlow algebras:
 
 ```text
-Evolvable<Todo, Todo.State>
+InMemoryTodoWork
+    AlgebraIO<CreateTodo.Algebra>
+    AlgebraIO<GetTodo.Algebra>
+    AlgebraIO<UpdateTodo.Algebra>
+    AlgebraIO<DeleteTodo.Algebra>
 ```
 
-Its accepted state carries:
+Normal service execution receives the appropriate interface from DI.
+
+A Process interpreter composes the already-existing interpreters:
 
 ```text
-TodoId Id          creation-fixed
-TodoDetail Detail  evolvable
-bool Completed     evolvable
+CreateTodo interpreter ─┐
+                        ├─ AlgebraSumIO<CreateTodo.Algebra, GetTodo.Algebra>
+GetTodo interpreter ────┘
 ```
 
-The HTTP PUT does not construct a replacement Todo directly. Work first reads the current Todo point and then proposes:
+The composed interpreter only redirects. It does not reimplement either WorkFlow.
 
-```csharp
-todo.Update(state => state with
-{
-    Detail = detail,
-    Completed = completed
-})
-```
-
-Only an accepted evolved point is passed to `PointWriter`.
-
-This keeps two statements separate:
-
-```text
-Todo.Transformation
-    establishes a Todo
-
-Todo.Evolution
-    establishes an admissible next Todo state
-```
-
-## Identity generation
-
-Creating a Todo does not accept an id from HTTP.
-
-Work requires a focused `TodoIdGenerationIO` capability. The current Grounding realizes it through `Guid.NewGuid()` and then establishes the generated value as a semantic `TodoId`.
-
-## CRUD semantics
-
-The primitive point capabilities remain smaller than CRUD:
-
-```text
-Read
-    PointReader
-
-Create
-    generate identity
-    establish Todo
-    read + write if absent
-
-Update
-    read current Todo
-    Todo.Update(...)
-    write accepted evolved point
-
-Delete
-    read + remove if present
-```
-
-The CRUD operations are available as:
+## CRUD API
 
 ```text
 POST   /todos
@@ -136,16 +122,6 @@ PUT    /todos/{id}
 DELETE /todos/{id}
 ```
 
-The Grounding is in-memory on purpose. Replacing it with EF Core or another mechanism should only require different Grounding implementations; Work should remain unchanged.
+`TodoDetail` covers only the semantic string. `Completed` remains a plain `bool`.
 
-## Example request
-
-```http
-POST /todos
-Content-Type: application/json
-
-{
-  "detail": "feel the semantics",
-  "completed": false
-}
-```
+`Todo` is `Evolvable<Todo, Todo.State>`; PUT reads the current point, proposes the next state with `Todo.Update(...)`, and writes only the accepted evolved point.

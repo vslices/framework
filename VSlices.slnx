@@ -3,8 +3,10 @@
   <Folder Name="/examples/simple-workflow/">
     <Project Path="examples/SampleWorkflow/SampleWorkflow.Spaces/SampleWorkflow.Spaces.csproj" />
     <Project Path="examples/SampleWorkflow/SampleWorkflow.Work/SampleWorkflow.Work.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Process/SampleWorkflow.Process.csproj" />
     <Project Path="examples/SampleWorkflow/SampleWorkflow.Grounding/SampleWorkflow.Grounding.csproj" />
     <Project Path="examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj" />
   </Folder>
   <Folder Name="/examples/space-modeling/">
     <Project Path="examples/VSlices.Space.Modeling/VSlices.Space.Modeling.csproj" />

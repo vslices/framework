@@ -1,24 +1,14 @@
 namespace VSlices.Work;
 
-/// <summary>
-/// Interprets one operation from a service-owned algebra into IO.
-/// </summary>
-/// <typeparam name="ALG">The algebra being interpreted.</typeparam>
 public interface AlgebraIO<ALG>
     where ALG : Functor<ALG>
 {
     IO<A> Interpret<A>(K<ALG, A> operation);
 }
 
-/// <summary>
-/// Declares that a runtime can interpret the specified algebra.
-/// </summary>
 public interface HasAlgebra<ALG, RT> : Has<Eff<RT>, AlgebraIO<ALG>>
     where ALG : Functor<ALG>;
 
-/// <summary>
-/// Functions for interpreting free programs over an algebra.
-/// </summary>
 public static class FreeAlgebra
 {
     public static IO<A> interpret<ALG, A>(
@@ -35,14 +25,27 @@ public static class FreeAlgebra
                     .Interpret(operation)
                     .Bind(next => interpret<ALG, A>(next, interpreter)),
 
-            _ => throw new NotSupportedException(
-                $"Unknown Free<{typeof(ALG).Name}> program node.")
+            _ => throw new NotSupportedException()
+        };
+
+    public static Free<G, A> hoist<N, F, G, A>(Free<F, A> program)
+        where N : Natural<F, G>
+        where F : Functor<F>
+        where G : Functor<G> =>
+        program switch
+        {
+            Pure<F, A>(var value) =>
+                Free.pure<G, A>(value),
+
+            Bind<F, A>(var operation) =>
+                Free.bind<G, A>(
+                    N.Transform(operation)
+                        .Map(next => hoist<N, F, G, A>(next))),
+
+            _ => throw new NotSupportedException()
         };
 }
 
-/// <summary>
-/// Runtime access to algebra interpretation.
-/// </summary>
 public static class AlgebraEnv<ALG, RT>
     where ALG : Functor<ALG>
     where RT : HasAlgebra<ALG, RT>

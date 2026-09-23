@@ -1,8 +1,8 @@
 namespace VSlices.Work;
 
-public interface Feature<F, ALG, REQ, RES>
+public interface WorkProcess<P, ALG, REQ, RES>
     where ALG : Functor<ALG>
-    where F : Feature<F, ALG, REQ, RES>
+    where P : WorkProcess<P, ALG, REQ, RES>
 {
     static abstract Free<ALG, RES> Get(REQ request);
 }

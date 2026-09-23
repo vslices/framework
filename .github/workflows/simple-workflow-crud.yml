@@ -31,8 +31,14 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Build Work
+        run: dotnet build src/VSlices.Work/VSlices.Work.csproj
+
       - name: Build API
         run: dotnet build examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj
+
+      - name: Run Process composition tests
+        run: dotnet run --project examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj
 
       - name: Smoke CRUD API
         shell: bash
