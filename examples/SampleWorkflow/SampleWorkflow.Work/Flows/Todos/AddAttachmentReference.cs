@@ -27,13 +27,13 @@ public sealed class AddAttachmentReference :
         Either<Error, Option<Todo>> Todo);
     
     public static Free<TodoAlgebra, Response> Describe(Request request) =>
-        from current in PointReader.read<TodoAlgebra, Todo, TodoId>(request.Id)
+        from current in TodoAlgebra.Read(request.Id)
         from response in current.Match(
             Some: todo =>
             {
                 if (todo.Attachments.Contains(request.Resource))
                 {
-                    return Free.pure<TodoAlgebra, Response>(
+                    return TodoAlgebra.Pure(
                         new Response(
                             Either.Right<Error, Option<Todo>>(Some(todo))));
                 }
@@ -45,18 +45,18 @@ public sealed class AddAttachmentReference :
                     })
                     .Match(
                         Succ: updated =>
-                            from _ in PointWriter.write<TodoAlgebra, Todo>(updated)
+                            from _ in TodoAlgebra.Write(updated)
                             select new Response(
                                 Either.Right<Error, Option<Todo>>(
                                     Some(updated))),
                         Fail: error =>
-                            Free.pure<TodoAlgebra, Response>(
+                            TodoAlgebra.Pure(
                                 new Response(
                                     Either.Left<Error, Option<Todo>>(
                                         error))));
             },
             None: static () =>
-                Free.pure<TodoAlgebra, Response>(
+                TodoAlgebra.Pure(
                     new Response(
                         Either.Right<Error, Option<Todo>>(
                             Option<Todo>.None))))
