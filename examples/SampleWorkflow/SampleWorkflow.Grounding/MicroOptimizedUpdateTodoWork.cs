@@ -45,7 +45,7 @@ public sealed class MicroOptimizedUpdateTodoWork :
             _ => throw new NotSupportedException()
         };
 
-    private Either<Error, Option<Todo>> Execute<A>(
+    private UpdateTodoMicroOptimized.Response Execute<A>(
         UpdateTodoMicroOptimized.ExecuteLinePart<A> execute)
     {
         var quectostep =
@@ -70,34 +70,43 @@ public sealed class MicroOptimizedUpdateTodoWork :
 
         if (index < 0)
         {
-            return Either.Right<Error, Option<Todo>>(
-                Option<Todo>.None);
+            return new UpdateTodoMicroOptimized.Response(
+                Either.Right<Error, Option<Todo>>(
+                    Option<Todo>.None));
         }
 
         var current = points.ValueAt(index);
 
-        if (execute.SatisfiedBy(current))
+        if (UpdateTodoMicroOptimized.SatisfiedBy(
+            current,
+            quectostep))
         {
             SemanticShortCircuits++;
 
-            return Either.Right<Error, Option<Todo>>(
-                Some(current));
+            return new UpdateTodoMicroOptimized.Response(
+                Either.Right<Error, Option<Todo>>(
+                    Some(current)));
         }
 
         Evolutions++;
 
-        return execute.Evolve(current)
-            .Match<Either<Error, Option<Todo>>>(
+        return UpdateTodoMicroOptimized
+            .Evolve(
+                current,
+                quectostep)
+            .Match(
                 Succ: updated =>
                 {
                     points.Replace(index, updated);
                     Writes++;
 
-                    return Either.Right<Error, Option<Todo>>(
-                        Some(updated));
+                    return new UpdateTodoMicroOptimized.Response(
+                        Either.Right<Error, Option<Todo>>(
+                            Some(updated)));
                 },
                 Fail: error =>
-                    Either.Left<Error, Option<Todo>>(error));
+                    new UpdateTodoMicroOptimized.Response(
+                        Either.Left<Error, Option<Todo>>(error)));
     }
 
     /// <summary>
