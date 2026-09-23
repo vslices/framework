@@ -91,7 +91,7 @@ input
 -> zero or more integrations
 ```
 
-The current `Feature<F, ALG, REQ, RES> -> Free<ALG, RES>` model now recovers the executable core without a separate runtime/request carrier.
+The current `Feature<ALG, REQ, RES> -> Free<ALG, RES>` model now recovers the executable core without a separate runtime/request carrier.
 
 The remaining problem is to rediscover the relation between executable work and the concrete mechanisms that make that work reachable.
 
@@ -188,7 +188,7 @@ This was technically expressive but allowed work to depend indirectly on broad r
 The current Work model has moved further away from broad runtime access:
 
 ```text
-Feature<F, ALG, REQ, RES>
+Feature<ALG, REQ, RES>
     -> Free<ALG, RES>
 ```
 
