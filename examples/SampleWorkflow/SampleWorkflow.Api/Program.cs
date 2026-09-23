@@ -47,7 +47,7 @@ app.MapPost("/todos", async (
                         value => Results.Created(
                             $"/todos/{value.Id.Value}",
                             TodoDto.From(value)),
-                        Results.Conflict));
+                        () => Results.Conflict()));
         },
         Fail: error =>
             Task.FromResult<IResult>(
@@ -71,7 +71,7 @@ app.MapGet("/todos/{id:guid}", async (
 
             return response.Todo.Match<IResult>(
                 todo => Results.Ok(TodoDto.From(todo)),
-                Results.NotFound);
+                () => Results.NotFound());
         },
         Fail: error =>
             Task.FromResult<IResult>(
@@ -131,7 +131,7 @@ app.MapDelete("/todos/{id:guid}", async (
 
             return response.Todo.Match<IResult>(
                 todo => Results.Ok(TodoDto.From(todo)),
-                Results.NotFound);
+                () => Results.NotFound());
         },
         Fail: error =>
             Task.FromResult<IResult>(
