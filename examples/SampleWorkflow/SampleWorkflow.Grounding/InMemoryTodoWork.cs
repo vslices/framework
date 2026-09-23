@@ -12,7 +12,8 @@ public sealed class InMemoryTodoWork :
     AlgebraIO<CreateTodo.Algebra>,
     AlgebraIO<GetTodo.Algebra>,
     AlgebraIO<UpdateTodo.Algebra>,
-    AlgebraIO<DeleteTodo.Algebra>
+    AlgebraIO<DeleteTodo.Algebra>,
+    AlgebraIO<AddAttachmentReference.Algebra>
 {
     private readonly ConcurrentDictionary<TodoId, Todo> points = new();
 
@@ -73,6 +74,21 @@ public sealed class InMemoryTodoWork :
                 {
                     points.TryRemove(remove.Id, out _);
                     return remove.Next(unit);
+                }),
+            _ => throw new NotSupportedException()
+        };
+
+    IO<A> AlgebraIO<AddAttachmentReference.Algebra>.Interpret<A>(
+        K<AddAttachmentReference.Algebra, A> operation) =>
+        operation switch
+        {
+            AddAttachmentReference.ReadPart<A> read =>
+                IO.lift(() => read.Next(Read(read.Id))),
+            AddAttachmentReference.WritePart<A> write =>
+                IO.lift(() =>
+                {
+                    points[write.Point.Id] = write.Point;
+                    return write.Next(unit);
                 }),
             _ => throw new NotSupportedException()
         };
