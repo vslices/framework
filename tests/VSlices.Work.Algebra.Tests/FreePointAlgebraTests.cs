@@ -115,7 +115,7 @@ public sealed class RenameAccount<RT> :
     public sealed record Response(Option<Account> Account);
 
     public static Flow<RT, Request, Response> Get() =>
-        Flow.request<RT, Request>() >>
+        Flow<RT, Request>.Asks(static request => request) >>
         (request => AlgebraEnv<AppAlgebra, RT>
             .run(AppPrograms.RenameWhenRoleExists(
                 request.AccountId,
