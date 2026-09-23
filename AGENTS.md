@@ -9,7 +9,7 @@ The Framework is being defined and validated through real implementation. Do not
 The current direction is semantic-first and is actively validating distinctions such as:
 
 - `Space`: semantic values, structure, admissibility, and pure transformations;
-- `Work`: executable behavior, coordination, WorkFlows, WorkProcesses, effects, and expected errors;
+- `Work`: executable behavior, coordination, WorkFlows, Feature composition, effects, and expected errors;
 - `Grounding`: acquisition or realization of facts and effects that are not derivable from pure semantics alone.
 
 These names and boundaries remain provisional. Prefer current repository evidence over remembered architecture.
@@ -64,10 +64,13 @@ Do not force this factorization when current evidence contradicts it, but do not
 The current `SampleWorkflow` and `SampleBFF` experiments have executable evidence for the following model:
 
 ```text
-Feature == WorkFlow == Free<WorkFlowAlgebra, Response>
+Feature == WorkFlow == Free<ALG, Response>
 
-1 WorkProcess : M WorkFlow
-1 WorkFlow    : Q WorkPart
+1 Feature / WorkFlow : Q WorkPart
+
+A Feature may reuse another Feature's WorkFlow by hoisting the child algebra
+into a larger composed ALG. Composition changes ALG; it does not require a
+second executable abstraction.
 ```
 
 `WorkLine` remains outside the current implemented scope.
@@ -157,44 +160,51 @@ Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historic
 
 ---
 
-## WorkProcess Composition
+## Feature Composition
 
-A WorkProcess composes already-existing WorkFlows.
+A Feature can reuse already-existing WorkFlows by composing their algebras.
 
-The current validated miniature uses a binary algebra sum:
+The same `Feature<F, ALG, REQ, RES>` contract is used whether `ALG` is a Feature-owned algebra or a sum of several child algebras.
 
-```text
-WorkFlow A algebra --\
-                     +--> AlgebraSum<A,B>
-WorkFlow B algebra --/
-```
-
-Each child WorkFlow is hoisted into the Process algebra through an external natural-transformation witness:
+For example:
 
 ```text
-InjectLeft<A,B>  : A ~> AlgebraSum<A,B>
-InjectRight<A,B> : B ~> AlgebraSum<A,B>
+CreateAndGetTodo
+    ALG = AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
+
+AttachFileToTodo
+    ALG = AlgebraSum<AddFile.Algebra, AddAttachmentReference.Algebra>
 ```
 
-and:
+`AlgebraSum` is an execution-language composition mechanism, not a separate category of Feature.
 
-```csharp
-FreeAlgebra.hoist<N, F, G, A>(Free<F, A>)
+The public family currently follows LanguageExt-style positional arities:
+
+```text
+AlgebraSum<A, B>
+AlgebraSum<A, B, C>
+AlgebraSum<A, B, C, D>
+AlgebraSum<A, B, C, D, E>
+AlgebraSum<A, B, C, D, E, F>
+AlgebraSum<A, B, C, D, E, F, G>
 ```
+
+Each sum exposes `FromA` through `FromG` as applicable. These helpers hoist an existing child Feature program into the larger algebra without exposing recursive `Left/Right` structure at the call site.
+
+The underlying natural transformations remain explicit as `InjectA` through `InjectG`. `InjectLeft` and `InjectRight` exist only as obsolete compatibility aliases for the binary form.
 
 Ownership rules:
 
 ```text
-WorkFlow owns its WorkParts.
-WorkProcess owns composition of WorkFlows.
+Feature / WorkFlow owns its WorkParts.
+The composing Feature owns its composed ALG and child-program injection.
 Grounding owns realization.
-A composing Process owns injection into its larger algebra.
-A lower WorkFlow does not know its future Process or BFF.
+A child WorkFlow does not know which future Feature or BFF may reuse it.
 ```
 
-The Process interpreter must delegate each branch to the interpreter that already owns it. It must not reimplement child WorkParts.
+`AlgebraSumIO<A,...,G>` composes existing interpreters and delegates each operation to the interpreter that owns that child algebra. It must not reimplement child WorkParts.
 
-Do not introduce arbitrary-N algebra machinery until real cases require it. Binary composition can be nested while the model is still under pressure.
+Do not introduce arities beyond seven or a different composition mechanism until real pressure requires it.
 
 ---
 
@@ -208,7 +218,7 @@ Do not:
 - delete or redesign `Flow` just to simplify the current experiment;
 - claim that its final role is settled.
 
-First preserve the validated Feature-as-Free and WorkProcess composition model. Let real cases determine whether `Flow` remains an execution carrier, presentation/runtime syntax, another abstraction, or is superseded on this path.
+First preserve the validated Feature-as-Free and composed-algebra model. Let real cases determine whether `Flow` remains an execution carrier, presentation/runtime syntax, another abstraction, or is superseded on this path.
 
 ---
 
@@ -231,7 +241,7 @@ Read/write vocabulary describes instructions. Stronger guarantees are separate s
 
 ## Guarantees
 
-The current Free WorkFlow / WorkProcess experiment does not settle the guarantee model.
+The current Free WorkFlow / composed-Feature experiment does not settle the guarantee model.
 
 Still treat the following as separate, unresolved work unless current repository evidence says otherwise:
 
@@ -256,7 +266,7 @@ Failures expected by the modeled Work must remain explicit.
 
 - do not throw exceptions for expected flows;
 - use explicit error values or typed alternatives;
-- preserve error information through WorkFlow and WorkProcess composition;
+- preserve error information through composed Feature WorkFlows;
 - distinguish semantic rejection from interpreter/runtime failure;
 - do not collapse missing authority or unsupported semantics into a plausible default.
 
@@ -288,7 +298,7 @@ Rules:
 - avoid shared service/program layers that steal WorkFlow ownership;
 - keep concrete realization behind explicit interpreter boundaries;
 - keep presentation adapters thin;
-- let a WorkProcess coordinate existing WorkFlows without rewriting them;
+- let a composing Feature reuse existing WorkFlows without rewriting them;
 - do not assign semantic policy to persistence or transport components merely because they can execute an operation.
 
 Vertical slices, DDD patterns, functional programming, and other established approaches may be used where they fit; do not treat them as mandatory top-level taxonomy.
@@ -332,12 +342,12 @@ Do NOT:
 - inject concrete service implementations into Feature definitions;
 - hide WorkParts behind vague helper/manager/service abstractions;
 - recreate a shared `TodoPrograms`-style layer that owns the real WorkFlow;
-- make a lower WorkFlow know the Process/BFF that may compose it later;
+- make a lower WorkFlow know the Feature/BFF that may compose it later;
 - treat one concrete interpreter as the semantic owner of several WorkFlows;
 - infer transactions or stronger persistence guarantees from point read/write/remove;
 - restore historical `RT` constraints at the Feature boundary without new evidence;
 - force every pure semantic transformation into a WorkPart;
-- generalize `AlgebraSum` to arbitrary-N machinery without pressure;
+- extend `AlgebraSum` beyond the supported A..G arities without pressure;
 - use current implementation convenience as proof of universal Framework semantics.
 
 ---
@@ -350,7 +360,7 @@ Current evidence should include, where relevant:
 
 - direct tests of generic algebra/hoist mechanisms;
 - Feature WorkFlow interpretation through `AlgebraIO<Feature.Algebra>`;
-- WorkProcess composition and interpreter delegation;
+- composed Feature algebra hoisting and interpreter delegation;
 - compile/build evidence for dependent Framework surfaces;
 - presentation/API smoke behavior;
 - preservation of semantic state transitions.
@@ -365,7 +375,8 @@ VSlices.Work.Services build
 VSlices.Work.Products build
 Work algebra tests
 SampleWorkflow API build
-WorkProcess hoist/composition tests
+composed Feature hoist/composition tests
+AlgebraSum A..G tests
 SampleFileRepo build
 cross-service SampleBFF composition tests
 CRUD smoke test
