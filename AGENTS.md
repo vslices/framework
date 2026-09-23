@@ -243,6 +243,28 @@ Read/write/remove vocabulary describes instructions. Stronger guarantees are sep
 
 ---
 
+## Temporal Capabilities
+
+Treat temporal observation, temporal delay, scheduling, and invocation as distinct concerns.
+
+The current validated Work vocabulary is:
+
+- `Clock<ALG>` for observing the current semantic `Moment`;
+- `Delay<ALG>` for delaying by a semantic `Duration<double>` or until a `Moment`.
+
+Reusable Grounding contracts are:
+
+- `ClockIO`;
+- `DelayIO`.
+
+`SystemTimeIO` may realize both through one `TimeProvider`, but that shared realization does not make clock observation and waiting the same semantic capability.
+
+Do not reintroduce `HasClock<RT>` or `ClockEnv<RT>`. They were removed after the temporal operations were expressed directly in Feature-owned algebras.
+
+Do not infer scheduling, recurring invocation, host lifecycle, or Hangfire/Quartz semantics from `Clock` or `Delay`. Those require separate pressure.
+
+---
+
 ## Guarantees
 
 The current Free WorkFlow / composed-Feature experiment does not settle the guarantee model.
