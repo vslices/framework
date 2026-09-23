@@ -38,6 +38,7 @@ PrintSize<UpdateTodoMicroOptimized.Step>("Step");
 PrintSize<UpdateTodoMicroOptimized.Flow>("Flow");
 PrintSize<UpdateTodoMicroOptimized.Process>("Process");
 PrintSize<UpdateTodoMicroOptimized.Line>("Line");
+PrintSize<MicroOptimizedUpdateTodoWork.CompiledLine>("CompiledLine");
 Console.WriteLine();
 
 await WarmUp();
@@ -56,6 +57,10 @@ await MeasureStablePrebuiltProgram();
 Console.WriteLine();
 Console.WriteLine($"=== stable intention / preinterpreted IO ({iterations:N0} executions) ===");
 await MeasureStablePreinterpreted();
+
+Console.WriteLine();
+Console.WriteLine($"=== compiled micro hot path ({iterations:N0} executions) ===");
+MeasureCompiledMicro();
 
 return;
 
@@ -346,6 +351,97 @@ async Task MeasureStablePreinterpreted()
                 _ = await microIO.RunAsync();
             }
         });
+}
+
+void MeasureCompiledMicro()
+{
+    var alternatingGrounding =
+        new MicroOptimizedUpdateTodoWork();
+
+    alternatingGrounding.Seed(
+        CreateTodo(
+            id,
+            detailA,
+            completed: false));
+
+    var toA =
+        alternatingGrounding.Compile(
+            new UpdateTodoMicroOptimized.Request(
+                id,
+                detailA,
+                Completed: false));
+
+    var toB =
+        alternatingGrounding.Compile(
+            new UpdateTodoMicroOptimized.Request(
+                id,
+                detailB,
+                Completed: true));
+
+    MeasureSync(
+        "micro-alt",
+        () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = ((index & 1) == 0 ? toB : toA).Run();
+            }
+        });
+
+    Console.WriteLine(
+        $"micro-alt ops: lookups={alternatingGrounding.Lookups:N0} short-circuits={alternatingGrounding.SemanticShortCircuits:N0} evolutions={alternatingGrounding.Evolutions:N0} writes={alternatingGrounding.Writes:N0}");
+
+    var stableGrounding =
+        new MicroOptimizedUpdateTodoWork();
+
+    stableGrounding.Seed(
+        CreateTodo(
+            id,
+            detailA,
+            completed: false));
+
+    var stable =
+        stableGrounding.Compile(
+            new UpdateTodoMicroOptimized.Request(
+                id,
+                detailB,
+                Completed: true));
+
+    _ = stable.Run();
+
+    MeasureSync(
+        "micro-stable",
+        () =>
+        {
+            for (var index = 0; index < iterations; index++)
+            {
+                _ = stable.Run();
+            }
+        });
+
+    Console.WriteLine(
+        $"micro-stable ops: lookups={stableGrounding.Lookups:N0} short-circuits={stableGrounding.SemanticShortCircuits:N0} evolutions={stableGrounding.Evolutions:N0} writes={stableGrounding.Writes:N0}");
+}
+
+static void MeasureSync(
+    string name,
+    Action action)
+{
+    GC.Collect();
+    GC.WaitForPendingFinalizers();
+    GC.Collect();
+
+    var before = GC.GetTotalAllocatedBytes(precise: true);
+    var stopwatch = Stopwatch.StartNew();
+
+    action();
+
+    stopwatch.Stop();
+    var allocated =
+        GC.GetTotalAllocatedBytes(precise: true) - before;
+
+    Console.WriteLine(
+        $"{name,-12} {stopwatch.Elapsed.TotalMilliseconds,10:N2} ms | {allocated / (double)iterations,10:N1} B/op");
 }
 
 static async Task Measure(
