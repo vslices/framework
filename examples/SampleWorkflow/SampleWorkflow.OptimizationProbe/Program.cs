@@ -431,14 +431,14 @@ static void MeasureSync(
     GC.WaitForPendingFinalizers();
     GC.Collect();
 
-    var before = GC.GetTotalAllocatedBytes(precise: true);
+    var before = GC.GetAllocatedBytesForCurrentThread();
     var stopwatch = Stopwatch.StartNew();
 
     action();
 
     stopwatch.Stop();
     var allocated =
-        GC.GetTotalAllocatedBytes(precise: true) - before;
+        GC.GetAllocatedBytesForCurrentThread() - before;
 
     Console.WriteLine(
         $"{name,-12} {stopwatch.Elapsed.TotalMilliseconds,10:N2} ms | {allocated / (double)iterations,10:N1} B/op");
