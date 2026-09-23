@@ -1,5 +1,6 @@
 using LanguageExt;
 using LanguageExt.Traits;
+using VSlices.Monads;
 using VSlices.Work;
 using Xunit;
 using static LanguageExt.Prelude;
