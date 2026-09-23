@@ -18,7 +18,7 @@ namespace SampleWorkflow.Benchmarks;
 ///
 /// The measured path is:
 ///
-/// UpdateTodo.Get
+/// UpdateTodo.Describe
 ///     -> Free&lt;TodoAlgebra, Response&gt;
 ///     -> AlgebraIO&lt;TodoAlgebra&gt;
 ///     -> EntityFrameworkPointIO
@@ -120,7 +120,7 @@ public class UpdateTodoPostgreSqlBenchmark
 
             last = await FreeAlgebra
                 .interpret(
-                    UpdateTodo.Get(request),
+                    UpdateTodo.Describe(request),
                     grounding)
                 .RunAsync();
         }
