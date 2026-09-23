@@ -24,8 +24,52 @@ public sealed class UpdateTodoMicroOptimized :
         TodoDetail Detail,
         bool Completed);
 
-    public readonly record struct Response(
-        Either<Error, Option<Todo>> Todo);
+    public readonly record struct Response
+    {
+        private enum Kind : byte
+        {
+            Failure,
+            Missing,
+            Present
+        }
+
+        private readonly Kind kind;
+        private readonly Error? error;
+        private readonly Todo? value;
+
+        private Response(
+            Kind kind,
+            Error? error,
+            Todo? value)
+        {
+            this.kind = kind;
+            this.error = error;
+            this.value = value;
+        }
+
+        public Either<Error, Option<Todo>> Todo =>
+            kind switch
+            {
+                Kind.Failure =>
+                    Either.Left<Error, Option<Todo>>(error!),
+                Kind.Missing =>
+                    Either.Right<Error, Option<Todo>>(
+                        Option<Todo>.None),
+                Kind.Present =>
+                    Either.Right<Error, Option<Todo>>(
+                        Some(value!)),
+                _ => throw new InvalidOperationException()
+            };
+
+        public static Response FromError(Error error) =>
+            new(Kind.Failure, error, null);
+
+        public static Response Missing =>
+            new(Kind.Missing, null, null);
+
+        public static Response Present(Todo todo) =>
+            new(Kind.Present, null, todo);
+    }
 
     public readonly record struct Line(Process Process);
     public readonly record struct Process(Flow Flow);
