@@ -61,7 +61,7 @@ Do not force this factorization when current evidence contradicts it, but do not
 
 ## Current Work Model
 
-The current `SampleWorkflow` experiment has executable evidence for the following model:
+The current `SampleWorkflow` and `SampleBFF` experiments have executable evidence for the following model:
 
 ```text
 Feature == WorkFlow == Free<WorkFlowAlgebra, Response>
@@ -319,7 +319,7 @@ real case
     -> observe the next boundary
 ```
 
-The next important pressure after the `SampleWorkflow` miniature is a real multi-service composition such as Ticket Support BFF `AttachFile` / `RemoveAttachment`.
+`SampleBFF.AttachFileToTodo` now validates composition across two independently owned WorkFlows and two distinct Groundings. The next observable pressure is partial-failure semantics across those WorkFlows: compensation, retry, reconciliation, or stronger guarantees when a product actually requires them. Ticket Support BFF `AttachFile` / `RemoveAttachment` remains the real-world pressure case after the isolated sample.
 
 ---
 
@@ -366,6 +366,8 @@ VSlices.Work.Products build
 Work algebra tests
 SampleWorkflow API build
 WorkProcess hoist/composition tests
+SampleFileRepo build
+cross-service SampleBFF composition tests
 CRUD smoke test
 ```
 
