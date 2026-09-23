@@ -11,7 +11,7 @@ namespace SampleWorkflow.Grounding;
 /// <summary>
 /// Specialized realization for UpdateTodoMicroOptimized.
 ///
-/// The semantic hierarchy remains visible down to Picostep, while the storage
+/// The semantic hierarchy remains visible down to Quectostep, while the storage
 /// realization uses only the operations required by this update workload.
 /// </summary>
 public sealed class MicroOptimizedUpdateTodoWork :
@@ -36,6 +36,21 @@ public sealed class MicroOptimizedUpdateTodoWork :
             : None;
     }
 
+    public CompiledLine Compile(
+        UpdateTodoMicroOptimized.Request request) =>
+        new(
+            this,
+            UpdateTodoMicroOptimized.Lower(
+                UpdateTodoMicroOptimized.Describe(request)));
+
+    public readonly struct CompiledLine(
+        MicroOptimizedUpdateTodoWork grounding,
+        UpdateTodoMicroOptimized.Quectostep step)
+    {
+        public UpdateTodoMicroOptimized.Response Run() =>
+            grounding.Execute(step);
+    }
+
     public IO<A> Interpret<A>(
         K<UpdateTodoMicroOptimized.Algebra, A> operation) =>
         operation switch
@@ -46,24 +61,14 @@ public sealed class MicroOptimizedUpdateTodoWork :
         };
 
     private UpdateTodoMicroOptimized.Response Execute<A>(
-        UpdateTodoMicroOptimized.ExecuteLinePart<A> execute)
-    {
-        var quectostep =
-            execute.Line
-                .Process
-                .Flow
-                .Step
-                .Substep
-                .Microstep
-                .Nanostep
-                .Picostep
-                .Femtostep
-                .Attostep
-                .Zeptostep
-                .Yoctostep
-                .Rontostep
-                .Quectostep;
+        UpdateTodoMicroOptimized.ExecuteLinePart<A> execute) =>
+        Execute(
+            UpdateTodoMicroOptimized.Lower(
+                execute.Line));
 
+    private UpdateTodoMicroOptimized.Response Execute(
+        UpdateTodoMicroOptimized.Quectostep quectostep)
+    {
         Lookups++;
 
         var index = points.FindIndex(quectostep.Id.Value);
