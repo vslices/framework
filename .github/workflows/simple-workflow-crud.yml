@@ -1,0 +1,68 @@
+name: Simple Workflow CRUD
+
+on:
+  push:
+    branches:
+      - experiment/simple-workflow-point-crud
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: simple-workflow-crud-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build API
+        run: dotnet build examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj
+
+      - name: Smoke CRUD API
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ASPNETCORE_URLS=http://127.0.0.1:5099             dotnet run --no-build             --project examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj             > /tmp/simple-workflow.log 2>&1 &
+          api_pid=$!
+          trap 'kill $api_pid || true; cat /tmp/simple-workflow.log' EXIT
+
+          for _ in $(seq 1 30); do
+            if curl -sSf http://127.0.0.1:5099/health > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          id=11111111-1111-1111-1111-111111111111
+
+          status=$(curl -sS -o /tmp/create.json -w "%{http_code}"             -X POST http://127.0.0.1:5099/todos             -H 'Content-Type: application/json'             -d "{\"id\":\"$id\",\"title\":\"first\",\"completed\":false}")
+          test "$status" = "201"
+
+          status=$(curl -sS -o /tmp/read.json -w "%{http_code}"             http://127.0.0.1:5099/todos/$id)
+          test "$status" = "200"
+
+          status=$(curl -sS -o /tmp/update.json -w "%{http_code}"             -X PUT http://127.0.0.1:5099/todos/$id             -H 'Content-Type: application/json'             -d '{"title":"updated","completed":true}')
+          test "$status" = "200"
+
+          status=$(curl -sS -o /tmp/delete.json -w "%{http_code}"             -X DELETE http://127.0.0.1:5099/todos/$id)
+          test "$status" = "200"
+
+          status=$(curl -sS -o /tmp/missing.json -w "%{http_code}"             http://127.0.0.1:5099/todos/$id)
+          test "$status" = "404"
