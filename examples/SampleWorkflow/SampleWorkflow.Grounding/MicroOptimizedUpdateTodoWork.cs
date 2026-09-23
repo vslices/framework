@@ -90,6 +90,17 @@ public sealed class MicroOptimizedUpdateTodoWork :
                 current);
         }
 
+        return EvolveAndWrite(
+            current,
+            index,
+            quectostep);
+    }
+
+    private UpdateTodoMicroOptimized.Response EvolveAndWrite(
+        Todo current,
+        int index,
+        UpdateTodoMicroOptimized.Quectostep quectostep)
+    {
         Evolutions++;
 
         return UpdateTodoMicroOptimized
