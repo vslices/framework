@@ -12,6 +12,6 @@ public sealed class GetTodo :
     public sealed record Response(Option<Todo> Todo);
 
     public static Free<TodoAlgebra, Response> Get(Request request) =>
-        from todo in PointReader.read<TodoAlgebra, Todo, TodoId>(request.Id)
+        from todo in TodoAlgebra.Read(request.Id)
         select new Response(todo);
 }
