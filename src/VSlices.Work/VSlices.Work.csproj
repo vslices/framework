@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\VSlices\VSlices.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="LanguageExt" />
+    <Using Include="LanguageExt.Common" />
+    <Using Include="LanguageExt.Traits" />
+    <Using Include="LanguageExt.Effects" />
+    <Using Include="LanguageExt.Prelude" Static="true" />
+    <Using Include="VSlices.Arrows" />
+  </ItemGroup>
+</Project>

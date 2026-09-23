@@ -2,6 +2,7 @@
   <Folder Name="/examples/" />
   <Folder Name="/examples/simple-workflow/">
     <Project Path="examples/SampleWorkflow/SampleWorkflow.Core/SampleWorkflow.Core.csproj" />
+    <Project Path="examples/SampleWorkflow/SampleWorkflow.Domain/SampleWorkflow.Domain.csproj" />
   </Folder>
   <Folder Name="/examples/space-modeling/">
     <Project Path="examples/VSlices.Space.Modeling/VSlices.Space.Modeling.csproj" />
@@ -15,15 +16,19 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
-    <Project Path="src/VSlices.Application/VSlices.Application.csproj" />
-    <Project Path="src/VSlices.Domain/VSlices.Domain.csproj" />
-    <Project Path="src/VSlices.Infrastructure/VSlices.Infrastructure.csproj" Id="aabbb6eb-6bcb-4070-a584-9e9ed3d34d62" />
+    <Project Path="src/VSlices.Grounding.EntityFrameworkCore/VSlices.Grounding.EntityFrameworkCore.csproj" />
+    <Project Path="src/VSlices.Grounding/VSlices.Grounding.csproj" />
+    <Project Path="src/VSlices.Space.Products/VSlices.Space.Products.csproj" />
+    <Project Path="src/VSlices.Space.Services/VSlices.Space.Services.csproj" />
     <Project Path="src/VSlices.Space/VSlices.Space.csproj" />
+    <Project Path="src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj" />
+    <Project Path="src/VSlices.Work.Products/VSlices.Work.Products.csproj" />
+    <Project Path="src/VSlices.Work.Services/VSlices.Work.Services.csproj" />
+    <Project Path="src/VSlices.Work/VSlices.Work.csproj" />
     <Project Path="src/VSlices/VSlices.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/VSlices.Space.Modeling.Tests/VSlices.Space.Modeling.Tests.csproj" />
     <Project Path="tests/VSlices.Space.Tests/VSlices.Space.Tests.csproj" />
-    <Project Path="tests/VSlices.Tests/VSlices.Tests.csproj" Id="58e0e2db-df3c-4f98-8635-a99989c3050b" />
   </Folder>
 </Solution>
