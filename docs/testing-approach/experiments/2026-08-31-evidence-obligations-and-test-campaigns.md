@@ -4,9 +4,11 @@ Status: exploratory, non-canonical
 
 Date: 2026-08-31
 
-This note records an experiment performed against the current VSlices Framework semantics and the current VSIR corpus in `access-management-product`.
+This note records an experiment performed against the VSlices Framework semantics and VSIR corpus as they existed on 2026-08-31.
 
 It is not a final test IR specification. Its purpose is to preserve findings that may guide a later specification.
+
+> Historical note: this experiment predates the retirement of `Entity` and `AggregateRoot` as Framework semantic categories. References to those traits below are evidence of the model that was under investigation at the time, not current guidance.
 
 ## Research question
 
@@ -173,15 +175,19 @@ Candidate obligations include:
 
 The current Framework already treats algebraic laws as executable semantic claims through `CategoryLaws` and `ArrowLaws`. Test tooling can generalize that pattern: traits may contribute reusable law catalogs to the evidence-obligation graph.
 
-### Classification obligations
+### Historical classification obligations
 
-Classification may contribute additional obligations, but current executable contracts are not yet equally expressive for every classification.
+At the time of this experiment, classification traits were being considered as sources of derived obligations:
 
-- A Value Object is value-identified.
-- An Entity has identity continuity.
-- An Aggregate Root is an identity-bearing consistency boundary.
+- Value Object -> value-oriented equality;
+- Entity -> identity continuity;
+- Aggregate Root -> identity-bearing consistency boundary.
 
-The semantic documentation is richer than some current trait surfaces. This difference should be treated as a design signal rather than silently filled by test generation.
+That direction was later revised.
+
+`Entity` and `AggregateRoot` are no longer current Framework semantic primitives, so test generation must not infer those bundled obligations from those labels.
+
+If current semantics establish identity continuity, a consistency boundary, authority, lifecycle, or another related claim, the obligation should be derived from that explicit semantic source instead.
 
 ## Obligations derivable from reusable invariant VSIR
 
