@@ -83,9 +83,9 @@ A feature should be understandable in isolation.
 
 ### Definition
 
-A Capability is a type-level requirement that describes something the runtime can do.
+A Capability is a typed description of an operation or behavior that Work may require.
 
-Capabilities are conceptually similar to LanguageExt typeclasses.
+Capabilities are conceptually similar to LanguageExt typeclasses. A runtime constraint provides evidence that the required capability or capability vocabulary can be supplied or interpreted.
 
 A Capability is NOT:
 
@@ -97,13 +97,15 @@ A Capability is NOT:
 
 A Capability IS:
 
-- a constraint on `RT`
-- a typed statement of required runtime behavior
-- a composable requirement that allows features to access effects safely
+- a typed statement of an operation or behavior available to Work
+- composable semantic vocabulary
+- something whose availability must remain explicit at the Feature boundary
 
-The runtime type `RT` is the carrier of capabilities.
+A capability requirement is expressed through constraints on `RT`.
 
-Features should express their requirements in terms of what `RT` must support.
+For direct capabilities, `RT` can expose the capability itself through `Has*`. For point algebras, atomic capabilities compose into an algebra and `RT` exposes the ability to interpret that algebra through `HasAlgebra<ALG, RT>`.
+
+The runtime type `RT` remains the compile-time evidence carrier for executable Work requirements.
 
 ### Examples
 
