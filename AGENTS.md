@@ -233,9 +233,13 @@ When Work needs operations over points of semantic spaces:
 - compose only the capabilities required by the owning Feature algebra;
 - build the WorkFlow as `Free<ALG, A>`;
 - let Grounding provide `AlgebraIO<ALG>`;
-- do not infer Repository, Store, Unit of Work, tracking, transactions, atomicity, or durability from read/write/remove capability alone.
+- when a reusable realization is useful, depend on the minimum grounding contract such as `PointReaderIO<POINT, ID>`, `PointWriterIO<POINT>`, or `PointRemoverIO<POINT, ID>`;
+- treat `EntityFrameworkPointIO` as an EF Core realization of those point capabilities, not as a semantic persistence boundary;
+- do not reintroduce `Repository`, `DatabaseIO`, Store, Unit of Work, tracking, transactions, atomicity, or durability from read/write/remove capability alone.
 
-Read/write vocabulary describes instructions. Stronger guarantees are separate semantics.
+`Repository` and `DatabaseIO` were removed after executable EF Core evidence showed that point capabilities were sufficient for the validated cases.
+
+Read/write/remove vocabulary describes instructions. Stronger guarantees are separate semantics.
 
 ---
 
