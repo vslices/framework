@@ -18,12 +18,12 @@ public sealed class UpdateTodoMicroOptimized :
         UpdateTodoMicroOptimized.Request,
         UpdateTodoMicroOptimized.Response>
 {
-    public sealed record Request(
+    public readonly record struct Request(
         TodoId Id,
         TodoDetail Detail,
         bool Completed);
 
-    public sealed record Response(
+    public readonly record struct Response(
         Either<Error, Option<Todo>> Todo);
 
     public readonly record struct Line(Process Process);
@@ -49,82 +49,66 @@ public sealed class UpdateTodoMicroOptimized :
 
     public sealed record ExecuteLinePart<A>(
         Line Line,
-        Func<Todo, bool> SatisfiedBy,
-        Func<Todo, Fin<Todo>> Evolve,
-        Func<Either<Error, Option<Todo>>, A> Next)
+        Func<Response, A> Next)
         : WorkPart<A>;
 
     public sealed class Algebra : Functor<Algebra>
     {
-        public static K<Algebra, Either<Error, Option<Todo>>> Execute(
-            Line line,
-            Func<Todo, bool> satisfiedBy,
-            Func<Todo, Fin<Todo>> evolve) =>
-            new ExecuteLinePart<Either<Error, Option<Todo>>>(
+        public static K<Algebra, Response> Execute(Line line) =>
+            new ExecuteLinePart<Response>(
                 line,
-                satisfiedBy,
-                evolve,
-                static result => result);
+                static response => response);
 
         static K<Algebra, B> Functor<Algebra>.Map<A, B>(
             Func<A, B> f,
             K<Algebra, A> ma) =>
             ma switch
             {
-                ExecuteLinePart<A>(
-                    var line,
-                    var satisfiedBy,
-                    var evolve,
-                    var next) =>
+                ExecuteLinePart<A>(var line, var next) =>
                     new ExecuteLinePart<B>(
                         line,
-                        satisfiedBy,
-                        evolve,
-                        result => f(next(result))),
+                        response => f(next(response))),
                 _ => throw new NotSupportedException()
             };
     }
 
-    public static Free<Algebra, Response> Get(Request request)
-    {
-        var line =
-            new Line(
-                new Process(
-                    new Flow(
-                        new Step(
-                            new Substep(
-                                new Microstep(
-                                    new Nanostep(
-                                        new Picostep(
-                                            new Femtostep(
-                                                new Attostep(
-                                                    new Zeptostep(
-                                                        new Yoctostep(
-                                                            new Rontostep(
-                                                                new Quectostep(
-                                                                    request.Id,
-                                                                    request.Detail,
-                                                                    request.Completed))))))))))))));
+    public static Free<Algebra, Response> Get(Request request) =>
+        Free.lift(
+            Algebra.Execute(
+                ToLine(request)));
 
-        Func<Todo, bool> satisfiedBy =
-            todo =>
-                todo.Detail == request.Detail &&
-                todo.Completed == request.Completed;
+    public static bool SatisfiedBy(
+        Todo todo,
+        Quectostep step) =>
+        todo.Detail == step.Detail &&
+        todo.Completed == step.Completed;
 
-        Func<Todo, Fin<Todo>> evolve =
-            todo => todo.Update(
-                state => state with
-                {
-                    Detail = request.Detail,
-                    Completed = request.Completed
-                });
+    public static Fin<Todo> Evolve(
+        Todo todo,
+        Quectostep step) =>
+        todo.Update(
+            state => state with
+            {
+                Detail = step.Detail,
+                Completed = step.Completed
+            });
 
-        return
-            from result in Free.lift(
-                Algebra.Execute(
-                    line,
-                    satisfiedBy,
-                    evolve))
-            select new Response(result);
-    }
+    private static Line ToLine(Request request) =>
+        new(
+            new Process(
+                new Flow(
+                    new Step(
+                        new Substep(
+                            new Microstep(
+                                new Nanostep(
+                                    new Picostep(
+                                        new Femtostep(
+                                            new Attostep(
+                                                new Zeptostep(
+                                                    new Yoctostep(
+                                                        new Rontostep(
+                                                            new Quectostep(
+                                                                request.Id,
+                                                                request.Detail,
+                                                                request.Completed))))))))))))));
 }
