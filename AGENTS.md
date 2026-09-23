@@ -154,9 +154,9 @@ InMemoryTodoWork
 
 This does not make those algebras the same. It means one realization can interpret several independently owned WorkFlow vocabularies.
 
-`HasAlgebra<ALG, RT>` and runtime carriers may remain useful execution mechanisms in contexts that need them, but they are not the current semantic boundary of `Feature`.
+`HasAlgebra<ALG, RT>` and `AlgebraEnv<ALG, RT>` have been removed together with the retired runtime-carrier surface.
 
-Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historical APIs or runtime helpers still exist.
+Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historical APIs once used it.
 
 ---
 
