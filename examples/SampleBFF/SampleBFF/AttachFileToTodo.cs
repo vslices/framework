@@ -4,6 +4,7 @@ using SampleFileRepo;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using VSlices.Work;
+using static LanguageExt.Prelude;
 
 namespace SampleBFF;
 
