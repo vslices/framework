@@ -4,6 +4,7 @@ using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
+using VSlices.Space.Traits;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,7 @@ app.MapPost("/todos", async (
     CreateTodoBody body,
     AlgebraIO<TodoAlgebra> interpreter) =>
 {
-    var detail = TodoDetail.Transformation.RunFin(body.Detail);
+    var detail = Transformable.Transform<string, TodoDetail>(body.Detail);
 
     return await detail.Match<Task<IResult>>(
         Succ: async semanticDetail =>
@@ -53,7 +54,7 @@ app.MapGet("/todos/{id:guid}", async (
     Guid id,
     AlgebraIO<TodoAlgebra> interpreter) =>
 {
-    var semanticId = TodoId.Transformation.RunFin(id);
+    var semanticId = Transformable.Transform<Guid, TodoId>(id);
 
     return await semanticId.Match<Task<IResult>>(
         Succ: async todoId =>
@@ -79,8 +80,8 @@ app.MapPut("/todos/{id:guid}", async (
     AlgebraIO<TodoAlgebra> interpreter) =>
 {
     var input =
-        from semanticId in TodoId.Transformation.RunFin(id)
-        from detail in TodoDetail.Transformation.RunFin(body.Detail)
+        from semanticId in Transformable.Transform<Guid, TodoId>(id)
+        from detail in Transformable.Transform<string, TodoDetail>(body.Detail)
         select (semanticId, detail);
 
     return await input.Match<Task<IResult>>(
