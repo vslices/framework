@@ -42,3 +42,37 @@ public static class FreeAlgebra
             _ => throw new NotSupportedException()
         };
 }
+
+
+/// <summary>
+/// Experimental interpretation of a FreeT Work program whose base monad is Fin.
+///
+/// Semantic failure remains a Fin value while Grounding effects remain IO.
+/// </summary>
+public static class FreeTAlgebra
+{
+    public static IO<Fin<A>> interpret<ALG, A>(
+        FreeT<ALG, Fin, A> program,
+        AlgebraIO<ALG> interpreter)
+        where ALG : Functor<ALG>
+    {
+        var layer = program.runFreeT.As();
+
+        return layer.Match(
+            Succ: step =>
+                step switch
+                {
+                    FreeTPure<ALG, Fin, A>(var value) =>
+                        IO.pure(Fin.Succ(value)),
+
+                    FreeTSuspend<ALG, Fin, A>(var operation) =>
+                        interpreter
+                            .Interpret(operation)
+                            .Bind(next => interpret(next, interpreter)),
+
+                    _ => throw new NotSupportedException()
+                },
+            Fail: error =>
+                IO.pure(Fin.Fail<A>(error)));
+    }
+}
