@@ -1,6 +1,7 @@
 using LanguageExt;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work.Algebras;
+using VSlices;
 using VSlices.Errors;
 using VSlices.Space;
 using VSlices.Work;
