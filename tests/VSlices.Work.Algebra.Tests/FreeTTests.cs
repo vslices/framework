@@ -30,9 +30,9 @@ public sealed class FreeTTests
             .interpret(program, grounding)
             .RunAsync();
 
-        var account = result.ThrowIfFail();
+        var updatedAccount = result.ThrowIfFail();
 
-        Assert.Equal("after", account.Name);
+        Assert.Equal("after", updatedAccount.Name);
         Assert.Equal(["read-account", "write-account"], grounding.Trace);
     }
 
