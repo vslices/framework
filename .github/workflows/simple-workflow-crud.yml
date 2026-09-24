@@ -62,7 +62,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          ASPNETCORE_URLS=http://127.0.0.1:5099             dotnet run --no-build             --project examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj             > /tmp/simple-workflow.log 2>&1 &
+          dotnet run --no-build --no-launch-profile \
+            --project examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj \
+            --urls http://127.0.0.1:5099 \
+            > /tmp/simple-workflow.log 2>&1 &
           api_pid=$!
           trap 'kill $api_pid || true; cat /tmp/simple-workflow.log' EXIT
 

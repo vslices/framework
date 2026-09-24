@@ -3,11 +3,13 @@ using LanguageExt.Common;
 using SampleFileRepo;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
+using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using static LanguageExt.Prelude;
 using Algebra = VSlices.Work.AlgebraSum<
     SampleFileRepo.AddFile.Algebra,
-    SampleWorkflow.Work.AddAttachmentReference.Algebra>;
+    SampleWorkflow.Work.Algebras.TodoAlgebra>;
 
 namespace SampleBFF;
 
@@ -20,7 +22,6 @@ namespace SampleBFF;
 /// </summary>
 public sealed class AttachFileToTodo :
     Feature<
-        AttachFileToTodo,
         Algebra,
         AttachFileToTodo.Request,
         AttachFileToTodo.Response>
@@ -37,23 +38,24 @@ public sealed class AttachFileToTodo :
     public sealed record Response(
         Either<Error, Option<Attached>> Attachment);
 
-    public static Free<Algebra, Response> Get(Request request)
+    public static Free<Algebra, Response> Describe(Request request)
     {
         var addFile = Algebra.FromA(
-            AddFile.Get(
+            AddFile.Describe(
                 new AddFile.Request(
                     request.Name,
                     request.Content)));
 
         return
             from stored in addFile
-            from response in ResourceReference.Transformation
-                .RunFin(stored.File.Id.ToString())
+            from response in Transformable
+                .Transform<string, ResourceReference>(
+                    stored.File.Id.ToString())
                 .Match(
                     Succ: resource =>
                     {
                         var associate = Algebra.FromB(
-                            AddAttachmentReference.Get(
+                            AddAttachmentReference.Describe(
                                 new AddAttachmentReference.Request(
                                     request.TodoId,
                                     resource)));

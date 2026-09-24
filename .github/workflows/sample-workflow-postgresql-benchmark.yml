@@ -1,0 +1,50 @@
+name: SampleWorkflow PostgreSQL Benchmark
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - examples/SampleWorkflow/SampleWorkflow.Benchmarks/**
+      - examples/SampleWorkflow/SampleWorkflow.Work/**
+      - examples/SampleWorkflow/SampleWorkflow.Spaces/**
+      - src/VSlices.Grounding.EntityFrameworkCore/**
+      - .github/workflows/sample-workflow-postgresql-benchmark.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sample-workflow-postgresql-benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Verify Docker
+        run: docker info
+
+      - name: Run UpdateTodo PostgreSQL benchmark
+        run: dotnet run -c Release --project examples/SampleWorkflow/SampleWorkflow.Benchmarks/SampleWorkflow.Benchmarks.csproj
+
+      - name: Upload BenchmarkDotNet artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sample-workflow-postgresql-benchmark
+          path: BenchmarkDotNet.Artifacts/**
+          if-no-files-found: ignore

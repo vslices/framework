@@ -2,7 +2,9 @@ using SampleFileRepo;
 using SampleWorkflow.Grounding;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
+using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using Xunit;
 
 namespace SampleBFF.Tests;
@@ -15,17 +17,18 @@ public sealed class CrossServiceFeatureCompositionTests
         var todoWork = new InMemoryTodoWork();
         var fileWork = new InMemoryFileWork();
 
-        var detail = TodoDetail.Transformation
-            .RunFin("todo with external file")
+        var detail = Transformable
+            .Transform<string, TodoDetail>(
+                "todo with external file")
             .ThrowIfFail();
 
         var created = await FreeAlgebra
             .interpret(
-                CreateTodo.Get(
+                CreateTodo.Describe(
                     new CreateTodo.Request(
                         detail,
                         Completed: false)),
-                (AlgebraIO<CreateTodo.Algebra>)todoWork)
+                (AlgebraIO<TodoAlgebra>)todoWork)
             .RunAsync();
 
         var todo = created.Todo.Match(
@@ -37,13 +40,13 @@ public sealed class CrossServiceFeatureCompositionTests
         var processInterpreter =
             new AlgebraSumIO<
                 AddFile.Algebra,
-                AddAttachmentReference.Algebra>(
+                TodoAlgebra>(
                 fileWork,
                 todoWork);
 
         var response = await FreeAlgebra
             .interpret(
-                AttachFileToTodo.Get(
+                AttachFileToTodo.Describe(
                     new AttachFileToTodo.Request(
                         todo.Id,
                         "evidence.txt",
@@ -65,9 +68,9 @@ public sealed class CrossServiceFeatureCompositionTests
 
         var persistedTodo = await FreeAlgebra
             .interpret(
-                GetTodo.Get(
+                GetTodo.Describe(
                     new GetTodo.Request(todo.Id)),
-                (AlgebraIO<GetTodo.Algebra>)todoWork)
+                (AlgebraIO<TodoAlgebra>)todoWork)
             .RunAsync();
 
         var rereadTodo = persistedTodo.Todo.IfNone(
@@ -81,7 +84,7 @@ public sealed class CrossServiceFeatureCompositionTests
 
         var persistedFile = await FreeAlgebra
             .interpret(
-                GetFile.Get(
+                GetFile.Describe(
                     new GetFile.Request(attached.File.Id)),
                 (AlgebraIO<GetFile.Algebra>)fileWork)
             .RunAsync();
@@ -100,20 +103,20 @@ public sealed class CrossServiceFeatureCompositionTests
         var todoWork = new InMemoryTodoWork();
         var fileWork = new InMemoryFileWork();
 
-        var missingTodoId = TodoId.Transformation
-            .RunFin(Guid.NewGuid())
+        var missingTodoId = Transformable
+            .Transform<Guid, TodoId>(Guid.NewGuid())
             .ThrowIfFail();
 
         var processInterpreter =
             new AlgebraSumIO<
                 AddFile.Algebra,
-                AddAttachmentReference.Algebra>(
+                TodoAlgebra>(
                 fileWork,
                 todoWork);
 
         var response = await FreeAlgebra
             .interpret(
-                AttachFileToTodo.Get(
+                AttachFileToTodo.Describe(
                     new AttachFileToTodo.Request(
                         missingTodoId,
                         "orphan.txt",

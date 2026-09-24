@@ -6,7 +6,7 @@ using static LanguageExt.Prelude;
 namespace SampleFileRepo;
 
 public sealed class AddFile :
-    Feature<AddFile, AddFile.Algebra, AddFile.Request, AddFile.Response>
+    Feature<AddFile.Algebra, AddFile.Request, AddFile.Response>
 {
     public sealed record Request(
         string Name,
@@ -50,7 +50,7 @@ public sealed class AddFile :
     private static Free<Algebra, SampleFileId> nextId() =>
         Free.lift(Algebra.NextId());
 
-    public static Free<Algebra, Response> Get(Request request) =>
+    public static Free<Algebra, Response> Describe(Request request) =>
         from id in nextId()
         let file = new SampleFile(
             id,

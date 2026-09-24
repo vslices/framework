@@ -5,7 +5,7 @@ using VSlices.Work;
 namespace SampleFileRepo;
 
 public sealed class GetFile :
-    Feature<GetFile, GetFile.Algebra, GetFile.Request, GetFile.Response>
+    Feature<GetFile.Algebra, GetFile.Request, GetFile.Response>
 {
     public sealed record Request(SampleFileId Id);
     public sealed record Response(Option<SampleFile> File);
@@ -40,7 +40,7 @@ public sealed class GetFile :
             };
     }
 
-    public static Free<Algebra, Response> Get(Request request) =>
+    public static Free<Algebra, Response> Describe(Request request) =>
         from file in PointReader.read<
             Algebra,
             SampleFile,
