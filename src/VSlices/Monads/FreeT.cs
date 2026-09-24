@@ -115,16 +115,21 @@ public sealed class FreeT<F, M> :
 
     static K<FreeT<F, M>, B> Monad<FreeT<F, M>>.Recur<A, B>(
         A value,
-        Func<A, K<FreeT<F, M>, Next<A, B>>> f) =>
+        Func<A, K<FreeT<F, M>, Next<A, B>>> f)
+    {
         // Prototype fallback for the LanguageExt version currently consumed by VSlices.
         // When promoted to the fork this should use the stack-safe recursion machinery
         // available in the target LanguageExt revision.
-        f(value)
-            .As()
-            .Bind(next =>
-                next.IsDone
-                    ? FreeT.pure<F, M, B>(next.Done)
-                    : ((Monad<FreeT<F, M>>)default!).Recur(next.Loop, f).As());
+        FreeT<F, M, B> Go(A current) =>
+            f(current)
+                .As()
+                .Bind(next =>
+                    next.IsDone
+                        ? FreeT.pure<F, M, B>(next.Done)
+                        : Go(next.Loop));
+
+        return Go(value);
+    }
 
     static K<FreeT<F, M>, B> Functor<FreeT<F, M>>.Map<A, B>(
         Func<A, B> f,
