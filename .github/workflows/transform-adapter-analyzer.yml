@@ -1,0 +1,44 @@
+name: TransformAdapter Analyzer Experiment CI
+
+on:
+  pull_request:
+    branches:
+      - experiment/flow-algebra-runtime
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: transform-adapter-analyzer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-transform-adapter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build Space
+        run: dotnet build src/VSlices.Space/VSlices.Space.csproj
+
+      - name: Build analyzer
+        run: dotnet build src/VSlices.Space.Analyzers/VSlices.Space.Analyzers.csproj
+
+      - name: Run analyzer tests
+        run: dotnet run --project tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj
+
+      - name: Build abstract views
+        run: dotnet build src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj
+
+      - name: Run UI adapter tests
+        run: dotnet run --project tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj
