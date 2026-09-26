@@ -110,6 +110,25 @@ public sealed class TransformAdapterAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        var transformable = context.Compilation.GetTypeByMetadataName(
+            "VSlices.Space.Traits.Transformable`2");
+
+        if (transformable is null)
+            return;
+
+        var direct = transformable.Construct(
+            source,
+            targetType);
+
+        if (targetType.AllInterfaces.Any(
+                implemented =>
+                    SymbolEqualityComparer.Default.Equals(
+                        implemented,
+                        direct)))
+        {
+            return;
+        }
+
         var inputTypes = targetType
             .GetTypeMembers("Input")
             .Where(static type => type.Arity == 0)
@@ -151,12 +170,6 @@ public sealed class TransformAdapterAnalyzer : DiagnosticAnalyzer
 
             return;
         }
-
-        var transformable = context.Compilation.GetTypeByMetadataName(
-            "VSlices.Space.Traits.Transformable`2");
-
-        if (transformable is null)
-            return;
 
         var expected = transformable.Construct(
             input,
