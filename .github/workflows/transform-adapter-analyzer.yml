@@ -1,0 +1,69 @@
+name: TransformAdapter Analyzer Experiment CI
+
+on:
+  pull_request:
+    branches:
+      - experiment/flow-algebra-runtime
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: transform-adapter-analyzer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-transform-adapter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build Space
+        run: dotnet build src/VSlices.Space/VSlices.Space.csproj
+
+      - name: Build analyzer
+        run: dotnet build src/VSlices.Space.Analyzers/VSlices.Space.Analyzers.csproj
+
+      - name: Verify analyzer ships with Space
+        run: |
+          package=$(find src/VSlices.Space/bin/Debug -name 'VSlices.Space.*.nupkg' | head -n 1)
+          test -n "$package"
+          unzip -l "$package" | grep -q 'analyzers/dotnet/cs/VSlices.Space.Analyzers.dll'
+          nuspec=$(unzip -Z1 "$package" | grep '\.nuspec$' | head -n 1)
+          unzip -p "$package" "$nuspec" > /tmp/vslices-space.nuspec
+          if grep -q 'VSlices.Space.Analyzers' /tmp/vslices-space.nuspec; then
+            echo "VSlices.Space.Analyzers must not be a package dependency."
+            exit 1
+          fi
+
+      - name: Run analyzer tests
+        run: dotnet run --project tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj
+
+      - name: Build abstract views
+        run: dotnet build src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj
+
+      - name: Run UI adapter tests
+        run: dotnet run --project tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj
+
+      - name: Build valid Razor adapter probe
+        run: dotnet build tests/VSlices.Views.Razor.AdapterProbe/VSlices.Views.Razor.AdapterProbe.csproj
+
+      - name: Verify Razor generated code receives analyzer diagnostics
+        run: |
+          if dotnet build tests/VSlices.Views.Razor.InvalidAdapterProbe/VSlices.Views.Razor.InvalidAdapterProbe.csproj > /tmp/invalid-razor-adapter.log 2>&1; then
+            cat /tmp/invalid-razor-adapter.log
+            echo "Expected invalid Razor adapter probe to fail."
+            exit 1
+          fi
+          cat /tmp/invalid-razor-adapter.log
+          grep -q 'VST002' /tmp/invalid-razor-adapter.log

@@ -1,6 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<ItemGroup>
 		<ProjectReference Include="..\VSlices\VSlices.csproj" />
+		<ProjectReference Include="..\VSlices.Space.Analyzers\VSlices.Space.Analyzers.csproj"
+		                  OutputItemType="Analyzer"
+		                  ReferenceOutputAssembly="false"
+		                  PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\VSlices.Space.Analyzers\bin\$(Configuration)\netstandard2.0\VSlices.Space.Analyzers.dll"
+		      Pack="true"
+		      PackagePath="analyzers/dotnet/cs"
+		      Visible="false" />
 	</ItemGroup>
 
 	<ItemGroup>
