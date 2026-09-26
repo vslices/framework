@@ -49,9 +49,9 @@ public sealed record ProcessRuntime(InMemoryTodoWork Work) :
 {
     static K<Eff<ProcessRuntime>, AlgebraIO<CreateTodoAlgebra>>
         Has<Eff<ProcessRuntime>, AlgebraIO<CreateTodoAlgebra>>.Ask { get; } =
-        liftEff<ProcessRuntime, AlgebraIO<CreateTodoAlgebra>>(rt => rt.Work);
+        liftEff<ProcessRuntime, AlgebraIO<CreateTodoAlgebra>>(rt => (AlgebraIO<CreateTodoAlgebra>)rt.Work);
 
     static K<Eff<ProcessRuntime>, AlgebraIO<GetTodoAlgebra>>
         Has<Eff<ProcessRuntime>, AlgebraIO<GetTodoAlgebra>>.Ask { get; } =
-        liftEff<ProcessRuntime, AlgebraIO<GetTodoAlgebra>>(rt => rt.Work);
+        liftEff<ProcessRuntime, AlgebraIO<GetTodoAlgebra>>(rt => (AlgebraIO<GetTodoAlgebra>)rt.Work);
 }
