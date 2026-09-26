@@ -35,8 +35,8 @@ public sealed class AttachFileToTodo :
     {
         var addFile = AddFile
             .Get()
-            .MapRuntime<AlgebraSum<FileAlgebra, TodoAlgebra>>(sum => sum.A)
-            .MapRequest<Request>(request =>
+            .MapRuntime((AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+            .MapRequest((Request request) =>
                 new AddFile.Request(
                     request.Name,
                     request.Content));
@@ -48,7 +48,7 @@ public sealed class AttachFileToTodo :
                     Succ: resource =>
                         AddAttachmentReference
                             .Get()
-                            .MapRuntime<AlgebraSum<FileAlgebra, TodoAlgebra>>(sum => sum.B)
+                            .MapRuntime((AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.B)
                             .MapRequest<Request>(request =>
                                 new AddAttachmentReference.Request(
                                     request.TodoId,
