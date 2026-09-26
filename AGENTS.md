@@ -124,13 +124,15 @@ public interface AlgebraIO<ALG>
 
 Features sharing the same module algebra compose directly.
 
-Independent module algebras compose structurally with:
+Independent module algebras currently compose structurally with the historically named:
 
 ```text
 AlgebraSum<A, B>
 ...
 AlgebraSum<A, B, C, D, E, F, G>
 ```
+
+Important mathematical caveat: in the executable-runtime model this value contains all child algebras simultaneously and is eliminated by projection. Its current behavior is therefore **product-like**, unlike the actual coproduct/sum of instruction functors used by the earlier Free experiment. Preserve the current type name during this experiment, but do not claim that the representation is mathematically a sum.
 
 A child Flow is adapted to the parent runtime by projection:
 
