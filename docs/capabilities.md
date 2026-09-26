@@ -72,7 +72,7 @@ A different Grounding may expose the same Work algebra through different mechani
 A consumer that needs multiple independently owned algebras composes them structurally:
 
 ```csharp
-AlgebraSum<FileAlgebra, TodoAlgebra>
+AlgebraMix<FileAlgebra, TodoAlgebra>
 ```
 
 Child Flows are adapted by projection:
@@ -80,7 +80,7 @@ Child Flows are adapted by projection:
 ```csharp
 AddFile.Get()
     .MapRuntime(
-        (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+        (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
 ```
 
 This makes the relationship explicit:
