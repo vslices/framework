@@ -116,17 +116,14 @@ public sealed class ExerciseRecord :
 
     public static Flow<RecordAlgebra, Request, Response> Get() =>
         new((algebra, request) =>
-            algebra.Writer.Write(new Record(request.Id, "created"))
-                .Bind(_ => algebra.Reader.Read(request.Id))
-                .Bind(created =>
-                    algebra.Writer.Write(new Record(request.Id, "updated"))
-                        .Bind(_ => algebra.Reader.Read(request.Id))
-                        .Bind(updated =>
-                            algebra.Remover.Remove(request.Id)
-                                .Bind(_ => algebra.Reader.Read(request.Id))
-                                .Map(removed =>
-                                    new Response(
-                                        created,
-                                        updated,
-                                        removed))))));
+            from _ in algebra.Writer.Write(new Record(request.Id, "created"))
+            from created in algebra.Reader.Read(request.Id)
+            from __ in algebra.Writer.Write(new Record(request.Id, "updated"))
+            from updated in algebra.Reader.Read(request.Id)
+            from ___ in algebra.Remover.Remove(request.Id)
+            from removed in algebra.Reader.Read(request.Id)
+            select new Response(
+                created,
+                updated,
+                removed));
 }
