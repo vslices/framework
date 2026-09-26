@@ -27,7 +27,7 @@ public sealed class TransformAdapterAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor InvalidInputConstructor = new(
         InvalidInputConstructorId,
         "TransformAdapter Input constructor is incompatible",
-        "Type '{0}.Input' must expose exactly one public instance constructor whose only parameter is '{1}'",
+        "Type '{0}.Input' must expose exactly one non-empty public instance constructor whose only parameter is '{1}'",
         "VSlices.Transforms",
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
@@ -132,7 +132,8 @@ public sealed class TransformAdapterAnalyzer : DiagnosticAnalyzer
         var publicConstructors = input.InstanceConstructors
             .Where(static constructor =>
                 constructor.DeclaredAccessibility ==
-                Accessibility.Public)
+                    Accessibility.Public &&
+                constructor.Parameters.Length > 0)
             .ToArray();
 
         if (publicConstructors.Length != 1 ||
