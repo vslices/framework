@@ -2,6 +2,7 @@ using LanguageExt;
 using LanguageExt.Common;
 using LanguageExt.Traits;
 using SampleWorkflow.Spaces;
+using VSlices;
 using VSlices.Monads;
 using VSlices.Space;
 using VSlices.Work;
