@@ -99,19 +99,19 @@ public sealed record ApiRuntime(InMemoryTodoWork Work) :
 {
     static K<Eff<ApiRuntime>, AlgebraIO<CreateTodoAlgebra>>
         Has<Eff<ApiRuntime>, AlgebraIO<CreateTodoAlgebra>>.Ask { get; } =
-        liftEff<ApiRuntime, AlgebraIO<CreateTodoAlgebra>>(rt => rt.Work);
+        liftEff<ApiRuntime, AlgebraIO<CreateTodoAlgebra>>(rt => (AlgebraIO<CreateTodoAlgebra>)rt.Work);
 
     static K<Eff<ApiRuntime>, AlgebraIO<GetTodoAlgebra>>
         Has<Eff<ApiRuntime>, AlgebraIO<GetTodoAlgebra>>.Ask { get; } =
-        liftEff<ApiRuntime, AlgebraIO<GetTodoAlgebra>>(rt => rt.Work);
+        liftEff<ApiRuntime, AlgebraIO<GetTodoAlgebra>>(rt => (AlgebraIO<GetTodoAlgebra>)rt.Work);
 
     static K<Eff<ApiRuntime>, AlgebraIO<UpdateTodoAlgebra>>
         Has<Eff<ApiRuntime>, AlgebraIO<UpdateTodoAlgebra>>.Ask { get; } =
-        liftEff<ApiRuntime, AlgebraIO<UpdateTodoAlgebra>>(rt => rt.Work);
+        liftEff<ApiRuntime, AlgebraIO<UpdateTodoAlgebra>>(rt => (AlgebraIO<UpdateTodoAlgebra>)rt.Work);
 
     static K<Eff<ApiRuntime>, AlgebraIO<DeleteTodoAlgebra>>
         Has<Eff<ApiRuntime>, AlgebraIO<DeleteTodoAlgebra>>.Ask { get; } =
-        liftEff<ApiRuntime, AlgebraIO<DeleteTodoAlgebra>>(rt => rt.Work);
+        liftEff<ApiRuntime, AlgebraIO<DeleteTodoAlgebra>>(rt => (AlgebraIO<DeleteTodoAlgebra>)rt.Work);
 }
 
 public sealed record CreateTodoBody(string Detail, bool Completed);
