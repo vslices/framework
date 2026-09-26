@@ -13,10 +13,12 @@ namespace VSlices.Space.Traits;
 /// <typeparam name="FROM">The representation accepted by the adapter.</typeparam>
 /// <typeparam name="TO">The semantic target.</typeparam>
 /// <remarks>
-/// The adapter convention requires <typeparamref name="TO"/> to declare a nested
-/// type named <c>Input</c>, that Input to expose exactly one non-empty public constructor
-/// with exactly one parameter of type <typeparamref name="FROM"/>, and the target
-/// to implement <c>Transformable&lt;TO.Input, TO&gt;</c>.
+/// If <typeparamref name="TO"/> already owns a direct
+/// <c>Transformable&lt;FROM, TO&gt;</c>, that canonical transformation is used as-is.
+/// Otherwise the adapter convention requires <typeparamref name="TO"/> to declare a
+/// nested type named <c>Input</c>, that Input to expose exactly one non-empty public
+/// constructor with exactly one parameter of type <typeparamref name="FROM"/>, and
+/// the target to implement <c>Transformable&lt;TO.Input, TO&gt;</c>.
 ///
 /// These conditions are verified statically by the VSlices analyzer when the
 /// closed adapter is visible to Roslyn. Runtime validation remains as a safety
@@ -53,6 +55,29 @@ public sealed class TransformAdapter<FROM, TO> :
     private static Func<FROM, Fin<TO>> CreateAdapter()
     {
         var targetType = typeof(TO);
+
+        var directTransformable = typeof(Transformable<,>)
+            .MakeGenericType(typeof(FROM), targetType);
+
+        if (directTransformable.IsAssignableFrom(targetType))
+        {
+            var directBridgeType = typeof(DirectTransformAdapterBridge<,>)
+                .MakeGenericType(
+                    typeof(FROM),
+                    targetType);
+
+            var createDirect = directBridgeType.GetMethod(
+                "Create",
+                BindingFlags.Public | BindingFlags.Static)
+                ?? throw InvalidConvention(
+                    "The direct TransformAdapter bridge could not be created.");
+
+            return (Func<FROM, Fin<TO>>)
+                (createDirect.Invoke(null, null)
+                 ?? throw InvalidConvention(
+                     "The direct TransformAdapter bridge returned no delegate."));
+        }
+
         var inputType = targetType.GetNestedType(
             "Input",
             BindingFlags.Public | BindingFlags.NonPublic);
@@ -145,4 +170,13 @@ internal static class TransformAdapterBridge<TFrom, TInput, TTo>
             TTo.Transformation.RunFin(
                 constructInput(value));
     }
+}
+
+
+internal static class DirectTransformAdapterBridge<TFrom, TTo>
+    where TTo : Transformable<TFrom, TTo>
+{
+    public static Func<TFrom, Fin<TTo>> Create() =>
+        static value =>
+            TTo.Transformation.RunFin(value);
 }
