@@ -139,11 +139,13 @@ semantic point != EF projection
 
 ## Algebra composition
 
-If a Feature consumes Work owned by independent modules, its runtime can be a structural sum:
+If a Feature consumes Work owned by independent modules, its runtime can use the historically named:
 
 ```csharp
 AlgebraSum<FileAlgebra, TodoAlgebra>
 ```
+
+Despite the name, the current executable-runtime representation is product-like: it contains both child algebras simultaneously. This differs materially from the earlier Free model, where `AlgebraSum` was an actual coproduct of instruction functors.
 
 The child Flow is lifted into that larger runtime by runtime projection:
 
