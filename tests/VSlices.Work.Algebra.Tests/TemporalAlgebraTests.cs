@@ -1,5 +1,6 @@
 using LanguageExt;
 using LanguageExt.Traits;
+using VSlices;
 using VSlices.Monads;
 using VSlices.Space.Quantities;
 using VSlices.Space.Temporal;
