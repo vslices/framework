@@ -54,3 +54,16 @@ jobs:
 
       - name: Run UI adapter tests
         run: dotnet run --project tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj
+
+      - name: Build valid Razor adapter probe
+        run: dotnet build tests/VSlices.Views.Razor.AdapterProbe/VSlices.Views.Razor.AdapterProbe.csproj
+
+      - name: Verify Razor generated code receives analyzer diagnostics
+        run: |
+          if dotnet build tests/VSlices.Views.Razor.InvalidAdapterProbe/VSlices.Views.Razor.InvalidAdapterProbe.csproj > /tmp/invalid-razor-adapter.log 2>&1; then
+            cat /tmp/invalid-razor-adapter.log
+            echo "Expected invalid Razor adapter probe to fail."
+            exit 1
+          fi
+          cat /tmp/invalid-razor-adapter.log
+          grep -q 'VST002' /tmp/invalid-razor-adapter.log
