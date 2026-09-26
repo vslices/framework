@@ -345,13 +345,22 @@ A grounding may contribute laws for guarantees that VSlices.Grounding does not k
 
 The capability side now has a concrete typed shape.
 
-A service-owned algebra composes point capabilities and a Feature requires its interpreter through:
+A Work module owns an executable algebra composed from the capability atoms supported by current evidence:
 
 ```csharp
-where RT : HasAlgebra<AppAlgebra, RT>
+public sealed record AppAlgebra(
+    PointReader<Account, AccountId> Reader,
+    PointWriter<Account> Writer);
 ```
 
-Grounding supplies `AlgebraIO<AppAlgebra>`; the Feature never names the concrete Grounding implementation.
+A Feature names that algebra directly in its Flow contract:
+
+```csharp
+Feature<RenameAccount, AppAlgebra, Request, Response>
+Flow<AppAlgebra, Request, Response>
+```
+
+Grounding implements the atoms and may export the assembled algebra through `AlgebraIO<AppAlgebra>`; the Feature never names the concrete Grounding implementation.
 
 This preserves the original goal of making runtime requirements explicit without introducing pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
 
@@ -359,7 +368,7 @@ The exact typed representation of guarantees remains intentionally open.
 
 ## Current scope decision
 
-The capability substrate required for point reading/writing and free algebra interpretation has been implemented because the experiment produced direct executable evidence for it.
+The executable capability substrate required for the demonstrated point and temporal cases has been implemented because the experiment produced direct executable evidence for it.
 
 The following remain deliberately deferred:
 
