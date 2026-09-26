@@ -62,13 +62,15 @@ Grounding chooses mechanism. It does not acquire authority to redefine Work sema
 
 ## Composition
 
-Independent Work algebras compose structurally:
+Independent Work algebras compose structurally through the currently named:
 
 ```text
 AlgebraSum<A, B>
 AlgebraSum<A, B, C>
 ...
 ```
+
+The name is historical. In the current executable-runtime model the composed value contains every child algebra and exposes projections to them, so the construction is product-like rather than the coproduct represented by the former Free instruction algebra.
 
 A child Flow is adapted to a composed runtime by projecting the algebra it requires:
 
