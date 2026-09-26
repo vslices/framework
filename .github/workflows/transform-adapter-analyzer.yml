@@ -39,6 +39,19 @@ jobs:
           package=$(find src/VSlices.Space/bin/Debug -name 'VSlices.Space.*.nupkg' | head -n 1)
           test -n "$package"
           unzip -l "$package" | grep -q 'analyzers/dotnet/cs/VSlices.Space.Analyzers.dll'
+          nuspec=$(unzip -Z1 "$package" | grep '\.nuspec
+
+      - name: Run analyzer tests
+        run: dotnet run --project tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj
+
+      - name: Build abstract views
+        run: dotnet build src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj
+
+      - name: Run UI adapter tests
+        run: dotnet run --project tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj
+ | head -n 1)
+          unzip -p "$package" "$nuspec" > /tmp/vslices-space.nuspec
+          ! grep -q 'VSlices.Space.Analyzers' /tmp/vslices-space.nuspec
 
       - name: Run analyzer tests
         run: dotnet run --project tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj
