@@ -25,6 +25,7 @@
     <File Path="docs/do-not.md" />
     <File Path="docs/feature-model.md" />
     <File Path="docs/point-algebras.md" />
+    <File Path="docs/transform-adapter.md" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
