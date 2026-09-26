@@ -1,9 +1,9 @@
-name: Feature Flow Recovery CI
+name: Flow Algebra Runtime Experiment CI
 
 on:
   pull_request:
     branches:
-      - valid-checkout
+      - fix/restore-feature-flow-boundary
   workflow_dispatch:
 
 permissions:
@@ -45,3 +45,6 @@ jobs:
 
       - name: Run SampleBFF tests
         run: dotnet run --project examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj
+
+      - name: Build EF Core Grounding tests
+        run: dotnet build tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj
