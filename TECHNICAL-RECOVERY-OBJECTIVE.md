@@ -80,7 +80,7 @@ input
 -> zero or more integrations
 ```
 
-The current `Feature<F, RT, REQ, RES>` and `Flow<RT, REQ, RES>` already recover the executable core more explicitly.
+The current `Feature<F, ALG, REQ, RES>` and `Flow<ALG, REQ, RES>` recover the executable core while making the Work-module algebra explicit.
 
 The remaining problem is to rediscover the relation between executable work and the concrete mechanisms that make that work reachable.
 
