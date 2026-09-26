@@ -5,41 +5,41 @@ namespace VSlices.Work;
 /// Each component remains independently owned and can be projected when a child
 /// Flow requires only one part of the composed runtime.
 /// </summary>
-public sealed record AlgebraSum<A, B>(
-    A A,
-    B B);
+public sealed record AlgebraSum<TA, TB>(
+    TA A,
+    TB B);
 
-public sealed record AlgebraSum<A, B, C>(
-    A A,
-    B B,
-    C C);
+public sealed record AlgebraSum<TA, TB, TC>(
+    TA A,
+    TB B,
+    TC C);
 
-public sealed record AlgebraSum<A, B, C, D>(
-    A A,
-    B B,
-    C C,
-    D D);
+public sealed record AlgebraSum<TA, TB, TC, TD>(
+    TA A,
+    TB B,
+    TC C,
+    TD D);
 
-public sealed record AlgebraSum<A, B, C, D, E>(
-    A A,
-    B B,
-    C C,
-    D D,
-    E E);
+public sealed record AlgebraSum<TA, TB, TC, TD, TE>(
+    TA A,
+    TB B,
+    TC C,
+    TD D,
+    TE E);
 
-public sealed record AlgebraSum<A, B, C, D, E, F>(
-    A A,
-    B B,
-    C C,
-    D D,
-    E E,
-    F F);
+public sealed record AlgebraSum<TA, TB, TC, TD, TE, TF>(
+    TA A,
+    TB B,
+    TC C,
+    TD D,
+    TE E,
+    TF F);
 
-public sealed record AlgebraSum<A, B, C, D, E, F, G>(
-    A A,
-    B B,
-    C C,
-    D D,
-    E E,
-    F F,
-    G G);
+public sealed record AlgebraSum<TA, TB, TC, TD, TE, TF, TG>(
+    TA A,
+    TB B,
+    TC C,
+    TD D,
+    TE E,
+    TF F,
+    TG G);
