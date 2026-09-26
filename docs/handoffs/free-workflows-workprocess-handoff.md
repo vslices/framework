@@ -1,5 +1,36 @@
 # Handoff — Free WorkFlows and composed Feature algebras
 
+## Historical status — superseded
+
+This handoff records the validated **2026-09-23 Free WorkFlow experiment** and should be read as historical evidence, not as the current Work contract.
+
+The later recovery trajectory was:
+
+```text
+Feature == Free<ALG, Response>
+    -> restore Flow as the Feature boundary
+    -> retain algebraic capability pressure
+    -> remove the Free/interpreter layer
+    -> make the executable module algebra the Flow runtime
+```
+
+Current maintained direction:
+
+```text
+Feature
+    -> Flow<ALG, Request, Response>
+
+ALG
+    -> executable Work-module algebra
+    -> composed from executable capability atoms
+
+Grounding
+    -> realizes those atoms
+```
+
+The remainder of this document is intentionally preserved as evidence of the earlier experiment and its conclusions at that time.
+
+
 > Date: 2026-09-23
 >
 > Origin branch: `experiment/cross-service-workprocess`
