@@ -22,7 +22,7 @@ public sealed class CreateAndGetTodo :
     {
         var create = CreateTodo
             .Get()
-            .MapRequest<Request>(request =>
+            .MapRequest((Request request) =>
                 new CreateTodo.Request(
                     request.Detail,
                     request.Completed));
@@ -38,7 +38,7 @@ public sealed class CreateAndGetTodo :
                         Some: todo =>
                             GetTodo
                                 .Get()
-                                .MapRequest<Request>(_ =>
+                                .MapRequest((Request _) =>
                                     new GetTodo.Request(todo.Id))
                                 .Map(read =>
                                     new Response(
