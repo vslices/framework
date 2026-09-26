@@ -15,33 +15,12 @@ namespace VSlices.Work;
 /// C# does not currently support associated types directly, so the generic
 /// parameters preserve compile-time enforcement while the nested types provide
 /// the canonical nominal contract.
+///
+/// Feature owns the Flow contract. Concrete execution of the returned IO remains
+/// outside this semantic boundary.
 /// </remarks>
 public interface Feature<F, ALG, REQ, RES>
     where F : Feature<F, ALG, REQ, RES>
 {
     static abstract Flow<ALG, REQ, RES> Get();
-
-    static virtual Fin<RES> Run(
-        REQ input,
-        ALG algebra,
-        EnvIO envIO) =>
-        F.Get().Run(algebra, input, envIO);
-
-    static virtual RES RunUnsafe(
-        REQ input,
-        ALG algebra,
-        EnvIO envIO) =>
-        F.Get().RunUnsafe(algebra, input, envIO);
-
-    static virtual Task<Fin<RES>> RunAsync(
-        REQ input,
-        ALG algebra,
-        EnvIO envIO) =>
-        F.Get().RunAsync(algebra, input, envIO);
-
-    static virtual Task<RES> RunUnsafeAsync(
-        REQ input,
-        ALG algebra,
-        EnvIO envIO) =>
-        F.Get().RunUnsafeAsync(algebra, input, envIO);
 }
