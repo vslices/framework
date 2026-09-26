@@ -28,13 +28,13 @@ public sealed class AlgebraSumArityTests
                 new(7));
 
         var flow =
-            ValueFlow<ATag>().MapRuntime<AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>>>(x => x.A)
-            .Bind(a => ValueFlow<BTag>().MapRuntime<AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>>>(x => x.B)
-            .Bind(b => ValueFlow<CTag>().MapRuntime<AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>>>(x => x.C)
-            .Bind(c => ValueFlow<DTag>().MapRuntime<AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>>>(x => x.D)
-            .Bind(d => ValueFlow<ETag>().MapRuntime<AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>>>(x => x.E)
-            .Bind(e => ValueFlow<FTag>().MapRuntime<AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>>>(x => x.F)
-            .Bind(f => ValueFlow<GTag>().MapRuntime<AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>>>(x => x.G)
+            ValueFlow<ATag>().MapRuntime((AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>> x) => x.A)
+            .Bind(a => ValueFlow<BTag>().MapRuntime((AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>> x) => x.B)
+            .Bind(b => ValueFlow<CTag>().MapRuntime((AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>> x) => x.C)
+            .Bind(c => ValueFlow<DTag>().MapRuntime((AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>> x) => x.D)
+            .Bind(d => ValueFlow<ETag>().MapRuntime((AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>> x) => x.E)
+            .Bind(e => ValueFlow<FTag>().MapRuntime((AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>> x) => x.F)
+            .Bind(f => ValueFlow<GTag>().MapRuntime((AlgebraSum<ValueAlgebra<ATag>, ValueAlgebra<BTag>, ValueAlgebra<CTag>, ValueAlgebra<DTag>, ValueAlgebra<ETag>, ValueAlgebra<FTag>, ValueAlgebra<GTag>> x) => x.G)
                 .Map(g => a + b + c + d + e + f + g)))))));
 
         var result = await flow.RunFlow(algebra, default(Unit)).RunAsync();
