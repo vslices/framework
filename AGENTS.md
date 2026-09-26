@@ -229,6 +229,21 @@ Current examples include:
 
 Do not create a semantic type merely because a primitive exists. `Completed` remains a plain `bool` in the current experiment because no evidence yet requires a separate space.
 
+### Presentation transform adaptation
+
+Presentation convenience must not redefine semantic transformation ownership.
+
+For `TransformAdapter<FROM, TO>`:
+
+- if `TO` already owns `Transformable<FROM, TO>`, use that transformation directly;
+- otherwise the adapter may mechanically establish `TO.Input` from `FROM` only when the validated single-input convention holds;
+- `TO.Input -> TO` remains owned by `TO.Transformation`;
+- do not infer missing values for multi-field Inputs;
+- do not make a semantic target implement a presentation-specific direct transform merely to satisfy a UI control;
+- keep the analyzer enabled so invalid adapter conventions fail during compilation when the closed target is visible.
+
+Reflection is a .NET realization detail and is cached per closed adapter pair. It is not semantic authority.
+
 ---
 
 ## Architecture
