@@ -34,6 +34,12 @@ jobs:
       - name: Build analyzer
         run: dotnet build src/VSlices.Space.Analyzers/VSlices.Space.Analyzers.csproj
 
+      - name: Verify analyzer ships with Space
+        run: |
+          package=$(find src/VSlices.Space/bin/Debug -name 'VSlices.Space.*.nupkg' | head -n 1)
+          test -n "$package"
+          unzip -l "$package" | grep -q 'analyzers/dotnet/cs/VSlices.Space.Analyzers.dll'
+
       - name: Run analyzer tests
         run: dotnet run --project tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj
 
