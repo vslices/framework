@@ -1,16 +1,18 @@
 using LanguageExt;
 using LanguageExt.Traits;
+using VSlices.Monads;
 using VSlices.Space.Quantities;
 using VSlices.Space.Temporal;
 using VSlices.Work;
 using Xunit;
+using static LanguageExt.Prelude;
 
 namespace VSlices.Work.Tests;
 
 public sealed class TemporalAlgebraTests
 {
     [Fact]
-    public async Task Temporal_Feature_is_inert_and_separates_clock_observation_from_delay()
+    public async Task Temporal_program_is_inert_and_separates_clock_observation_from_delay()
     {
         var origin = new Moment(
             new DateTimeOffset(2026, 9, 23, 12, 0, 0, TimeSpan.Zero));
@@ -18,15 +20,39 @@ public sealed class TemporalAlgebraTests
         var temporal = new RecordingTemporalIO(origin);
         var interpreter = new TemporalProbeIO(temporal, temporal);
 
-        var program = TemporalProbe.Get(
-            new TemporalProbe.Request(
-                new Duration<double>(2),
-                new Duration<double>(5)));
+        var program = TemporalProbeWork.Program(
+            new Duration<double>(2),
+            new Duration<double>(5));
 
         Assert.Empty(temporal.Trace);
 
         var response = await FreeAlgebra
             .interpret(program, interpreter)
+            .RunAsync();
+
+        Assert.Equal(origin, response);
+        Assert.Equal(
+            ["now", "delay-for:2", "delay-until:5"],
+            temporal.Trace);
+    }
+
+    [Fact]
+    public async Task Temporal_Feature_exposes_the_program_through_Flow()
+    {
+        var origin = new Moment(
+            new DateTimeOffset(2026, 9, 23, 12, 0, 0, TimeSpan.Zero));
+
+        var temporal = new RecordingTemporalIO(origin);
+        var interpreter = new TemporalProbeIO(temporal, temporal);
+        var runtime = new TemporalRuntime(interpreter);
+
+        var response = await TemporalProbe<TemporalRuntime>
+            .Get()
+            .RunFlow(
+                runtime,
+                new TemporalProbe<TemporalRuntime>.Request(
+                    new Duration<double>(2),
+                    new Duration<double>(5)))
             .RunAsync();
 
         Assert.Equal(origin, response.Observed);
@@ -36,12 +62,13 @@ public sealed class TemporalAlgebraTests
     }
 }
 
-public sealed class TemporalProbe :
+public sealed class TemporalProbe<RT> :
     Feature<
-        TemporalProbe,
-        TemporalProbe.Algebra,
-        TemporalProbe.Request,
-        TemporalProbe.Response>
+        TemporalProbe<RT>,
+        RT,
+        TemporalProbe<RT>.Request,
+        TemporalProbe<RT>.Response>
+    where RT : HasAlgebra<TemporalProbeAlgebra, RT>
 {
     public sealed record Request(
         Duration<double> DelayFor,
@@ -49,88 +76,109 @@ public sealed class TemporalProbe :
 
     public sealed record Response(Moment Observed);
 
-    public abstract record WorkPart<A> : K<Algebra, A>;
+    public static Flow<RT, Request, Response> Get() =>
+        Flow<RT, Request>.Asks(static request => request) >>
+        (request => AlgebraEnv<TemporalProbeAlgebra, RT>
+            .run(TemporalProbeWork.Program(
+                request.DelayFor,
+                request.DelayUntilOffset))
+            .Map(observed => new Response(observed)));
+}
 
-    public sealed record NowPart<A>(
-        Func<Moment, A> Next)
-        : WorkPart<A>;
+public static class TemporalProbeWork
+{
+    public static Free<TemporalProbeAlgebra, Moment> Program(
+        Duration<double> delayFor,
+        Duration<double> delayUntilOffset) =>
+        from now in Clock.now<TemporalProbeAlgebra>()
+        from _ in Delay.forDuration<TemporalProbeAlgebra>(delayFor)
+        from __ in Delay.until<TemporalProbeAlgebra>(
+            now + delayUntilOffset)
+        select now;
+}
 
-    public sealed record DelayForPart<A>(
-        Duration<double> Duration,
-        Func<Unit, A> Next)
-        : WorkPart<A>;
+public abstract record TemporalProbeWorkPart<A> : K<TemporalProbeAlgebra, A>;
 
-    public sealed record DelayUntilPart<A>(
-        Moment Moment,
-        Func<Unit, A> Next)
-        : WorkPart<A>;
+public sealed record TemporalProbeNowPart<A>(
+    Func<Moment, A> Next)
+    : TemporalProbeWorkPart<A>;
 
-    public sealed class Algebra :
-        Functor<Algebra>,
-        Clock<Algebra>,
-        Delay<Algebra>
-    {
-        static K<Algebra, Moment>
-            Clock<Algebra>.Now() =>
-            new NowPart<Moment>(static moment => moment);
+public sealed record TemporalProbeDelayForPart<A>(
+    Duration<double> Duration,
+    Func<Unit, A> Next)
+    : TemporalProbeWorkPart<A>;
 
-        static K<Algebra, Unit>
-            Delay<Algebra>.For(Duration<double> duration) =>
-            new DelayForPart<Unit>(
-                duration,
-                static value => value);
+public sealed record TemporalProbeDelayUntilPart<A>(
+    Moment Moment,
+    Func<Unit, A> Next)
+    : TemporalProbeWorkPart<A>;
 
-        static K<Algebra, Unit>
-            Delay<Algebra>.Until(Moment moment) =>
-            new DelayUntilPart<Unit>(
-                moment,
-                static value => value);
+public sealed class TemporalProbeAlgebra :
+    Functor<TemporalProbeAlgebra>,
+    Clock<TemporalProbeAlgebra>,
+    Delay<TemporalProbeAlgebra>
+{
+    static K<TemporalProbeAlgebra, Moment>
+        Clock<TemporalProbeAlgebra>.Now() =>
+        new TemporalProbeNowPart<Moment>(static moment => moment);
 
-        static K<Algebra, B> Functor<Algebra>.Map<A, B>(
-            Func<A, B> f,
-            K<Algebra, A> ma) =>
-            ma switch
-            {
-                NowPart<A>(var next) =>
-                    new NowPart<B>(
-                        moment => f(next(moment))),
-                DelayForPart<A>(var duration, var next) =>
-                    new DelayForPart<B>(
-                        duration,
-                        value => f(next(value))),
-                DelayUntilPart<A>(var moment, var next) =>
-                    new DelayUntilPart<B>(
-                        moment,
-                        value => f(next(value))),
-                _ => throw new NotSupportedException()
-            };
-    }
+    static K<TemporalProbeAlgebra, Unit>
+        Delay<TemporalProbeAlgebra>.For(Duration<double> duration) =>
+        new TemporalProbeDelayForPart<Unit>(
+            duration,
+            static value => value);
 
-    public static Free<Algebra, Response> Get(Request request) =>
-        from now in Clock.now<Algebra>()
-        from _ in Delay.forDuration<Algebra>(request.DelayFor)
-        from __ in Delay.until<Algebra>(
-            now + request.DelayUntilOffset)
-        select new Response(now);
+    static K<TemporalProbeAlgebra, Unit>
+        Delay<TemporalProbeAlgebra>.Until(Moment moment) =>
+        new TemporalProbeDelayUntilPart<Unit>(
+            moment,
+            static value => value);
+
+    static K<TemporalProbeAlgebra, B> Functor<TemporalProbeAlgebra>.Map<A, B>(
+        Func<A, B> f,
+        K<TemporalProbeAlgebra, A> ma) =>
+        ma switch
+        {
+            TemporalProbeNowPart<A>(var next) =>
+                new TemporalProbeNowPart<B>(
+                    moment => f(next(moment))),
+            TemporalProbeDelayForPart<A>(var duration, var next) =>
+                new TemporalProbeDelayForPart<B>(
+                    duration,
+                    value => f(next(value))),
+            TemporalProbeDelayUntilPart<A>(var moment, var next) =>
+                new TemporalProbeDelayUntilPart<B>(
+                    moment,
+                    value => f(next(value))),
+            _ => throw new NotSupportedException()
+        };
 }
 
 public sealed class TemporalProbeIO(
     ClockIO clock,
     DelayIO delay)
-    : AlgebraIO<TemporalProbe.Algebra>
+    : AlgebraIO<TemporalProbeAlgebra>
 {
     public IO<A> Interpret<A>(
-        K<TemporalProbe.Algebra, A> operation) =>
+        K<TemporalProbeAlgebra, A> operation) =>
         operation switch
         {
-            TemporalProbe.NowPart<A> now =>
+            TemporalProbeNowPart<A> now =>
                 clock.Now.Map(now.Next),
-            TemporalProbe.DelayForPart<A> wait =>
+            TemporalProbeDelayForPart<A> wait =>
                 delay.For(wait.Duration).Map(wait.Next),
-            TemporalProbe.DelayUntilPart<A> wait =>
+            TemporalProbeDelayUntilPart<A> wait =>
                 delay.Until(wait.Moment).Map(wait.Next),
             _ => throw new NotSupportedException()
         };
+}
+
+public sealed record TemporalRuntime(AlgebraIO<TemporalProbeAlgebra> Algebra)
+    : HasAlgebra<TemporalProbeAlgebra, TemporalRuntime>
+{
+    static K<Eff<TemporalRuntime>, AlgebraIO<TemporalProbeAlgebra>>
+        Has<Eff<TemporalRuntime>, AlgebraIO<TemporalProbeAlgebra>>.Ask { get; } =
+        liftEff<TemporalRuntime, AlgebraIO<TemporalProbeAlgebra>>(rt => rt.Algebra);
 }
 
 public sealed class RecordingTemporalIO(Moment now) :
