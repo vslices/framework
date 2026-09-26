@@ -56,10 +56,9 @@ public sealed class TransformAdapter<FROM, TO> :
     {
         var targetType = typeof(TO);
 
-        var directTransformable = typeof(Transformable<,>)
-            .MakeGenericType(typeof(FROM), targetType);
-
-        if (directTransformable.IsAssignableFrom(targetType))
+        if (ImplementsTargetOwnedTransform(
+                targetType,
+                typeof(FROM)))
         {
             var directBridgeType = typeof(DirectTransformAdapterBridge<,>)
                 .MakeGenericType(
@@ -110,10 +109,9 @@ public sealed class TransformAdapter<FROM, TO> :
                 $"'{inputType}' must expose one public constructor whose only parameter is '{typeof(FROM)}'.");
         }
 
-        var transformable = typeof(Transformable<,>)
-            .MakeGenericType(inputType, targetType);
-
-        if (!transformable.IsAssignableFrom(targetType))
+        if (!ImplementsTargetOwnedTransform(
+                targetType,
+                inputType))
         {
             throw InvalidConvention(
                 $"'{targetType}' must implement Transformable<{inputType.Name}, {targetType.Name}>.");
@@ -136,6 +134,18 @@ public sealed class TransformAdapter<FROM, TO> :
              ?? throw InvalidConvention(
                  "The typed TransformAdapter bridge returned no delegate."));
     }
+
+    private static bool ImplementsTargetOwnedTransform(
+        Type targetType,
+        Type sourceType) =>
+        targetType
+            .GetInterfaces()
+            .Any(@interface =>
+                @interface.IsGenericType &&
+                @interface.GetGenericTypeDefinition() ==
+                    typeof(Transformable<,>) &&
+                @interface.GenericTypeArguments[0] == sourceType &&
+                @interface.GenericTypeArguments[1] == targetType);
 
     private static InvalidOperationException InvalidConvention(
         string message) =>
