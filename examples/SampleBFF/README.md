@@ -15,7 +15,7 @@ SampleBFF.AttachFileToTodo
 `AttachFileToTodo` remains an ordinary Feature. Its runtime is the structural composition of the two module algebras:
 
 ```csharp
-AlgebraSum<FileAlgebra, TodoAlgebra>
+AlgebraMix<FileAlgebra, TodoAlgebra>
 ```
 
 There is no Free-monad program, hoisting layer, or composed interpreter.
@@ -51,7 +51,7 @@ The BFF Feature is:
 ```text
 Feature<
     AttachFileToTodo,
-    AlgebraSum<FileAlgebra, TodoAlgebra>,
+    AlgebraMix<FileAlgebra, TodoAlgebra>,
     Request,
     Response>
 ```
@@ -71,11 +71,11 @@ The parent adapts each child to the larger runtime by projection:
 ```csharp
 AddFile.Get()
     .MapRuntime(
-        (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+        (AlgebraMix<FileAlgebra, TodoAlgebra> sum) => sum.A)
 
 AddAttachmentReference.Get()
     .MapRuntime(
-        (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.B)
+        (AlgebraMix<FileAlgebra, TodoAlgebra> sum) => sum.B)
 ```
 
 Requests are adapted independently with `MapRequest`.
@@ -84,7 +84,7 @@ This gives the composition geometry:
 
 ```text
 parent runtime
-    AlgebraSum<FileAlgebra, TodoAlgebra>
+    AlgebraMix<FileAlgebra, TodoAlgebra>
         |                       |
         v                       v
     FileAlgebra             TodoAlgebra
@@ -110,24 +110,24 @@ InMemoryTodoWork
 The BFF composes the exported algebra values:
 
 ```csharp
-new AlgebraSum<FileAlgebra, TodoAlgebra>(
+new AlgebraMix<FileAlgebra, TodoAlgebra>(
     files.Algebra,
     todo.Algebra)
 ```
 
 No child Grounding needs to know that the BFF exists.
 
-## AlgebraSum arities
+## AlgebraMix arities
 
 VSlices currently offers positional structural composition through seven children:
 
 ```text
-AlgebraSum<A, B>
-AlgebraSum<A, B, C>
-AlgebraSum<A, B, C, D>
-AlgebraSum<A, B, C, D, E>
-AlgebraSum<A, B, C, D, E, F>
-AlgebraSum<A, B, C, D, E, F, G>
+AlgebraMix<A, B>
+AlgebraMix<A, B, C>
+AlgebraMix<A, B, C, D>
+AlgebraMix<A, B, C, D, E>
+AlgebraMix<A, B, C, D, E, F>
+AlgebraMix<A, B, C, D, E, F, G>
 ```
 
 The A..G positions are mechanism only. They do not encode semantic priority or authority.
@@ -161,7 +161,7 @@ Therefore:
 Feature composition
 != atomic composition
 
-AlgebraSum
+AlgebraMix
 != transaction
 != rollback
 != compensation
