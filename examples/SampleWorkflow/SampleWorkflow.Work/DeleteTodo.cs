@@ -1,54 +1,66 @@
 using LanguageExt;
 using LanguageExt.Traits;
 using SampleWorkflow.Spaces;
+using VSlices;
+using VSlices.Monads;
 using VSlices.Work;
 using static LanguageExt.Prelude;
 
 namespace SampleWorkflow.Work;
 
-public sealed class DeleteTodo :
-    Feature<DeleteTodo, DeleteTodo.Algebra, DeleteTodo.Request, DeleteTodo.Response>
+public sealed class DeleteTodo<RT> :
+    Feature<DeleteTodo<RT>, RT, DeleteTodo<RT>.Request, DeleteTodo<RT>.Response>
+    where RT : HasAlgebra<DeleteTodoAlgebra, RT>
 {
     public sealed record Request(TodoId Id);
     public sealed record Response(Option<Todo> Todo);
 
-    public abstract record WorkPart<A> : K<Algebra, A>;
-    public sealed record ReadPart<A>(TodoId Id, Func<Option<Todo>, A> Next) : WorkPart<A>;
-    public sealed record RemovePart<A>(TodoId Id, Func<Unit, A> Next) : WorkPart<A>;
+    public static Flow<RT, Request, Response> Get() =>
+        Flow<RT, Request>.Asks(static request => request) >>
+        (request => AlgebraEnv<DeleteTodoAlgebra, RT>
+            .run(DeleteTodoWork.Program(request.Id))
+            .Map(todo => new Response(todo)));
+}
 
-    public sealed class Algebra :
-        Functor<Algebra>,
-        PointReader<Algebra, Todo, TodoId>,
-        PointRemover<Algebra, Todo, TodoId>
-    {
-        static K<Algebra, Option<Todo>>
-            PointReader<Algebra, Todo, TodoId>.Read(TodoId id) =>
-            new ReadPart<Option<Todo>>(id, static point => point);
-
-        static K<Algebra, Unit>
-            PointRemover<Algebra, Todo, TodoId>.Remove(TodoId id) =>
-            new RemovePart<Unit>(id, static value => value);
-
-        static K<Algebra, B> Functor<Algebra>.Map<A, B>(
-            Func<A, B> f,
-            K<Algebra, A> ma) =>
-            ma switch
-            {
-                ReadPart<A>(var id, var next) =>
-                    new ReadPart<B>(id, point => f(next(point))),
-                RemovePart<A>(var id, var next) =>
-                    new RemovePart<B>(id, value => f(next(value))),
-                _ => throw new NotSupportedException()
-            };
-    }
-
-    public static Free<Algebra, Response> Get(Request request) =>
-        from current in PointReader.read<Algebra, Todo, TodoId>(request.Id)
+public static class DeleteTodoWork
+{
+    public static Free<DeleteTodoAlgebra, Option<Todo>> Program(TodoId id) =>
+        from current in PointReader.read<DeleteTodoAlgebra, Todo, TodoId>(id)
         from deleted in current.Match(
             Some: point =>
-                from _ in PointRemover.remove<Algebra, Todo, TodoId>(request.Id)
+                from _ in PointRemover.remove<DeleteTodoAlgebra, Todo, TodoId>(id)
                 select Some(point),
             None: static () =>
-                Free.pure<Algebra, Option<Todo>>(Option<Todo>.None))
-        select new Response(deleted);
+                Free.pure<DeleteTodoAlgebra, Option<Todo>>(Option<Todo>.None))
+        select deleted;
+}
+
+public abstract record DeleteTodoWorkPart<A> : K<DeleteTodoAlgebra, A>;
+public sealed record DeleteTodoReadPart<A>(TodoId Id, Func<Option<Todo>, A> Next) : DeleteTodoWorkPart<A>;
+public sealed record DeleteTodoRemovePart<A>(TodoId Id, Func<Unit, A> Next) : DeleteTodoWorkPart<A>;
+
+public sealed class DeleteTodoAlgebra :
+    Functor<DeleteTodoAlgebra>,
+    PointReader<DeleteTodoAlgebra, Todo, TodoId>,
+    PointRemover<DeleteTodoAlgebra, Todo, TodoId>
+{
+    static K<DeleteTodoAlgebra, Option<Todo>>
+        PointReader<DeleteTodoAlgebra, Todo, TodoId>.Read(TodoId id) =>
+        new DeleteTodoReadPart<Option<Todo>>(id, static point => point);
+
+    static K<DeleteTodoAlgebra, Unit>
+        PointRemover<DeleteTodoAlgebra, Todo, TodoId>.Remove(TodoId id) =>
+        new DeleteTodoRemovePart<Unit>(id, static value => value);
+
+    static K<DeleteTodoAlgebra, B> Functor<DeleteTodoAlgebra>.Map<A, B>(
+        Func<A, B> f,
+        K<DeleteTodoAlgebra, A> ma) =>
+        ma switch
+        {
+            DeleteTodoReadPart<A>(var id, var next) =>
+                new DeleteTodoReadPart<B>(id, point => f(next(point))),
+            DeleteTodoRemovePart<A>(var id, var next) =>
+                new DeleteTodoRemovePart<B>(id, value => f(next(value))),
+            _ => throw new NotSupportedException()
+        };
 }
