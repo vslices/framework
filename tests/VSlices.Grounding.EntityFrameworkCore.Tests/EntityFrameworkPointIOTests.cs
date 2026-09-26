@@ -1,5 +1,5 @@
 using LanguageExt;
-using LanguageExt.Traits;
+using VSlices.Monads;
 using VSlices.Work;
 using Xunit;
 
@@ -50,7 +50,7 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
     }
 
     [Fact]
-    public async Task Projected_point_grounding_interprets_a_Feature_owned_algebra()
+    public async Task Projected_point_grounding_can_form_an_executable_algebra_for_a_Feature()
     {
         await database.ResetAsync();
         await using var context = database.CreateContext();
@@ -69,24 +69,18 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
                 static point => point.Id,
                 id => projection => projection.Id == id);
 
-        var interpreter =
-            new RecordAlgebraIO(points, points, points);
+        var algebra = new RecordAlgebra(
+            Reader: points,
+            Writer: points,
+            Remover: points);
 
         var id = Guid.NewGuid();
 
-        var program =
-            from _ in PointWriter.write<RecordAlgebra, Record>(
-                new Record(id, "created"))
-            from created in PointReader.read<RecordAlgebra, Record, Guid>(id)
-            from __ in PointWriter.write<RecordAlgebra, Record>(
-                new Record(id, "updated"))
-            from updated in PointReader.read<RecordAlgebra, Record, Guid>(id)
-            from ___ in PointRemover.remove<RecordAlgebra, Record, Guid>(id)
-            from removed in PointReader.read<RecordAlgebra, Record, Guid>(id)
-            select new PointEvidence(created, updated, removed);
-
-        var evidence = await FreeAlgebra
-            .interpret(program, interpreter)
+        var evidence = await ExerciseRecord
+            .Get()
+            .RunFlow(
+                algebra,
+                new ExerciseRecord.Request(id))
             .RunAsync();
 
         Assert.Equal(
@@ -105,76 +99,34 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
     }
 }
 
-public sealed record PointEvidence(
-    Option<Record> Created,
-    Option<Record> Updated,
-    Option<Record> Removed);
+public sealed record RecordAlgebra(
+    PointReader<Record, Guid> Reader,
+    PointWriter<Record> Writer,
+    PointRemover<Record, Guid> Remover);
 
-public abstract record RecordOperation<A> : K<RecordAlgebra, A>;
-
-public sealed record ReadRecord<A>(
-    Guid Id,
-    Func<Option<Record>, A> Next)
-    : RecordOperation<A>;
-
-public sealed record WriteRecord<A>(
-    Record Point,
-    Func<Unit, A> Next)
-    : RecordOperation<A>;
-
-public sealed record RemoveRecord<A>(
-    Guid Id,
-    Func<Unit, A> Next)
-    : RecordOperation<A>;
-
-public sealed class RecordAlgebra :
-    Functor<RecordAlgebra>,
-    PointReader<RecordAlgebra, Record, Guid>,
-    PointWriter<RecordAlgebra, Record>,
-    PointRemover<RecordAlgebra, Record, Guid>
+public sealed class ExerciseRecord :
+    Feature<ExerciseRecord, RecordAlgebra, ExerciseRecord.Request, ExerciseRecord.Response>
 {
-    static K<RecordAlgebra, Option<Record>>
-        PointReader<RecordAlgebra, Record, Guid>.Read(Guid id) =>
-        new ReadRecord<Option<Record>>(id, static point => point);
+    public sealed record Request(Guid Id);
 
-    static K<RecordAlgebra, Unit>
-        PointWriter<RecordAlgebra, Record>.Write(Record point) =>
-        new WriteRecord<Unit>(point, static value => value);
+    public sealed record Response(
+        Option<Record> Created,
+        Option<Record> Updated,
+        Option<Record> Removed);
 
-    static K<RecordAlgebra, Unit>
-        PointRemover<RecordAlgebra, Record, Guid>.Remove(Guid id) =>
-        new RemoveRecord<Unit>(id, static value => value);
-
-    static K<RecordAlgebra, B> Functor<RecordAlgebra>.Map<A, B>(
-        Func<A, B> f,
-        K<RecordAlgebra, A> ma) =>
-        ma switch
-        {
-            ReadRecord<A>(var id, var next) =>
-                new ReadRecord<B>(id, point => f(next(point))),
-            WriteRecord<A>(var point, var next) =>
-                new WriteRecord<B>(point, value => f(next(value))),
-            RemoveRecord<A>(var id, var next) =>
-                new RemoveRecord<B>(id, value => f(next(value))),
-            _ => throw new NotSupportedException()
-        };
-}
-
-public sealed class RecordAlgebraIO(
-    PointReaderIO<Record, Guid> reader,
-    PointWriterIO<Record> writer,
-    PointRemoverIO<Record, Guid> remover)
-    : AlgebraIO<RecordAlgebra>
-{
-    public IO<A> Interpret<A>(K<RecordAlgebra, A> operation) =>
-        operation switch
-        {
-            ReadRecord<A> read =>
-                reader.Read(read.Id).Map(read.Next),
-            WriteRecord<A> write =>
-                writer.Write(write.Point).Map(write.Next),
-            RemoveRecord<A> remove =>
-                remover.Remove(remove.Id).Map(remove.Next),
-            _ => throw new NotSupportedException()
-        };
+    public static Flow<RecordAlgebra, Request, Response> Get() =>
+        new((algebra, request) =>
+            algebra.Writer.Write(new Record(request.Id, "created"))
+                .Bind(_ => algebra.Reader.Read(request.Id))
+                .Bind(created =>
+                    algebra.Writer.Write(new Record(request.Id, "updated"))
+                        .Bind(_ => algebra.Reader.Read(request.Id))
+                        .Bind(updated =>
+                            algebra.Remover.Remove(request.Id)
+                                .Bind(_ => algebra.Reader.Read(request.Id))
+                                .Map(removed =>
+                                    new Response(
+                                        created,
+                                        updated,
+                                        removed))))));
 }
