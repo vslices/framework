@@ -1,9 +1,6 @@
 name: Feature Flow Recovery CI
 
 on:
-  push:
-    branches:
-      - fix/restore-feature-flow-boundary
   pull_request:
     branches:
       - valid-checkout
