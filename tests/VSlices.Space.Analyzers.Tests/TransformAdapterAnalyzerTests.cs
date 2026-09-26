@@ -41,6 +41,36 @@ public sealed class TransformAdapterAnalyzerTests
     }
 
     [Fact]
+    public async Task Direct_target_owned_transform_does_not_require_Input()
+    {
+        var diagnostics = await Analyze(
+            """
+            using VSlices.Space.Traits;
+
+            namespace VSlices.Space.Traits
+            {
+                public sealed class TransformAdapter<A, B> { }
+                public interface Transformable<A, B> { }
+            }
+
+            namespace Probe
+            {
+                public sealed class LocationName :
+                    Transformable<string, LocationName>
+                {
+                }
+
+                public sealed class Usage
+                {
+                    private TransformAdapter<string, LocationName>? adapter;
+                }
+            }
+            """);
+
+        Assert.Empty(diagnostics);
+    }
+
+    [Fact]
     public async Task Missing_Input_is_reported()
     {
         var diagnostics = await Analyze(
