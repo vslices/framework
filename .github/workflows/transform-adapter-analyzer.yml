@@ -89,4 +89,5 @@ jobs:
 
       - name: Report NativeAOT probe result
         if: always()
-        run: echo "NativeAOT TransformAdapter probe outcome: ${{ steps.aot_probe.outcome }}"
+        run: |
+          echo "NativeAOT TransformAdapter probe outcome: ${{ steps.aot_probe.outcome }}"
