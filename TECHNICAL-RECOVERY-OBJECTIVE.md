@@ -199,7 +199,7 @@ Entity Framework Core realizes the same point atoms through `EntityFrameworkPoin
 
 Temporal Work follows the same executable-atom direction: `ClockIO` and `DelayIO` can be composed directly into a temporal Work algebra and used as a `Flow` runtime.
 
-Independent module algebras compose structurally through `AlgebraSum<...>`. Child Flows adapt to a larger runtime through `MapRuntime`, while request adaptation remains independent through `MapRequest`.
+Independent module algebras compose structurally through `AlgebraMix<...>`. Child Flows adapt to a larger runtime through `MapRuntime`, while request adaptation remains independent through `MapRequest`.
 
 The recovery objective remains to retain the expressive power of the old effectful runtime while making capability requirements, algebraic structure, and grounding boundaries smaller, explicit, and independently justified.
 
