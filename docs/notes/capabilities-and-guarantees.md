@@ -2,7 +2,7 @@
 
 > Status: executable capability substrate validated for current point/temporal cases; guarantees remain exploratory.
 >
-> The current Flow/algebra experiment validates point reading, writing and removal, temporal atoms, same-module Feature composition, cross-module `AlgebraSum` composition, and EF Core Grounding without a Free/interpreter layer. Guarantee representation, analyzers, laws, and guarantee-oriented VSIR syntax remain intentionally separate.
+> The current Flow/algebra experiment validates point reading, writing and removal, temporal atoms, same-module Feature composition, cross-module `AlgebraMix` composition, and EF Core Grounding without a Free/interpreter layer. Guarantee representation, analyzers, laws, and guarantee-oriented VSIR syntax remain intentionally separate.
 
 ## Motivation
 
@@ -143,7 +143,7 @@ AlgebraIO<TodoAlgebra>
 
 The previous trajectory through `Free<ALG,A>`, operation functors, `HasAlgebra`, and `AlgebraEnv` was useful experimental evidence, but those mechanisms are not part of the current Work model.
 
-Independent module algebras compose with `AlgebraSum<...>`. A parent Feature adapts the larger runtime to each child runtime via `MapRuntime`; request adaptation is orthogonal via `MapRequest`.
+Independent module algebras compose with `AlgebraMix<...>`. A parent Feature adapts the larger runtime to each child runtime via `MapRuntime`; request adaptation is orthogonal via `MapRequest`.
 
 The same shape is not limited to CRUD. `ClockIO` and `DelayIO` already act as executable temporal atoms and can be composed into a temporal algebra used directly by Flow.
 
