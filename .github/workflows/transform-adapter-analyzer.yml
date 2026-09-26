@@ -79,3 +79,14 @@ jobs:
           fi
           cat /tmp/invalid-razor-adapter.log
           grep -q 'VST002' /tmp/invalid-razor-adapter.log
+
+      - name: NativeAOT TransformAdapter probe
+        id: aot_probe
+        continue-on-error: true
+        run: |
+          dotnet publish tests/VSlices.TransformAdapter.AotProbe/VSlices.TransformAdapter.AotProbe.csproj -c Release -o /tmp/vslices-transform-aot
+          /tmp/vslices-transform-aot/VSlices.TransformAdapter.AotProbe
+
+      - name: Report NativeAOT probe result
+        if: always()
+        run: echo "NativeAOT TransformAdapter probe outcome: ${{ steps.aot_probe.outcome }}"
