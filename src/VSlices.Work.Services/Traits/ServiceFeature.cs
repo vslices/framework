@@ -1,4 +1,5 @@
-﻿using VSlices.Services;
+﻿using LanguageExt;
+using VSlices.Services;
 
 namespace VSlices.Work;
 
