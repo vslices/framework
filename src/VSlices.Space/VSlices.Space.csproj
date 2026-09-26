@@ -3,7 +3,8 @@
 		<ProjectReference Include="..\VSlices\VSlices.csproj" />
 		<ProjectReference Include="..\VSlices.Space.Analyzers\VSlices.Space.Analyzers.csproj"
 		                  OutputItemType="Analyzer"
-		                  ReferenceOutputAssembly="false" />
+		                  ReferenceOutputAssembly="false"
+		                  PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
