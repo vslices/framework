@@ -1,0 +1,47 @@
+name: Feature Flow Recovery CI
+
+on:
+  push:
+    branches:
+      - fix/restore-feature-flow-boundary
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: feature-flow-recovery-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-feature-flow-recovery:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build Work
+        run: dotnet build src/VSlices.Work/VSlices.Work.csproj
+
+      - name: Run Work algebra tests
+        run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
+
+      - name: Build SampleWorkflow API
+        run: dotnet build examples/SampleWorkflow/SampleWorkflow.Api/SampleWorkflow.Api.csproj
+
+      - name: Run SampleWorkflow Process tests
+        run: dotnet run --project examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj
+
+      - name: Build SampleFileRepo
+        run: dotnet build examples/SampleFileRepo/SampleFileRepo/SampleFileRepo.csproj
+
+      - name: Run SampleBFF tests
+        run: dotnet run --project examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj
