@@ -48,6 +48,7 @@
     <Project Path="tests/VSlices.Space.Tests/VSlices.Space.Tests.csproj" />
     <Project Path="tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj" />
     <Project Path="tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj" />
+    <Project Path="tests/VSlices.Views.Razor.AdapterProbe/VSlices.Views.Razor.AdapterProbe.csproj" />
     <Project Path="tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj" />
   </Folder>
 </Solution>
