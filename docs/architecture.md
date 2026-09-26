@@ -62,21 +62,21 @@ Grounding chooses mechanism. It does not acquire authority to redefine Work sema
 
 ## Composition
 
-Independent Work algebras compose structurally through the currently named:
+Independent Work algebras compose structurally through:
 
 ```text
-AlgebraSum<A, B>
-AlgebraSum<A, B, C>
+AlgebraMix<A, B>
+AlgebraMix<A, B, C>
 ...
 ```
 
-The name is historical. In the current executable-runtime model the composed value contains every child algebra and exposes projections to them, so the construction is product-like rather than the coproduct represented by the former Free instruction algebra.
+`AlgebraMix` means only that independently owned executable algebras are available together to a composing Flow. The name deliberately avoids claiming product/coproduct semantics beyond the projections actually used.
 
 A child Flow is adapted to a composed runtime by projecting the algebra it requires:
 
 ```csharp
 child.MapRuntime(
-    (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+    (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
 ```
 
 Requests can be adapted independently with `MapRequest`, or runtime and request together with `ContraMap`.
