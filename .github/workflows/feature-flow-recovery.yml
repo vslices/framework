@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - fix/restore-feature-flow-boundary
+  pull_request:
+    branches:
+      - valid-checkout
   workflow_dispatch:
 
 permissions:
