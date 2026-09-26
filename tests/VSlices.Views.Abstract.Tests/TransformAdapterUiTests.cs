@@ -20,6 +20,18 @@ public sealed class TransformAdapterUiTests
     }
 
     [Fact]
+    public void Adapter_preserves_existing_direct_target_owned_transforms()
+    {
+        var result = TransformAdapter<string, LocationName>
+            .Transform("  Warehouse  ");
+
+        Assert.False(result.IsFail);
+        Assert.Equal(
+            "Warehouse",
+            result.ThrowIfFail().Value);
+    }
+
+    [Fact]
     public void Adapter_preserves_errors_from_the_target_owned_transformation()
     {
         var result = TransformAdapter<string, EmailAddress>
@@ -55,6 +67,22 @@ public sealed class TransformAdapterUiTests
             "must contain @",
             failureMessage,
             StringComparison.Ordinal);
+    }
+
+    public sealed record LocationName :
+        Transformable<string, LocationName>
+    {
+        private LocationName(string value) =>
+            Value = value;
+
+        public string Value { get; }
+
+        public static Req<string, LocationName>.Full Transformation =>
+            Req<string, LocationName>.Ensure<string>(
+                static value => !string.IsNullOrWhiteSpace(value),
+                "A location name cannot be empty.") >>
+            Req<string, LocationName>.Transform<string, LocationName>(
+                static value => new LocationName(value.Trim()));
     }
 
     public sealed record EmailAddress :
