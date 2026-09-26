@@ -128,5 +128,5 @@ public sealed class ExerciseRecord :
                                     new Response(
                                         created,
                                         updated,
-                                        removed))))));
+                                        removed)))));
 }
