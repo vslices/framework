@@ -107,13 +107,15 @@ Features sharing the same algebra compose directly as Flows. Their requests can 
 
 ### Independent modules
 
-A Feature that coordinates independently owned Work can use:
+A Feature that coordinates independently owned Work can currently use:
 
 ```text
 AlgebraSum<A, B, ...>
 ```
 
 and project each child algebra with `MapRuntime`.
+
+The type name is retained from the previous experiment, but the current executable runtime is product-like: the parent contains all required child algebras and projects one out for each child Flow. Whether the type should eventually be renamed to reflect that mathematics remains open.
 
 This preserves child ownership:
 
