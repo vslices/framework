@@ -124,21 +124,21 @@ public interface AlgebraIO<ALG>
 
 Features sharing the same module algebra compose directly.
 
-Independent module algebras currently compose structurally with the historically named:
+Independent module algebras compose structurally with:
 
 ```text
-AlgebraSum<A, B>
+AlgebraMix<A, B>
 ...
-AlgebraSum<A, B, C, D, E, F, G>
+AlgebraMix<A, B, C, D, E, F, G>
 ```
 
-Important mathematical caveat: in the executable-runtime model this value contains all child algebras simultaneously and is eliminated by projection. Its current behavior is therefore **product-like**, unlike the actual coproduct/sum of instruction functors used by the earlier Free experiment. Preserve the current type name during this experiment, but do not claim that the representation is mathematically a sum.
+`AlgebraMix` is intentionally modest vocabulary: it means that independently owned executable algebras are available together to a composing Flow. It does not claim categorical product/coproduct semantics, ordering, priority, transactionality, or shared ownership.
 
 A child Flow is adapted to the parent runtime by projection:
 
 ```csharp
 child.MapRuntime(
-    (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+    (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
 ```
 
 Request adaptation is independent:
@@ -306,7 +306,7 @@ Do NOT:
 - infer transactions or stronger persistence guarantees from point read/write/remove;
 - replace the explicit module algebra runtime with an arbitrary dependency carrier without new evidence;
 - force every pure semantic transformation into a WorkPart;
-- extend `AlgebraSum` beyond the supported A..G arities without pressure;
+- extend `AlgebraMix` beyond the supported A..G arities without pressure;
 - use current implementation convenience as proof of universal Framework semantics.
 
 ---
@@ -319,7 +319,7 @@ Current evidence should include, where relevant:
 
 - direct tests of executable capability atoms;
 - Feature execution through `Flow<ALG, Request, Response>`;
-- composed Feature runtime projection through `AlgebraSum` and `MapRuntime`;
+- composed Feature runtime projection through `AlgebraMix` and `MapRuntime`;
 - compile/build evidence for dependent Framework surfaces;
 - presentation/API smoke behavior;
 - preservation of semantic state transitions.
@@ -335,7 +335,7 @@ VSlices.Work.Products build
 Work algebra tests
 SampleWorkflow API build
 composed Feature hoist/composition tests
-AlgebraSum A..G tests
+AlgebraMix A..G tests
 SampleFileRepo build
 cross-service SampleBFF composition tests
 CRUD smoke test
