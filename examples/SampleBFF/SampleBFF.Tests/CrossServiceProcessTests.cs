@@ -132,21 +132,21 @@ public sealed record BffRuntime(
 {
     static K<Eff<BffRuntime>, AlgebraIO<CreateTodoAlgebra>>
         Has<Eff<BffRuntime>, AlgebraIO<CreateTodoAlgebra>>.Ask { get; } =
-        liftEff<BffRuntime, AlgebraIO<CreateTodoAlgebra>>(rt => rt.TodoWork);
+        liftEff<BffRuntime, AlgebraIO<CreateTodoAlgebra>>(rt => (AlgebraIO<CreateTodoAlgebra>)rt.TodoWork);
 
     static K<Eff<BffRuntime>, AlgebraIO<GetTodoAlgebra>>
         Has<Eff<BffRuntime>, AlgebraIO<GetTodoAlgebra>>.Ask { get; } =
-        liftEff<BffRuntime, AlgebraIO<GetTodoAlgebra>>(rt => rt.TodoWork);
+        liftEff<BffRuntime, AlgebraIO<GetTodoAlgebra>>(rt => (AlgebraIO<GetTodoAlgebra>)rt.TodoWork);
 
     static K<Eff<BffRuntime>, AlgebraIO<AddAttachmentReferenceAlgebra>>
         Has<Eff<BffRuntime>, AlgebraIO<AddAttachmentReferenceAlgebra>>.Ask { get; } =
-        liftEff<BffRuntime, AlgebraIO<AddAttachmentReferenceAlgebra>>(rt => rt.TodoWork);
+        liftEff<BffRuntime, AlgebraIO<AddAttachmentReferenceAlgebra>>(rt => (AlgebraIO<AddAttachmentReferenceAlgebra>)rt.TodoWork);
 
     static K<Eff<BffRuntime>, AlgebraIO<AddFileAlgebra>>
         Has<Eff<BffRuntime>, AlgebraIO<AddFileAlgebra>>.Ask { get; } =
-        liftEff<BffRuntime, AlgebraIO<AddFileAlgebra>>(rt => rt.FileWork);
+        liftEff<BffRuntime, AlgebraIO<AddFileAlgebra>>(rt => (AlgebraIO<AddFileAlgebra>)rt.FileWork);
 
     static K<Eff<BffRuntime>, AlgebraIO<GetFileAlgebra>>
         Has<Eff<BffRuntime>, AlgebraIO<GetFileAlgebra>>.Ask { get; } =
-        liftEff<BffRuntime, AlgebraIO<GetFileAlgebra>>(rt => rt.FileWork);
+        liftEff<BffRuntime, AlgebraIO<GetFileAlgebra>>(rt => (AlgebraIO<GetFileAlgebra>)rt.FileWork);
 }
