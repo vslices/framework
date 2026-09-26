@@ -49,7 +49,7 @@ public sealed class AttachFileToTodo :
                         AddAttachmentReference
                             .Get()
                             .MapRuntime((AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.B)
-                            .MapRequest<Request>(request =>
+                            .MapRequest((Request request) =>
                                 new AddAttachmentReference.Request(
                                     request.TodoId,
                                     resource))
