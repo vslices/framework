@@ -52,6 +52,18 @@ jobs:
       - name: Build abstract views
         run: dotnet build src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj
 
+      - name: Build Framework checkpoint
+        run: dotnet build VSlices.slnx
+
+      - name: Run Work algebra tests
+        run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
+
+      - name: Run same-module Feature composition tests
+        run: dotnet run --project examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj
+
+      - name: Run cross-service AlgebraMix tests
+        run: dotnet run --project examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj
+
       - name: Run UI adapter tests
         run: dotnet run --project tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj
 
