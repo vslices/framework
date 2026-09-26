@@ -67,6 +67,21 @@ jobs:
       - name: Run UI adapter tests
         run: dotnet run --project tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj
 
+      - name: Verify Views package carries adapter diagnostics
+        run: |
+          dotnet restore tests/VSlices.Views.PackageConsumer.InvalidProbe/VSlices.Views.PackageConsumer.InvalidProbe.csproj \
+            --source src/VSlices.Views.Abstract/bin/Debug \
+            --source src/VSlices.Space/bin/Debug \
+            --source src/VSlices/bin/Debug \
+            --source https://api.nuget.org/v3/index.json
+          if dotnet build tests/VSlices.Views.PackageConsumer.InvalidProbe/VSlices.Views.PackageConsumer.InvalidProbe.csproj --no-restore > /tmp/package-consumer.log 2>&1; then
+            cat /tmp/package-consumer.log
+            echo "Expected packaged Views consumer to receive VST002."
+            exit 1
+          fi
+          cat /tmp/package-consumer.log
+          grep -q 'VST002' /tmp/package-consumer.log
+
       - name: Build valid Razor adapter probe
         run: dotnet build tests/VSlices.Views.Razor.AdapterProbe/VSlices.Views.Razor.AdapterProbe.csproj
 
