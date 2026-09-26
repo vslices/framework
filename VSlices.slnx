@@ -33,6 +33,7 @@
     <Project Path="src/VSlices.Space.Products/VSlices.Space.Products.csproj" />
     <Project Path="src/VSlices.Space.Services/VSlices.Space.Services.csproj" />
     <Project Path="src/VSlices.Space/VSlices.Space.csproj" />
+    <Project Path="src/VSlices.Space.Analyzers/VSlices.Space.Analyzers.csproj" />
     <Project Path="src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj" />
     <Project Path="src/VSlices.Work.Products/VSlices.Work.Products.csproj" />
     <Project Path="src/VSlices.Work.Services/VSlices.Work.Services.csproj" />
@@ -44,6 +45,8 @@
     <Project Path="tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj" />
     <Project Path="tests/VSlices.Space.Modeling.Tests/VSlices.Space.Modeling.Tests.csproj" />
     <Project Path="tests/VSlices.Space.Tests/VSlices.Space.Tests.csproj" />
+    <Project Path="tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj" />
+    <Project Path="tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj" />
     <Project Path="tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj" />
   </Folder>
 </Solution>
