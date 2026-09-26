@@ -14,7 +14,7 @@ namespace VSlices.Space.Traits;
 /// <typeparam name="TO">The semantic target.</typeparam>
 /// <remarks>
 /// The adapter convention requires <typeparamref name="TO"/> to declare a nested
-/// type named <c>Input</c>, that Input to expose exactly one public constructor
+/// type named <c>Input</c>, that Input to expose exactly one non-empty public constructor
 /// with exactly one parameter of type <typeparamref name="FROM"/>, and the target
 /// to implement <c>Transformable&lt;TO.Input, TO&gt;</c>.
 ///
@@ -64,12 +64,15 @@ public sealed class TransformAdapter<FROM, TO> :
         }
 
         var constructors = inputType
-            .GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+            .GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+            .Where(static constructor =>
+                constructor.GetParameters().Length > 0)
+            .ToArray();
 
         if (constructors.Length != 1)
         {
             throw InvalidConvention(
-                $"'{inputType}' must expose exactly one public instance constructor.");
+                $"'{inputType}' must expose exactly one non-empty public instance constructor.");
         }
 
         var constructor = constructors[0];
