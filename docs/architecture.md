@@ -1,39 +1,110 @@
 # Architecture
 
-VSlices is split by responsibility, not by technical fashion.
+VSlices is split by responsibility rather than by a Domain/Application/Infrastructure layering.
 
 ## VSlices
 
-Core primitives shared by the rest of the framework.
+Core language and reusable mechanisms shared by the rest of the Framework.
 
-Includes:
-- errors
-- literals
-- monads
-- base traits
+Current examples include:
 
-## VSlices.Domain
+- `Req` / `ReqK`;
+- `Flow`;
+- category/arrow traits;
+- literals and small cross-cutting primitives.
 
-Domain modeling primitives.
+## VSlices.Space
 
-Includes:
-- value objects
-- repositories contracts
-- domain environments
-- domain runtime capabilities
+Owns semantic meaning.
 
-## VSlices.Application
+Space contains semantic values, structure, admissibility, identity where meaningful, pure transformations, quantities, temporal values, finance, and other semantic spaces.
 
-Application behavior and feature execution.
+A Space does not acquire external facts merely because a realization can do so.
 
-Includes:
-- features
-- flows
-- observability
-- orchestration
+## VSlices.Work
 
-## VSlices.Infrastructure
+Owns executable behavior.
 
-Concrete technical implementations and batteries.
+The current Feature contract is:
 
-Infrastructure implements capabilities, but does not define the framework mental model.
+```text
+Feature
+    -> Flow<ALG, Request, Response>
+```
+
+For capability-backed Work, `ALG` is an executable algebra: a simple value that composes the smallest executable capability atoms the module exposes.
+
+Example:
+
+```csharp
+public sealed record TodoAlgebra(
+    PointReader<Todo, TodoId> Reader,
+    PointWriter<Todo> Writer,
+    PointRemover<Todo, TodoId> Remover,
+    TodoIdSource Ids);
+```
+
+The algebra is the runtime required by the Flow. It is not a Free program, interpreter vocabulary, DI service bag, Repository, or Infrastructure layer.
+
+## VSlices.Grounding
+
+Owns concrete contact with the external world.
+
+Grounding implements the executable atoms declared by Work and may expose the resulting algebra through:
+
+```csharp
+AlgebraIO<ALG>
+```
+
+For example, one grounding may implement point reading/writing/removal against memory while another realizes the same atoms through Entity Framework Core.
+
+Grounding chooses mechanism. It does not acquire authority to redefine Work semantics.
+
+## Composition
+
+Independent Work algebras compose structurally through the currently named:
+
+```text
+AlgebraSum<A, B>
+AlgebraSum<A, B, C>
+...
+```
+
+The name is historical. In the current executable-runtime model the composed value contains every child algebra and exposes projections to them, so the construction is product-like rather than the coproduct represented by the former Free instruction algebra.
+
+A child Flow is adapted to a composed runtime by projecting the algebra it requires:
+
+```csharp
+child.MapRuntime(
+    (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+```
+
+Requests can be adapted independently with `MapRequest`, or runtime and request together with `ContraMap`.
+
+This preserves the distinction:
+
+```text
+runtime composition
+!= request adaptation
+!= result mapping
+!= Grounding realization
+```
+
+## Current boundary
+
+The validated direction is therefore:
+
+```text
+Space
+    semantic meaning
+
+Work
+    Feature -> Flow<Algebra, Request, Response>
+    Algebra -> executable capability atoms
+
+Grounding
+    realizes capability atoms
+    exposes executable Algebra
+```
+
+Historical Domain/Application/Infrastructure and Free-WorkFlow models are evidence of the path that led here, not the current architecture.

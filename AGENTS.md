@@ -61,211 +61,131 @@ Do not force this factorization when current evidence contradicts it, but do not
 
 ## Current Work Model
 
-The current recovery direction keeps `Flow<RT, REQ, RES>` as the executable Feature boundary while allowing Free programs over explicit algebras to remain an implementation mechanism beneath that boundary.
+The current validated direction uses `Flow` directly over executable Work algebras.
 
 ```text
 Feature
-    -> Flow<RT, REQ, RES>
-    -> capability-backed work
-    -> optional Free<ALG, A> programs interpreted through runtime-owned grounding
+    -> Flow<ALG, Request, Response>
+
+ALG
+    -> executable algebra owned by a Work module
+    -> composed from minimal executable capability atoms
+
+Grounding
+    -> implements those atoms
+    -> may expose the completed algebra through AlgebraIO<ALG>
 ```
 
-`WorkLine` remains outside the current implemented scope.
+There is no Free-monad/interpreter layer in the current Work model.
 
 ### Feature / WorkFlow
 
 A Feature owns its request/response contract and exposes execution through Flow:
 
 ```csharp
-Feature<F, RT, REQ, RES>
+Feature<F, ALG, REQ, RES>
 {
-    static abstract Flow<RT, REQ, RES> Get();
+    static abstract Flow<ALG, REQ, RES> Get();
 }
 ```
 
-The runtime and request remain separate execution channels. Free/algebra programs may still be used underneath Flow when they faithfully model WorkParts and interpretation, but they are not the Feature boundary itself.
+For capability-backed Work, the runtime parameter is the module algebra itself.
 
-### WorkPart
+### Executable algebra
 
-A WorkPart is currently understood as a specific instruction in a WorkFlow.
+A `[concept].Work` module should expose a small algebra composed from the executable atoms supported by current evidence.
 
-Do not infer that every pure semantic calculation must become a WorkPart. Pure transformations such as accepted state evolution may remain inside Free continuations unless real pressure shows that they need independent inspectability or execution semantics.
-
-### Feature-owned algebra
-
-Each WorkFlow owns only the instruction vocabulary it actually requires.
-
-For example:
-
-```text
-CreateTodo.Algebra
-    NextId
-    ReadTodo
-    WriteTodo
-
-GetTodo.Algebra
-    ReadTodo
-
-UpdateTodo.Algebra
-    ReadTodo
-    WriteTodo
-
-DeleteTodo.Algebra
-    ReadTodo
-    RemoveTodo
-```
-
-Generic vocabulary such as `PointReader`, `PointWriter`, and `PointRemover` may be reused to construct those algebras.
-
-Do not replace the per-Feature algebra with one broad shared service algebra merely because the same realization can interpret all operations.
-
----
-
-## Grounding and Interpretation
-
-`Grounding` owns concrete realization of WorkParts.
-
-The current interpreter boundary is:
+Example:
 
 ```csharp
-AlgebraIO<ALG>
+public sealed record TodoAlgebra(
+    PointReader<Todo, TodoId> Reader,
+    PointWriter<Todo> Writer,
+    PointRemover<Todo, TodoId> Remover,
+    TodoIdSource Ids);
 ```
 
-A single concrete service may implement several Feature algebras:
+Do not create a broad dependency bag. The algebra represents the executable vocabulary owned by that Work module.
 
-```text
-InMemoryTodoWork
-    AlgebraIO<CreateTodo.Algebra>
-    AlgebraIO<GetTodo.Algebra>
-    AlgebraIO<UpdateTodo.Algebra>
-    AlgebraIO<DeleteTodo.Algebra>
+### Grounding
+
+Grounding implements capability atoms and assembles the algebra.
+
+```csharp
+public interface AlgebraIO<ALG>
+{
+    ALG Algebra { get; }
+}
 ```
 
-This does not make those algebras the same. It means one realization can interpret several independently owned WorkFlow vocabularies.
+`AlgebraIO` is an export contract for an executable algebra, not an operation interpreter.
 
-`HasAlgebra<ALG, RT>` and runtime carriers may remain useful execution mechanisms in contexts that need them, but they are not the current semantic boundary of `Feature`.
+### Feature composition
 
-Do not reintroduce `RT` into `Feature<F, ALG, REQ, RES>` merely because historical APIs or runtime helpers still exist.
+Features sharing the same module algebra compose directly.
 
----
-
-## Feature Composition
-
-A Feature can reuse already-existing WorkFlows by composing their algebras.
-
-The same `Feature<F, ALG, REQ, RES>` contract is used whether `ALG` is a Feature-owned algebra or a sum of several child algebras.
-
-For example:
-
-```text
-CreateAndGetTodo
-    ALG = AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
-
-AttachFileToTodo
-    ALG = AlgebraSum<AddFile.Algebra, AddAttachmentReference.Algebra>
-```
-
-`AlgebraSum` is an execution-language composition mechanism, not a separate category of Feature.
-
-The public family currently follows LanguageExt-style positional arities:
+Independent module algebras currently compose structurally with the historically named:
 
 ```text
 AlgebraSum<A, B>
-AlgebraSum<A, B, C>
-AlgebraSum<A, B, C, D>
-AlgebraSum<A, B, C, D, E>
-AlgebraSum<A, B, C, D, E, F>
+...
 AlgebraSum<A, B, C, D, E, F, G>
 ```
 
-Each sum exposes `FromA` through `FromG` as applicable. These helpers hoist an existing child Feature program into the larger algebra without exposing recursive `Left/Right` structure at the call site.
+Important mathematical caveat: in the executable-runtime model this value contains all child algebras simultaneously and is eliminated by projection. Its current behavior is therefore **product-like**, unlike the actual coproduct/sum of instruction functors used by the earlier Free experiment. Preserve the current type name during this experiment, but do not claim that the representation is mathematically a sum.
 
-The underlying natural transformations remain explicit as `InjectA` through `InjectG`. Positional A..G vocabulary is the only supported injection surface.
+A child Flow is adapted to the parent runtime by projection:
+
+```csharp
+child.MapRuntime(
+    (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+```
+
+Request adaptation is independent:
+
+```csharp
+child.MapRequest(
+    (Parent.Request request) => new Child.Request(...))
+```
+
+Use `ContraMap` when both runtime and request should be adapted together.
 
 Ownership rules:
 
 ```text
-Feature / WorkFlow owns its WorkParts.
-The composing Feature owns its composed ALG and child-program injection.
-Grounding owns realization.
-A child WorkFlow does not know which future Feature or BFF may reuse it.
+child Work module owns its algebra
+child Feature owns its Flow
+parent Feature owns composition/projection
+Grounding owns realization
 ```
 
-`AlgebraSumIO<A,...,G>` composes existing interpreters and delegates each operation to the interpreter that owns that child algebra. It must not reimplement child WorkParts.
+### Point capabilities
 
-Do not introduce arities beyond seven or a different composition mechanism until real pressure requires it.
+The currently validated point atoms are:
 
----
-
-## Flow Status
-
-For this recovery checkpoint, `Flow<RT, REQ, RES>` is the Feature execution boundary.
-
-The previous Feature-as-Free experiment remains useful evidence for algebraic WorkParts, interpretation, and composition, but it no longer defines the public Feature contract.
-
-Preserve the distinction:
-
-```text
-Flow
-    Feature execution boundary
-
-Free<ALG, A>
-    optional internal Work program
-
-AlgebraIO<ALG>
-    concrete interpretation boundary
+```csharp
+PointReader<POINT, ID>
+PointWriter<POINT>
+PointRemover<POINT, ID>
 ```
 
-Do not remove the useful algebra/Free mechanisms merely because Flow is restored, and do not make Free the Feature boundary again without new evidence.
+They execute in `IO` and can be implemented directly by Grounding.
 
----
+Do not infer Repository, Store, Unit of Work, tracking, transaction, atomicity or durability semantics from these atoms alone.
 
-## Point Capabilities
+`EntityFrameworkPointIO` is a Grounding realization of the point atoms.
 
-When Work needs operations over points of semantic spaces:
+### Temporal capabilities
 
-- prefer small structural capabilities over importing historical infrastructure abstractions;
-- use `PointReader<ALG, POINT, ID>` for point reading where it fits;
-- use `PointWriter<ALG, POINT>` for point writing where it fits;
-- use `PointRemover<ALG, POINT, ID>` for point removal where it fits;
-- compose only the capabilities required by the owning Feature algebra;
-- build the WorkFlow as `Free<ALG, A>`;
-- let Grounding provide `AlgebraIO<ALG>`;
-- when a reusable realization is useful, depend on the minimum grounding contract such as `PointReaderIO<POINT, ID>`, `PointWriterIO<POINT>`, or `PointRemoverIO<POINT, ID>`;
-- treat `EntityFrameworkPointIO` as an EF Core realization of those point capabilities, not as a semantic persistence boundary;
-- do not reintroduce `Repository`, `DatabaseIO`, Store, Unit of Work, tracking, transactions, atomicity, or durability from read/write/remove capability alone.
+`ClockIO` and `DelayIO` are executable temporal atoms and may be composed into a temporal Work algebra.
 
-`Repository` and `DatabaseIO` were removed after executable EF Core evidence showed that point capabilities were sufficient for the validated cases.
-
-Read/write/remove vocabulary describes instructions. Stronger guarantees are separate semantics.
-
----
-
-## Temporal Capabilities
-
-Treat temporal observation, temporal delay, scheduling, and invocation as distinct concerns.
-
-The current validated Work vocabulary is:
-
-- `Clock<ALG>` for observing the current semantic `Moment`;
-- `Delay<ALG>` for delaying by a semantic `Duration<double>` or until a `Moment`.
-
-Reusable Grounding contracts are:
-
-- `ClockIO`;
-- `DelayIO`.
-
-`SystemTimeIO` may realize both through one `TimeProvider`, but that shared realization does not make clock observation and waiting the same semantic capability.
-
-Do not reintroduce `HasClock<RT>` or `ClockEnv<RT>`. They were removed after the temporal operations were expressed directly in Feature-owned algebras.
-
-Do not infer scheduling, recurring invocation, host lifecycle, or Hangfire/Quartz semantics from `Clock` or `Delay`. Those require separate pressure.
+Observation, delay, scheduling and invocation remain distinct concerns. Do not infer scheduler or recurrence semantics from clock/delay capabilities.
 
 ---
 
 ## Guarantees
 
-The current Free WorkFlow / composed-Feature experiment does not settle the guarantee model.
+The current executable-algebra / Flow model does not settle the guarantee model.
 
 Still treat the following as separate, unresolved work unless current repository evidence says otherwise:
 
@@ -320,7 +240,7 @@ Rules:
 - keep Features understandable in isolation;
 - keep WorkFlow instruction vocabulary local to its owner;
 - avoid shared service/program layers that steal WorkFlow ownership;
-- keep concrete realization behind explicit interpreter boundaries;
+- keep concrete realization behind explicit Grounding boundaries;
 - keep presentation adapters thin;
 - let a composing Feature reuse existing WorkFlows without rewriting them;
 - do not assign semantic policy to persistence or transport components merely because they can execute an operation.
@@ -369,7 +289,7 @@ Do NOT:
 - make a lower WorkFlow know the Feature/BFF that may compose it later;
 - treat one concrete interpreter as the semantic owner of several WorkFlows;
 - infer transactions or stronger persistence guarantees from point read/write/remove;
-- restore historical `RT` constraints at the Feature boundary without new evidence;
+- replace the explicit module algebra runtime with an arbitrary dependency carrier without new evidence;
 - force every pure semantic transformation into a WorkPart;
 - extend `AlgebraSum` beyond the supported A..G arities without pressure;
 - use current implementation convenience as proof of universal Framework semantics.
@@ -382,9 +302,9 @@ Testing should preserve the same architectural model.
 
 Current evidence should include, where relevant:
 
-- direct tests of generic algebra/hoist mechanisms;
-- Feature WorkFlow interpretation through `AlgebraIO<Feature.Algebra>`;
-- composed Feature algebra hoisting and interpreter delegation;
+- direct tests of executable capability atoms;
+- Feature execution through `Flow<ALG, Request, Response>`;
+- composed Feature runtime projection through `AlgebraSum` and `MapRuntime`;
 - compile/build evidence for dependent Framework surfaces;
 - presentation/API smoke behavior;
 - preservation of semantic state transitions.
