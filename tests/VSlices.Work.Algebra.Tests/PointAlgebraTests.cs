@@ -29,8 +29,52 @@ public sealed class PointAlgebraTests
                 static x => x.Name,
                 static () => string.Empty));
         Assert.Equal(
-            ["read-account", "write-account", "read-account"],
+            ["read-account-or-default", "write-account", "read-account-or-default"],
             grounding.Trace);
+    }
+
+    [Fact]
+    public async Task ReadOrDefault_preserves_absence_as_an_expected_branch()
+    {
+        var id = new AccountId(Guid.NewGuid());
+        var grounding = new InMemoryAccountGrounding([]);
+
+        var result = await grounding
+            .ReadOrDefault(id)
+            .Run()
+            .As()
+            .RunAsync();
+
+        Assert.True(result.IsNone);
+    }
+
+    [Fact]
+    public async Task Default_Read_is_available_on_concrete_readers_and_fails_like_Single()
+    {
+        var id = new AccountId(Guid.NewGuid());
+        var grounding = new InMemoryAccountGrounding([]);
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () =>
+            {
+                _ = await grounding.Read(id).RunAsync();
+            });
+
+        Assert.Equal(
+            "Sequence contains no matching element.",
+            error.Message);
+    }
+
+    [Fact]
+    public async Task Concrete_Read_can_override_the_default_required_read_semantics()
+    {
+        var id = new AccountId(Guid.NewGuid());
+        var reader = new FallbackAccountReader();
+
+        var account = await reader.Read(id).RunAsync();
+
+        Assert.Equal(id, account.Id);
+        Assert.Equal("fallback", account.Name);
     }
 }
 
@@ -46,14 +90,18 @@ public sealed class RenameAccount :
 
     public static Flow<AccountAlgebra, Request, Response> Get() =>
         new((algebra, request) =>
-            algebra.Reader.Read(request.AccountId)
+            algebra.Reader
+                .ReadOrDefault(request.AccountId)
+                .Run()
+                .As()
                 .Bind(current =>
                     current.Match(
                         Some: account =>
                             algebra.Writer
                                 .Write(account with { Name = request.Name })
                                 .Bind(_ => algebra.Reader.Read(request.AccountId))
-                                .Map(updated => new Response(updated)),
+                                .Map(updated =>
+                                    new Response(Some(updated))),
                         None: static () =>
                             IO.pure(new Response(Option<Account>.None)))));
 }
@@ -62,7 +110,6 @@ public readonly record struct AccountId(Guid Value);
 public sealed record Account(AccountId Id, string Name);
 
 public sealed class InMemoryAccountGrounding :
-    AlgebraIO<AccountAlgebra>,
     PointReader<Account, AccountId>,
     PointWriter<Account>
 {
@@ -77,14 +124,15 @@ public sealed class InMemoryAccountGrounding :
     public AccountAlgebra Algebra { get; }
     public List<string> Trace { get; } = [];
 
-    public IO<Option<Account>> Read(AccountId id) =>
-        IO.lift(() =>
-        {
-            Trace.Add("read-account");
-            return accounts.TryGetValue(id, out var point)
-                ? Some(point)
-                : Option<Account>.None;
-        });
+    public OptionT<IO, Account> ReadOrDefault(AccountId id) =>
+        OptionT.lift<IO, Account>(
+            IO.lift(() =>
+            {
+                Trace.Add("read-account-or-default");
+                return accounts.TryGetValue(id, out var point)
+                    ? Some(point)
+                    : Option<Account>.None;
+            }));
 
     public IO<Unit> Write(Account point) =>
         IO.lift(() =>
@@ -93,4 +141,14 @@ public sealed class InMemoryAccountGrounding :
             accounts[point.Id] = point;
             return unit;
         });
+}
+
+public sealed class FallbackAccountReader :
+    PointReader<Account, AccountId>
+{
+    public OptionT<IO, Account> ReadOrDefault(AccountId id) =>
+        OptionT<IO, Account>.None;
+
+    public IO<Account> Read(AccountId id) =>
+        IO.pure(new Account(id, "fallback"));
 }
