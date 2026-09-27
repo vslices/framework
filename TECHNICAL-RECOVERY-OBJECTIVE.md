@@ -193,7 +193,7 @@ For point-oriented external work, the validated atoms are:
 - `PointWriter<POINT>`;
 - `PointRemover<POINT, ID>`.
 
-Grounding implements those atoms directly and may export the completed module algebra through `AlgebraIO<ALG>`.
+Grounding implements those atoms directly and may expose the completed module algebra through an ordinary concrete property. No generic algebra-provider trait is currently required.
 
 Entity Framework Core realizes the same point atoms through `EntityFrameworkPointIO` rather than through `DatabaseIO`, Repository, or a Free-operation interpreter.
 
