@@ -135,11 +135,7 @@ Features execute directly through:
 Flow<TodoAlgebra, Request, Response>
 ```
 
-Grounding implements the atoms and may expose the completed algebra through:
-
-```csharp
-AlgebraIO<TodoAlgebra>
-```
+Grounding implements the atoms and may expose the completed algebra directly as a concrete property. No generic provider trait is currently justified.
 
 The previous trajectory through `Free<ALG,A>`, operation functors, `HasAlgebra`, and `AlgebraEnv` was useful experimental evidence, but those mechanisms are not part of the current Work model.
 
@@ -360,7 +356,7 @@ Feature<RenameAccount, AppAlgebra, Request, Response>
 Flow<AppAlgebra, Request, Response>
 ```
 
-Grounding implements the atoms and may export the assembled algebra through `AlgebraIO<AppAlgebra>`; the Feature never names the concrete Grounding implementation.
+Grounding implements the atoms and may expose the assembled algebra directly; the Feature never names the concrete Grounding implementation. The previous `AlgebraIO<ALG>` marker was removed because no generic behavior consumed it.
 
 This preserves the original goal of making runtime requirements explicit without introducing pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
 
