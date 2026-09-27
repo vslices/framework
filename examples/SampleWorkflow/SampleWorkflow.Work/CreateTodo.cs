@@ -21,7 +21,7 @@ public sealed class CreateTodo :
                         .RunFin(new Todo.Input(id, request.Detail, request.Completed))
                         .Match(
                             Succ: todo =>
-                                algebra.Reader.Read(todo.Id)
+                                algebra.Reader.ReadOrDefault(todo.Id).Run().As()
                                     .Bind(current =>
                                         current.Match(
                                             Some: static _ =>
