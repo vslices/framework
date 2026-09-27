@@ -73,7 +73,7 @@ ALG
 
 Grounding
     -> implements those atoms
-    -> may expose the completed algebra through AlgebraIO<ALG>
+    -> assembles and may expose the completed algebra
 ```
 
 There is no Free-monad/interpreter layer in the current Work model.
@@ -111,14 +111,13 @@ Do not create a broad dependency bag. The algebra represents the executable voca
 
 Grounding implements capability atoms and assembles the algebra.
 
+A concrete Grounding may expose the assembled algebra through an ordinary property such as:
+
 ```csharp
-public interface AlgebraIO<ALG>
-{
-    ALG Algebra { get; }
-}
+public TodoAlgebra Algebra { get; }
 ```
 
-`AlgebraIO` is an export contract for an executable algebra, not an operation interpreter.
+Do not introduce a generic "algebra provider" trait merely because several Groundings expose such a property. The previous `AlgebraIO<ALG>` contract added no executable capability or semantic guarantee and has been retired. If later generic composition or provisioning requires a contract, rediscover the smallest truthful abstraction from that pressure.
 
 ### Feature composition
 
