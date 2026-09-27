@@ -6,7 +6,6 @@ using static LanguageExt.Prelude;
 namespace SampleFileRepo;
 
 public sealed class InMemoryFileWork :
-    AlgebraIO<FileAlgebra>,
     PointReader<SampleFile, SampleFileId>,
     PointWriter<SampleFile>,
     FileIdSource
@@ -26,11 +25,12 @@ public sealed class InMemoryFileWork :
     public IO<SampleFileId> Next() =>
         IO.lift(() => new SampleFileId(Guid.NewGuid()));
 
-    public IO<Option<SampleFile>> Read(SampleFileId id) =>
-        IO.lift(() =>
-            files.TryGetValue(id, out var file)
-                ? Some(file)
-                : Option<SampleFile>.None);
+    public OptionT<IO, SampleFile> ReadOrDefault(SampleFileId id) =>
+        OptionT.lift<IO, SampleFile>(
+            IO.lift(() =>
+                files.TryGetValue(id, out var file)
+                    ? Some(file)
+                    : Option<SampleFile>.None));
 
     public IO<Unit> Write(SampleFile point) =>
         IO.lift(() =>
