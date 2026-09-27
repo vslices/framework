@@ -65,7 +65,7 @@ public interface PointRemover<POINT, ID>
 
 `ReadOrDefault` is the primitive a Grounding must realize. It keeps absence explicit as `OptionT<IO, POINT>`.
 
-`Read` is a default required-value view over that primitive. If the point is absent it fails exceptionally, matching the distinction between LINQ `Single` and `SingleOrDefault`. An implementation may declare its own `Read` when required lookup has more specific semantics.
+`Read` is a default required-value view over that primitive. If the point is absent it fails exceptionally, matching the distinction between LINQ `Single` and `SingleOrDefault`. An implementation may declare its own `Read` when required lookup needs more specific failure or retrieval semantics, but the override should preserve the meaning that the point is required to exist.
 
 The `IO` foundation keeps world contact explicit while leaving realization to Grounding.
 
