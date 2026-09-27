@@ -9,7 +9,7 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
     : IClassFixture<PostgreSqlFixture>
 {
     [Fact]
-    public async Task Direct_point_grounding_reads_writes_and_removes_without_Repository_semantics()
+    public async Task Direct_point_grounding_supports_optional_and_required_reads()
     {
         await database.ResetAsync();
         await using var context = database.CreateContext();
@@ -22,7 +22,12 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
 
         var id = Guid.NewGuid();
 
-        var missing = await points.Read(id).RunAsync();
+        var missing = await points
+            .ReadOrDefault(id)
+            .Run()
+            .As()
+            .RunAsync();
+
         Assert.True(missing.IsNone);
 
         await points
@@ -30,23 +35,30 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
             .RunAsync();
 
         var created = await points.Read(id).RunAsync();
-        Assert.Equal(
-            "created",
-            created.Match(static point => point.Name, static () => string.Empty));
+        Assert.Equal("created", created.Name);
 
         await points
             .Write(new DirectRecord { Id = id, Name = "updated" })
             .RunAsync();
 
         var updated = await points.Read(id).RunAsync();
-        Assert.Equal(
-            "updated",
-            updated.Match(static point => point.Name, static () => string.Empty));
+        Assert.Equal("updated", updated.Name);
 
         await points.Remove(id).RunAsync();
 
-        var removed = await points.Read(id).RunAsync();
+        var removed = await points
+            .ReadOrDefault(id)
+            .Run()
+            .As()
+            .RunAsync();
+
         Assert.True(removed.IsNone);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            async () =>
+            {
+                _ = await points.Read(id).RunAsync();
+            });
     }
 
     [Fact]
@@ -85,15 +97,11 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
 
         Assert.Equal(
             new Record(id, "created"),
-            evidence.Created.Match(
-                static point => point,
-                static () => new Record(Guid.Empty, string.Empty)));
+            evidence.Created);
 
         Assert.Equal(
             new Record(id, "updated"),
-            evidence.Updated.Match(
-                static point => point,
-                static () => new Record(Guid.Empty, string.Empty)));
+            evidence.Updated);
 
         Assert.True(evidence.Removed.IsNone);
     }
@@ -110,8 +118,8 @@ public sealed class ExerciseRecord :
     public sealed record Request(Guid Id);
 
     public sealed record Response(
-        Option<Record> Created,
-        Option<Record> Updated,
+        Record Created,
+        Record Updated,
         Option<Record> Removed);
 
     public static Flow<RecordAlgebra, Request, Response> Get() =>
@@ -123,7 +131,11 @@ public sealed class ExerciseRecord :
                         .Bind(_ => algebra.Reader.Read(request.Id))
                         .Bind(updated =>
                             algebra.Remover.Remove(request.Id)
-                                .Bind(_ => algebra.Reader.Read(request.Id))
+                                .Bind(_ =>
+                                    algebra.Reader
+                                        .ReadOrDefault(request.Id)
+                                        .Run()
+                                        .As())
                                 .Map(removed =>
                                     new Response(
                                         created,
