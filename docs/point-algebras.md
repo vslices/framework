@@ -113,16 +113,7 @@ public sealed class InMemoryTodoWork :
 }
 ```
 
-`AlgebraIO<ALG>` means that the Grounding exports one executable realization of the algebra:
-
-```csharp
-public interface AlgebraIO<ALG>
-{
-    ALG Algebra { get; }
-}
-```
-
-It is not an operation interpreter.
+The `Algebra` property is currently an ordinary concrete export. No Framework trait is needed merely to state that a Grounding exposes an assembled algebra. The former `AlgebraIO<ALG>` marker was retired because nothing consumed it generically.
 
 ## Entity Framework Core
 
