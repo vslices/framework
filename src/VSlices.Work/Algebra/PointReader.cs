@@ -39,8 +39,10 @@ public interface PointReader<POINT, ID>
 /// available on concrete PointReader implementations.
 ///
 /// A concrete implementation may declare its own Read method when required
-/// point lookup has more specific semantics; normal C# member resolution gives
-/// that instance method precedence over this extension.
+/// point lookup needs more specific failure or retrieval semantics. Such an
+/// override should preserve the meaning that the point is required to exist.
+/// Normal C# member resolution gives that instance method precedence over this
+/// extension.
 /// </summary>
 public static class PointReaderExtensions
 {
