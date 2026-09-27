@@ -79,6 +79,23 @@ public sealed class PointAlgebraTests
 
         Assert.Equal(id, error.Id);
     }
+
+    [Fact]
+    public async Task Specialized_Read_dispatches_through_the_PointReader_trait()
+    {
+        var id = new AccountId(Guid.NewGuid());
+        PointReader<Account, AccountId> reader =
+            new SpecificAccountReader();
+
+        var error = await Assert.ThrowsAsync<AccountNotFoundException>(
+            async () =>
+            {
+                _ = await reader.Read(id).RunAsync();
+            });
+
+        Assert.Equal(id, error.Id);
+    }
+
 }
 
 public sealed record AccountAlgebra(
