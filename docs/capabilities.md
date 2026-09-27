@@ -43,16 +43,7 @@ This gives the runtime a structural meaning: it is the algebra of executable ope
 
 ## Grounding
 
-Grounding implements the atoms.
-
-A grounding can expose a complete executable algebra through:
-
-```csharp
-public interface AlgebraIO<ALG>
-{
-    ALG Algebra { get; }
-}
-```
+Grounding implements the atoms and may expose the assembled module algebra directly.
 
 For example:
 
@@ -66,6 +57,8 @@ InMemoryTodoWork
 ```
 
 A different Grounding may expose the same Work algebra through different mechanisms.
+
+No generic provider contract is currently required. The former `AlgebraIO<ALG>` interface was removed because it only restated the existence of an `Algebra` property without adding capability, guarantee, or generic behavior.
 
 ## Composition
 
@@ -104,7 +97,9 @@ The current point vocabulary is intentionally small:
 ```csharp
 public interface PointReader<POINT, ID>
 {
-    IO<Option<POINT>> Read(ID id);
+    OptionT<IO, POINT> ReadOrDefault(ID id);
+
+    IO<POINT> Read(ID id) => ...;
 }
 
 public interface PointWriter<POINT>
@@ -117,6 +112,8 @@ public interface PointRemover<POINT, ID>
     IO<Unit> Remove(ID id);
 }
 ```
+
+`ReadOrDefault` models expected absence. The default `Read` models required presence and fails exceptionally when no point exists, analogous to LINQ `Single` versus `SingleOrDefault`.
 
 Reading, writing and removal do not imply Repository, tracking, transactions, atomicity, durability, enumeration, or Unit of Work semantics.
 
