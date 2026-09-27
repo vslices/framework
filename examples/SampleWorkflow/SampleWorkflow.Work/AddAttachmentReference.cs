@@ -24,7 +24,7 @@ public sealed class AddAttachmentReference :
 
     public static Flow<TodoAlgebra, Request, Response> Get() =>
         new((algebra, request) =>
-            algebra.Reader.Read(request.Id)
+            algebra.Reader.ReadOrDefault(request.Id).Run().As()
                 .Bind(current =>
                     current.Match(
                         Some: todo =>
