@@ -66,15 +66,18 @@ public sealed class PointAlgebraTests
     }
 
     [Fact]
-    public async Task Concrete_Read_can_override_the_default_required_read_semantics()
+    public async Task Concrete_Read_can_specialize_required_read_failure_semantics()
     {
         var id = new AccountId(Guid.NewGuid());
-        var reader = new FallbackAccountReader();
+        var reader = new SpecificAccountReader();
 
-        var account = await reader.Read(id).RunAsync();
+        var error = await Assert.ThrowsAsync<AccountNotFoundException>(
+            async () =>
+            {
+                _ = await reader.Read(id).RunAsync();
+            });
 
-        Assert.Equal(id, account.Id);
-        Assert.Equal("fallback", account.Name);
+        Assert.Equal(id, error.Id);
     }
 }
 
@@ -143,12 +146,19 @@ public sealed class InMemoryAccountGrounding :
         });
 }
 
-public sealed class FallbackAccountReader :
+public sealed class SpecificAccountReader :
     PointReader<Account, AccountId>
 {
     public OptionT<IO, Account> ReadOrDefault(AccountId id) =>
         OptionT<IO, Account>.None;
 
     public IO<Account> Read(AccountId id) =>
-        IO.pure(new Account(id, "fallback"));
+        IO.lift<Account>(
+            () => throw new AccountNotFoundException(id));
+}
+
+public sealed class AccountNotFoundException(AccountId id) :
+    InvalidOperationException($"Account '{id}' does not exist.")
+{
+    public AccountId Id { get; } = id;
 }
