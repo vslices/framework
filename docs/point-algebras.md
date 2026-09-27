@@ -39,7 +39,9 @@ The smallest supported vocabulary preserves continuity from documentary evidence
 ```csharp
 public interface PointReader<POINT, ID>
 {
-    IO<Option<POINT>> Read(ID id);
+    OptionT<IO, POINT> ReadOrDefault(ID id);
+
+    IO<POINT> Read(ID id) => ...;
 }
 ```
 
@@ -61,7 +63,11 @@ public interface PointRemover<POINT, ID>
 }
 ```
 
-The `IO` result makes world contact explicit while leaving realization to Grounding.
+`ReadOrDefault` is the primitive a Grounding must realize. It keeps absence explicit as `OptionT<IO, POINT>`.
+
+`Read` is a default required-value view over that primitive. If the point is absent it fails exceptionally, matching the distinction between LINQ `Single` and `SingleOrDefault`. An implementation may declare its own `Read` when required lookup has more specific semantics.
+
+The `IO` foundation keeps world contact explicit while leaving realization to Grounding.
 
 ## Work algebra
 
@@ -99,7 +105,6 @@ Grounding implements the atoms and assembles the algebra.
 
 ```csharp
 public sealed class InMemoryTodoWork :
-    AlgebraIO<TodoAlgebra>,
     PointReader<Todo, TodoId>,
     PointWriter<Todo>,
     PointRemover<Todo, TodoId>
