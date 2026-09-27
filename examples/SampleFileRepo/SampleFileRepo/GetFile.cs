@@ -12,6 +12,6 @@ public sealed class GetFile :
 
     public static Flow<FileAlgebra, Request, Response> Get() =>
         new((algebra, request) =>
-            algebra.Reader.Read(request.Id)
+            algebra.Reader.ReadOrDefault(request.Id).Run().As()
                 .Map(file => new Response(file)));
 }
