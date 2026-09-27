@@ -13,8 +13,13 @@ namespace VSlices.Work;
 public interface PointReader<POINT, ID>
 {
     /// <summary>
-    /// Reads a point when it exists.
+    /// Reads zero or one point for the supplied identity.
     /// </summary>
+    /// <remarks>
+    /// Implementations must preserve at-most-one semantics. If the underlying
+    /// realization can observe more than one point for the same identity, that
+    /// condition should fail the effect rather than choose one arbitrarily.
+    /// </remarks>
     OptionT<IO, POINT> ReadOrDefault(ID id);
 
     /// <summary>
