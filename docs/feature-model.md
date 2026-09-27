@@ -97,7 +97,7 @@ Grounding owns:
     how those requirements contact the world
 ```
 
-`AlgebraIO<ALG>` is the optional Grounding-facing contract for exporting the completed executable algebra.
+No generic Grounding-to-algebra provider contract is currently required. A concrete Grounding may simply expose its assembled algebra as a property. The former `AlgebraIO<ALG>` marker was retired because no generic behavior consumed it.
 
 ## Feature composition
 
