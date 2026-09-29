@@ -9,28 +9,28 @@ using static LanguageExt.Prelude;
 namespace SampleWorkflow.Grounding;
 
 public sealed class InMemoryTodoWork :
-    AlgebraIO<CreateTodo.Algebra>,
-    AlgebraIO<GetTodo.Algebra>,
-    AlgebraIO<UpdateTodo.Algebra>,
-    AlgebraIO<DeleteTodo.Algebra>,
-    AlgebraIO<AddAttachmentReference.Algebra>
+    AlgebraIO<CreateTodoAlgebra>,
+    AlgebraIO<GetTodoAlgebra>,
+    AlgebraIO<UpdateTodoAlgebra>,
+    AlgebraIO<DeleteTodoAlgebra>,
+    AlgebraIO<AddAttachmentReferenceAlgebra>
 {
     private readonly ConcurrentDictionary<TodoId, Todo> points = new();
 
-    IO<A> AlgebraIO<CreateTodo.Algebra>.Interpret<A>(
-        K<CreateTodo.Algebra, A> operation) =>
+    IO<A> AlgebraIO<CreateTodoAlgebra>.Interpret<A>(
+        K<CreateTodoAlgebra, A> operation) =>
         operation switch
         {
-            CreateTodo.NextIdPart<A> next =>
+            CreateTodoNextIdPart<A> next =>
                 IO.lift(Guid.NewGuid)
                     .Bind(value => TodoId.Transformation
                         .RunFin(value)
                         .Match(
                             Succ: id => IO.pure(next.Next(id)),
                             Fail: IO.fail<A>)),
-            CreateTodo.ReadPart<A> read =>
+            CreateTodoReadPart<A> read =>
                 IO.lift(() => read.Next(Read(read.Id))),
-            CreateTodo.WritePart<A> write =>
+            CreateTodoWritePart<A> write =>
                 IO.lift(() =>
                 {
                     points[write.Point.Id] = write.Point;
@@ -39,22 +39,22 @@ public sealed class InMemoryTodoWork :
             _ => throw new NotSupportedException()
         };
 
-    IO<A> AlgebraIO<GetTodo.Algebra>.Interpret<A>(
-        K<GetTodo.Algebra, A> operation) =>
+    IO<A> AlgebraIO<GetTodoAlgebra>.Interpret<A>(
+        K<GetTodoAlgebra, A> operation) =>
         operation switch
         {
-            GetTodo.ReadPart<A> read =>
+            GetTodoReadPart<A> read =>
                 IO.lift(() => read.Next(Read(read.Id))),
             _ => throw new NotSupportedException()
         };
 
-    IO<A> AlgebraIO<UpdateTodo.Algebra>.Interpret<A>(
-        K<UpdateTodo.Algebra, A> operation) =>
+    IO<A> AlgebraIO<UpdateTodoAlgebra>.Interpret<A>(
+        K<UpdateTodoAlgebra, A> operation) =>
         operation switch
         {
-            UpdateTodo.ReadPart<A> read =>
+            UpdateTodoReadPart<A> read =>
                 IO.lift(() => read.Next(Read(read.Id))),
-            UpdateTodo.WritePart<A> write =>
+            UpdateTodoWritePart<A> write =>
                 IO.lift(() =>
                 {
                     points[write.Point.Id] = write.Point;
@@ -63,13 +63,13 @@ public sealed class InMemoryTodoWork :
             _ => throw new NotSupportedException()
         };
 
-    IO<A> AlgebraIO<DeleteTodo.Algebra>.Interpret<A>(
-        K<DeleteTodo.Algebra, A> operation) =>
+    IO<A> AlgebraIO<DeleteTodoAlgebra>.Interpret<A>(
+        K<DeleteTodoAlgebra, A> operation) =>
         operation switch
         {
-            DeleteTodo.ReadPart<A> read =>
+            DeleteTodoReadPart<A> read =>
                 IO.lift(() => read.Next(Read(read.Id))),
-            DeleteTodo.RemovePart<A> remove =>
+            DeleteTodoRemovePart<A> remove =>
                 IO.lift(() =>
                 {
                     points.TryRemove(remove.Id, out _);
@@ -78,13 +78,13 @@ public sealed class InMemoryTodoWork :
             _ => throw new NotSupportedException()
         };
 
-    IO<A> AlgebraIO<AddAttachmentReference.Algebra>.Interpret<A>(
-        K<AddAttachmentReference.Algebra, A> operation) =>
+    IO<A> AlgebraIO<AddAttachmentReferenceAlgebra>.Interpret<A>(
+        K<AddAttachmentReferenceAlgebra, A> operation) =>
         operation switch
         {
-            AddAttachmentReference.ReadPart<A> read =>
+            AddAttachmentReferenceReadPart<A> read =>
                 IO.lift(() => read.Next(Read(read.Id))),
-            AddAttachmentReference.WritePart<A> write =>
+            AddAttachmentReferenceWritePart<A> write =>
                 IO.lift(() =>
                 {
                     points[write.Point.Id] = write.Point;

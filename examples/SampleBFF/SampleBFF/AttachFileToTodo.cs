@@ -3,11 +3,9 @@ using LanguageExt.Common;
 using SampleFileRepo;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
+using VSlices.Monads;
 using VSlices.Work;
 using static LanguageExt.Prelude;
-using Algebra = VSlices.Work.AlgebraSum<
-    SampleFileRepo.AddFile.Algebra,
-    SampleWorkflow.Work.AddAttachmentReference.Algebra>;
 
 namespace SampleBFF;
 
@@ -18,12 +16,15 @@ namespace SampleBFF;
 /// SampleWorkflow owns the Todo-to-resource association.
 /// SampleBFF alone knows that a SampleFileId can be represented as a Todo ResourceReference.
 /// </summary>
-public sealed class AttachFileToTodo :
+public sealed class AttachFileToTodo<RT> :
     Feature<
-        AttachFileToTodo,
-        Algebra,
-        AttachFileToTodo.Request,
-        AttachFileToTodo.Response>
+        AttachFileToTodo<RT>,
+        RT,
+        AttachFileToTodo<RT>.Request,
+        AttachFileToTodo<RT>.Response>
+    where RT :
+        HasAlgebra<AddFileAlgebra, RT>,
+        HasAlgebra<AddAttachmentReferenceAlgebra, RT>
 {
     public sealed record Request(
         TodoId TodoId,
@@ -37,63 +38,47 @@ public sealed class AttachFileToTodo :
     public sealed record Response(
         Either<Error, Option<Attached>> Attachment);
 
-    public static Free<Algebra, Response> Get(Request request)
-    {
-        var addFile = Algebra.FromA(
-            AddFile.Get(
-                new AddFile.Request(
-                    request.Name,
-                    request.Content)));
-
-        return
-            from stored in addFile
-            from response in ResourceReference.Transformation
-                .RunFin(stored.File.Id.ToString())
-                .Match(
-                    Succ: resource =>
-                    {
-                        var associate = Algebra.FromB(
-                            AddAttachmentReference.Get(
-                                new AddAttachmentReference.Request(
-                                    request.TodoId,
-                                    resource)));
-
-                        return
-                            from associated in associate
-                            from mapped in associated.Todo.Match(
-                                Left: error =>
-                                    Free.pure<Algebra, Response>(
-                                        new Response(
-                                            Either.Left<
-                                                Error,
-                                                Option<Attached>>(error))),
-                                Right: maybe =>
-                                    maybe.Match(
-                                        Some: todo =>
-                                            Free.pure<Algebra, Response>(
+    public static Flow<RT, Request, Response> Get() =>
+        new((runtime, request) =>
+            AddFile<RT>
+                .Get()
+                .RunFlow(
+                    runtime,
+                    new AddFile<RT>.Request(
+                        request.Name,
+                        request.Content))
+                .Bind(stored =>
+                    ResourceReference.Transformation
+                        .RunFin(stored.File.Id.ToString())
+                        .Match(
+                            Succ: resource =>
+                                AddAttachmentReference<RT>
+                                    .Get()
+                                    .RunFlow(
+                                        runtime,
+                                        new AddAttachmentReference<RT>.Request(
+                                            request.TodoId,
+                                            resource))
+                                    .Map(associated =>
+                                        associated.Todo.Match(
+                                            Left: error =>
+                                                new Response(
+                                                    Either.Left<
+                                                        Error,
+                                                        Option<Attached>>(error)),
+                                            Right: maybe =>
                                                 new Response(
                                                     Either.Right<
                                                         Error,
                                                         Option<Attached>>(
-                                                            Some(
-                                                                new Attached(
-                                                                    todo,
-                                                                    stored.File))))),
-                                        None: () =>
-                                            Free.pure<Algebra, Response>(
-                                                new Response(
-                                                    Either.Right<
-                                                        Error,
-                                                        Option<Attached>>(
-                                                            Option<Attached>.None)))))
-                            select mapped;
-                    },
-                    Fail: error =>
-                        Free.pure<Algebra, Response>(
-                            new Response(
-                                Either.Left<
-                                    Error,
-                                    Option<Attached>>(error))))
-            select response;
-    }
+                                                        maybe.Map(todo =>
+                                                            new Attached(
+                                                                todo,
+                                                                stored.File)))))),
+                            Fail: error =>
+                                IO.pure(
+                                    new Response(
+                                        Either.Left<
+                                            Error,
+                                            Option<Attached>>(error))))));
 }

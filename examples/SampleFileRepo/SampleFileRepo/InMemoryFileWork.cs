@@ -7,24 +7,23 @@ using static LanguageExt.Prelude;
 namespace SampleFileRepo;
 
 public sealed class InMemoryFileWork :
-    AlgebraIO<AddFile.Algebra>,
-    AlgebraIO<GetFile.Algebra>
+    AlgebraIO<AddFileAlgebra>,
+    AlgebraIO<GetFileAlgebra>
 {
     private readonly ConcurrentDictionary<SampleFileId, SampleFile> files = new();
 
-    public int Count =>
-        files.Count;
+    public int Count => files.Count;
 
-    IO<A> AlgebraIO<AddFile.Algebra>.Interpret<A>(
-        K<AddFile.Algebra, A> operation) =>
+    IO<A> AlgebraIO<AddFileAlgebra>.Interpret<A>(
+        K<AddFileAlgebra, A> operation) =>
         operation switch
         {
-            AddFile.NextIdPart<A> next =>
+            AddFileNextIdPart<A> next =>
                 IO.lift(() =>
                     next.Next(
                         new SampleFileId(
                             Guid.NewGuid()))),
-            AddFile.WritePart<A> write =>
+            AddFileWritePart<A> write =>
                 IO.lift(() =>
                 {
                     files[write.Point.Id] = write.Point;
@@ -33,11 +32,11 @@ public sealed class InMemoryFileWork :
             _ => throw new NotSupportedException()
         };
 
-    IO<A> AlgebraIO<GetFile.Algebra>.Interpret<A>(
-        K<GetFile.Algebra, A> operation) =>
+    IO<A> AlgebraIO<GetFileAlgebra>.Interpret<A>(
+        K<GetFileAlgebra, A> operation) =>
         operation switch
         {
-            GetFile.ReadPart<A> read =>
+            GetFileReadPart<A> read =>
                 IO.lift(() =>
                     read.Next(Read(read.Id))),
             _ => throw new NotSupportedException()

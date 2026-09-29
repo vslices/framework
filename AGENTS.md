@@ -61,40 +61,29 @@ Do not force this factorization when current evidence contradicts it, but do not
 
 ## Current Work Model
 
-The current `SampleWorkflow` and `SampleBFF` experiments have executable evidence for the following model:
+The current recovery direction keeps `Flow<RT, REQ, RES>` as the executable Feature boundary while allowing Free programs over explicit algebras to remain an implementation mechanism beneath that boundary.
 
 ```text
-Feature == WorkFlow == Free<ALG, Response>
-
-1 Feature / WorkFlow : Q WorkPart
-
-A Feature may reuse another Feature's WorkFlow by hoisting the child algebra
-into a larger composed ALG. Composition changes ALG; it does not require a
-second executable abstraction.
+Feature
+    -> Flow<RT, REQ, RES>
+    -> capability-backed work
+    -> optional Free<ALG, A> programs interpreted through runtime-owned grounding
 ```
 
 `WorkLine` remains outside the current implemented scope.
 
 ### Feature / WorkFlow
 
-A Feature directly owns the semantic program for one WorkFlow:
+A Feature owns its request/response contract and exposes execution through Flow:
 
 ```csharp
-Feature<F, ALG, REQ, RES>
-    where ALG : Functor<ALG>
+Feature<F, RT, REQ, RES>
 {
-    static abstract Free<ALG, RES> Get(REQ request);
+    static abstract Flow<RT, REQ, RES> Get();
 }
 ```
 
-The important ownership rule is:
-
-```text
-Feature does not merely execute a WorkFlow.
-Feature is the WorkFlow.
-```
-
-A Feature must not delegate its real program to a parallel shared `*Programs` layer merely to keep the Feature thin.
+The runtime and request remain separate execution channels. Free/algebra programs may still be used underneath Flow when they faithfully model WorkParts and interpretation, but they are not the Feature boundary itself.
 
 ### WorkPart
 
@@ -210,15 +199,24 @@ Do not introduce arities beyond seven or a different composition mechanism until
 
 ## Flow Status
 
-`Flow<RT, REQ, RES>` still exists in the repository, but its final relationship to the current Free WorkFlow model is unresolved.
+For this recovery checkpoint, `Flow<RT, REQ, RES>` is the Feature execution boundary.
 
-Do not:
+The previous Feature-as-Free experiment remains useful evidence for algebraic WorkParts, interpretation, and composition, but it no longer defines the public Feature contract.
 
-- restore `Flow` as the Feature boundary merely because older documentation says so;
-- delete or redesign `Flow` just to simplify the current experiment;
-- claim that its final role is settled.
+Preserve the distinction:
 
-First preserve the validated Feature-as-Free and composed-algebra model. Let real cases determine whether `Flow` remains an execution carrier, presentation/runtime syntax, another abstraction, or is superseded on this path.
+```text
+Flow
+    Feature execution boundary
+
+Free<ALG, A>
+    optional internal Work program
+
+AlgebraIO<ALG>
+    concrete interpretation boundary
+```
+
+Do not remove the useful algebra/Free mechanisms merely because Flow is restored, and do not make Free the Feature boundary again without new evidence.
 
 ---
 

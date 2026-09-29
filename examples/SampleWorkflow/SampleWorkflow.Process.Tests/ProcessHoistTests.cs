@@ -1,35 +1,34 @@
+using LanguageExt;
+using LanguageExt.Traits;
 using SampleWorkflow.Grounding;
 using SampleWorkflow.Process;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using VSlices.Work;
 using Xunit;
+using static LanguageExt.Prelude;
 
 namespace SampleWorkflow.Process.Tests;
 
-public sealed class ComposedFeatureHoistTests
+public sealed class ComposedFeatureFlowTests
 {
     [Fact]
-    public async Task Feature_composes_WorkFlow_algebras_by_hoisting_child_Features()
+    public async Task Feature_composes_child_Features_through_Flow()
     {
         var detail = TodoDetail.Transformation
-            .RunFin("composed through hoist")
+            .RunFin("composed through flow")
             .ThrowIfFail();
 
         var service = new InMemoryTodoWork();
+        var runtime = new ProcessRuntime(service);
 
-        var interpreter =
-            new AlgebraSumIO<CreateTodo.Algebra, GetTodo.Algebra>(
-                service,
-                service);
-
-        var response = await FreeAlgebra
-            .interpret(
-                CreateAndGetTodo.Get(
-                    new CreateAndGetTodo.Request(
-                        detail,
-                        Completed: false)),
-                interpreter)
+        var response = await CreateAndGetTodo<ProcessRuntime>
+            .Get()
+            .RunFlow(
+                runtime,
+                new CreateAndGetTodo<ProcessRuntime>.Request(
+                    detail,
+                    Completed: false))
             .RunAsync();
 
         var todo = response.Todo
@@ -39,7 +38,20 @@ public sealed class ComposedFeatureHoistTests
                     () => throw new InvalidOperationException(
                         "Expected the Process to return the created Todo.")));
 
-        Assert.Equal("composed through hoist", todo.Detail.Value);
+        Assert.Equal("composed through flow", todo.Detail.Value);
         Assert.False(todo.Completed);
     }
+}
+
+public sealed record ProcessRuntime(InMemoryTodoWork Work) :
+    HasAlgebra<CreateTodoAlgebra, ProcessRuntime>,
+    HasAlgebra<GetTodoAlgebra, ProcessRuntime>
+{
+    static K<Eff<ProcessRuntime>, AlgebraIO<CreateTodoAlgebra>>
+        Has<Eff<ProcessRuntime>, AlgebraIO<CreateTodoAlgebra>>.Ask { get; } =
+        liftEff<ProcessRuntime, AlgebraIO<CreateTodoAlgebra>>(rt => (AlgebraIO<CreateTodoAlgebra>)rt.Work);
+
+    static K<Eff<ProcessRuntime>, AlgebraIO<GetTodoAlgebra>>
+        Has<Eff<ProcessRuntime>, AlgebraIO<GetTodoAlgebra>>.Ask { get; } =
+        liftEff<ProcessRuntime, AlgebraIO<GetTodoAlgebra>>(rt => (AlgebraIO<GetTodoAlgebra>)rt.Work);
 }
