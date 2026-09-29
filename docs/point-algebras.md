@@ -67,6 +67,8 @@ public interface PointRemover<POINT, ID>
 
 `Read` is a default required-value view over that primitive. If the point is absent it fails exceptionally, matching the distinction between LINQ `Single` and `SingleOrDefault`. An implementation may declare its own `Read` when required lookup needs more specific failure or retrieval semantics, but the override should preserve the meaning that the point is required to exist.
 
+Because default interface members are not exposed as ordinary instance members on a concrete implementing type, `PointReaderExtensions.Read` forwards concrete readers to the trait member. This lets a Grounding implement only `ReadOrDefault` and still call `grounding.Read(id)`. If the concrete reader declares its own `Read`, normal C# member resolution gives that specialized method precedence while interface dispatch preserves the override.
+
 The `IO` foundation keeps world contact explicit while leaving realization to Grounding.
 
 ## Work algebra
