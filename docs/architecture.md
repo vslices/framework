@@ -50,11 +50,9 @@ The algebra is the runtime required by the Flow. It is not a Free program, inter
 
 Owns concrete contact with the external world.
 
-Grounding implements the executable atoms declared by Work and may expose the resulting algebra through:
+Grounding implements the executable atoms declared by Work and may expose the resulting algebra as an ordinary concrete property.
 
-```csharp
-AlgebraIO<ALG>
-```
+No generic Grounding-to-algebra provider contract is currently required. The former `AlgebraIO<ALG>` marker was retired because no generic behavior consumed it.
 
 For example, one grounding may implement point reading/writing/removal against memory while another realizes the same atoms through Entity Framework Core.
 
