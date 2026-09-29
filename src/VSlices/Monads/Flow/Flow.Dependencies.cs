@@ -84,15 +84,15 @@ public sealed class Compute<ALG, A>(Func<ALG, IO<A>> run)
                         .Map(b => project(a, b))));
 }
 
-public sealed partial class Flow<RT, RQ, A>
+public sealed partial class Flow<ALG, RQ, A>
 {
-    public static implicit operator Flow<RT, RQ, A>(
+    public static implicit operator Flow<ALG, RQ, A>(
         Derive<RQ, A> derived) =>
         new((_, request) => derived.Run(request));
 
-    public static implicit operator Flow<RT, RQ, A>(
-        Compute<RT, A> computation) =>
-        new((runtime, _) => computation.Run(runtime));
+    public static implicit operator Flow<ALG, RQ, A>(
+        Compute<ALG, A> computation) =>
+        new((algebra, _) => computation.Run(algebra));
 }
 
 namespace VSlices;

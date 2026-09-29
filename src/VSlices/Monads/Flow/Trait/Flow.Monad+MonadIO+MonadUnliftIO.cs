@@ -4,12 +4,12 @@ using System.Text;
 
 namespace VSlices.Monads;
 
-public partial class Flow<RT, RQ>
+public partial class Flow<ALG, RQ>
 {
-    static K<Flow<RT, RQ>, B> Monad<Flow<RT, RQ>>.Bind<A, B>(
-        K<Flow<RT, RQ>, A> ma,
-        Func<A, K<Flow<RT, RQ>, B>> f) =>
-        new Flow<RT, RQ, B>(
+    static K<Flow<ALG, RQ>, B> Monad<Flow<ALG, RQ>>.Bind<A, B>(
+        K<Flow<ALG, RQ>, A> ma,
+        Func<A, K<Flow<ALG, RQ>, B>> f) =>
+        new Flow<ALG, RQ, B>(
             (s, r) => ma.RunFlow(s, r)
                 .Bind(a => f(a).RunFlow(s, r)));
     
@@ -23,21 +23,21 @@ public partial class Flow<RT, RQ>
     /// <param name="fb">
     ///
     /// </param>
-    /// <returns>A new computation of type <see cref="Flow{RT, RQ, A}"/>.</returns>
-    public static Flow<RT, RQ, B> Bind<A, B>(
-        K<Flow<RT, RQ>, A> ma,
-        Func<A, Flow<RT, RQ, B>> fb) =>
+    /// <returns>A new computation of type <see cref="Flow{ALG, RQ, A}"/>.</returns>
+    public static Flow<ALG, RQ, B> Bind<A, B>(
+        K<Flow<ALG, RQ>, A> ma,
+        Func<A, Flow<ALG, RQ, B>> fb) =>
         +Monad.bind(ma, fb);
 
-    public static Flow<RT, RQ, B> Bind<A, B>(
-        K<Flow<RT, RQ>, A> ma,
-        Func<A, K<Flow<RT, RQ>, B>> fb) =>
+    public static Flow<ALG, RQ, B> Bind<A, B>(
+        K<Flow<ALG, RQ>, A> ma,
+        Func<A, K<Flow<ALG, RQ>, B>> fb) =>
         Bind(ma, a => +fb(a));
 
-    static K<Flow<RT, RQ>, B> Monad<Flow<RT, RQ>>.Recur<A, B>(
+    static K<Flow<ALG, RQ>, B> Monad<Flow<ALG, RQ>>.Recur<A, B>(
         A value,
-        Func<A, K<Flow<RT, RQ>, Next<A, B>>> f) =>
-        new Flow<RT, RQ, B>((ctx, req) =>
+        Func<A, K<Flow<ALG, RQ>, Next<A, B>>> f) =>
+        new Flow<ALG, RQ, B>((ctx, req) =>
             FinT.lift(
                     IO.liftAsync(async env =>
                     {
@@ -69,29 +69,29 @@ public partial class Flow<RT, RQ>
     /// <typeparam name="A"></typeparam>
     /// <param name="mma"></param>
     /// <returns></returns>
-    public static Flow<RT, RQ, A> Flatten<A>(
-        K<Flow<RT, RQ>, K<Flow<RT, RQ>, A>> mma) =>
+    public static Flow<ALG, RQ, A> Flatten<A>(
+        K<Flow<ALG, RQ>, K<Flow<ALG, RQ>, A>> mma) =>
         +Monad.flatten(mma);
 
-    public static Flow<RT, RQ, A> Flatten<A>(
-        K<Flow<RT, RQ>, Flow<RT, RQ, A>> mma) =>
+    public static Flow<ALG, RQ, A> Flatten<A>(
+        K<Flow<ALG, RQ>, Flow<ALG, RQ, A>> mma) =>
         +Monad.flatten(mma.Map(ma => ma.Kind()));
 
-    static K<Flow<RT, RQ>, A> MonadIO<Flow<RT, RQ>>.LiftIO<A>(IO<A> ma) =>
-        new Flow<RT, RQ, A>((_, _) => ma);
+    static K<Flow<ALG, RQ>, A> MonadIO<Flow<ALG, RQ>>.LiftIO<A>(IO<A> ma) =>
+        new Flow<ALG, RQ, A>((_, _) => ma);
 
     /// <summary>
-    /// Lifts an <see cref="IO{T}"/> computation into the <see cref="Flow{RT, RQ, T}"/> context.
+    /// Lifts an <see cref="IO{T}"/> computation into the <see cref="Flow{ALG, RQ, T}"/> context.
     /// </summary>
     /// <typeparam name="A">The type of the result produced by the <see cref="IO{T}"/> computation.</typeparam>
     /// <param name="ma">The <see cref="IO{T}"/> computation to be lifted.</param>
-    /// <returns>A <see cref="Flow{RT, RQ, A}"/> representing the lifted computation.</returns>
-    public static Flow<RT, RQ, A> LiftIO<A>(IO<A> ma) =>
-        +MonadIO.liftIO<Flow<RT, RQ>, A>(ma);
+    /// <returns>A <see cref="Flow{ALG, RQ, A}"/> representing the lifted computation.</returns>
+    public static Flow<ALG, RQ, A> LiftIO<A>(IO<A> ma) =>
+        +MonadIO.liftIO<Flow<ALG, RQ>, A>(ma);
     
-    static K<Flow<RT, RQ>, IO<A>> MonadUnliftIO<Flow<RT, RQ>>.ToIO<A>(
-        K<Flow<RT, RQ>, A> ma) =>
-        new Flow<RT, RQ, IO<A>>((c, r) => IO.pure(ma.RunFlow(c, r)));
+    static K<Flow<ALG, RQ>, IO<A>> MonadUnliftIO<Flow<ALG, RQ>>.ToIO<A>(
+        K<Flow<ALG, RQ>, A> ma) =>
+        new Flow<ALG, RQ, IO<A>>((c, r) => IO.pure(ma.RunFlow(c, r)));
 
     /// <summary>
     ///
@@ -99,6 +99,6 @@ public partial class Flow<RT, RQ>
     /// <typeparam name="A">The type of the result produced by the computation.</typeparam>
     /// <param name="ma">The monadic computation to convert.</param>
     /// <returns></returns>
-    public static Flow<RT, RQ, IO<A>> ToIO<A>(K<Flow<RT, RQ>, A> ma) =>
+    public static Flow<ALG, RQ, IO<A>> ToIO<A>(K<Flow<ALG, RQ>, A> ma) =>
         +MonadUnliftIO.toIO(ma);
 }

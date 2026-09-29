@@ -5,7 +5,7 @@ namespace VSlices;
 
 public static partial class FlowFluentAPISyntax
 {
-    extension<RT, RQ, A>(K<Flow<RT, RQ>, A> ma)
+    extension<ALG, RQ, A>(K<Flow<ALG, RQ>, A> ma)
     {
         /// <summary>
         ///
@@ -13,8 +13,8 @@ public static partial class FlowFluentAPISyntax
         /// <typeparam name="B"></typeparam>
         /// <param name="fb"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, B> Bind<B>(Func<A, K<Flow<RT, RQ>, B>> fb) =>
-            Flow<RT, RQ>.Bind(ma, fb);
+        public Flow<ALG, RQ, B> Bind<B>(Func<A, K<Flow<ALG, RQ>, B>> fb) =>
+            Flow<ALG, RQ>.Bind(ma, fb);
 
         /// <summary>
         ///
@@ -22,26 +22,26 @@ public static partial class FlowFluentAPISyntax
         /// <typeparam name="B"></typeparam>
         /// <param name="fb"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, B> Bind<B>(Func<A, Flow<RT, RQ, B>> fb) =>
-            Flow<RT, RQ>.Bind(ma, fb);
+        public Flow<ALG, RQ, B> Bind<B>(Func<A, Flow<ALG, RQ, B>> fb) =>
+            Flow<ALG, RQ>.Bind(ma, fb);
     }
 
-    extension<RT, RQ, A>(K<Flow<RT, RQ>, K<Flow<RT, RQ>, A>> ma)
+    extension<ALG, RQ, A>(K<Flow<ALG, RQ>, K<Flow<ALG, RQ>, A>> ma)
     {
-        public Flow<RT, RQ, A> Flatten<B>() =>
-            Flow<RT, RQ>.Flatten(ma);
+        public Flow<ALG, RQ, A> Flatten<B>() =>
+            Flow<ALG, RQ>.Flatten(ma);
     }
 
-    extension<RT, RQ, A>(K<Flow<RT, RQ>, Flow<RT, RQ, A>> ma)
+    extension<ALG, RQ, A>(K<Flow<ALG, RQ>, Flow<ALG, RQ, A>> ma)
     {
-        public Flow<RT, RQ, A> Flatten<B>() =>
-            Flow<RT, RQ>.Flatten(ma);
+        public Flow<ALG, RQ, A> Flatten<B>() =>
+            Flow<ALG, RQ>.Flatten(ma);
     }
 }
 
 public static partial class FlowLinqSyntax
 {
-    extension<RT, RQ, A>(K<Flow<RT, RQ>, A> ma)
+    extension<ALG, RQ, A>(K<Flow<ALG, RQ>, A> ma)
     {
         /// <summary>
         ///
@@ -51,8 +51,8 @@ public static partial class FlowLinqSyntax
         /// <param name="bind"></param>
         /// <param name="project"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, C> SelectMany<B, C>(
-            Func<A, Flow<RT, RQ, B>> bind,
+        public Flow<ALG, RQ, C> SelectMany<B, C>(
+            Func<A, Flow<ALG, RQ, B>> bind,
             Func<A, B, C> project) =>
             ma.Bind(x => bind(x).Map(y => project(x, y)));
         
@@ -64,8 +64,8 @@ public static partial class FlowLinqSyntax
         /// <param name="bind"></param>
         /// <param name="project"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, C> SelectMany<B, C>(
-            Func<A, K<Flow<RT, RQ>, B>> bind,
+        public Flow<ALG, RQ, C> SelectMany<B, C>(
+            Func<A, K<Flow<ALG, RQ>, B>> bind,
             Func<A, B, C> project) =>
             ma.Bind(x => bind(x).Map(y => project(x, y)));
     }
@@ -73,7 +73,7 @@ public static partial class FlowLinqSyntax
 
 public static partial class FlowOperatorSyntax
 {
-    extension<RT, RQ, A, B>(K<Flow<RT, RQ>, A>)
+    extension<ALG, RQ, A, B>(K<Flow<ALG, RQ>, A>)
     {
 
         /// <summary>
@@ -82,9 +82,9 @@ public static partial class FlowOperatorSyntax
         /// <param name="ma"></param>
         /// <param name="f"></param>
         /// <returns></returns>
-        public static Flow<RT, RQ, B> operator >>(
-            K<Flow<RT, RQ>, A> ma, 
-            Func<A, K<Flow<RT, RQ>, B>> f) =>
+        public static Flow<ALG, RQ, B> operator >>(
+            K<Flow<ALG, RQ>, A> ma, 
+            Func<A, K<Flow<ALG, RQ>, B>> f) =>
             ma.Bind(f);
 
         /// <summary>
@@ -93,9 +93,9 @@ public static partial class FlowOperatorSyntax
         /// <param name="ma"></param>
         /// <param name="f"></param>
         /// <returns></returns>
-        public static Flow<RT, RQ, B> operator >>(
-            K<Flow<RT, RQ>, A> ma,
-            Func<A, Flow<RT, RQ, B>> f) =>
+        public static Flow<ALG, RQ, B> operator >>(
+            K<Flow<ALG, RQ>, A> ma,
+            Func<A, Flow<ALG, RQ, B>> f) =>
             ma.Bind(f);
     }
 }

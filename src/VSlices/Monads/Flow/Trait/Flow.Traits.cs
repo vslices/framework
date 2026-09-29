@@ -7,15 +7,15 @@ namespace VSlices.Monads;
 /// <summary>
 /// Represents a monadic liftFlow that encapsulates computations with a specific runtime and request context.
 /// </summary>
-/// <typeparam name="RT">The type of the runtime context used in the liftFlow.</typeparam>
+/// <typeparam name="ALG">The type of the executable algebra used in the liftFlow.</typeparam>
 /// <typeparam name="RQ">The type of the request context used in the liftFlow.</typeparam>
-public partial class Flow<RT, RQ> :
-    MonadUnliftIO<Flow<RT, RQ>>,
-    Fallible<Error, Flow<RT, RQ>>,
-    Alternative<Flow<RT, RQ>>,
-    MonoidK<Flow<RT, RQ>>,
-    Final<Flow<RT, RQ>>,
-    Readable<Flow<RT, RQ>, (RT, RQ)>
+public partial class Flow<ALG, RQ> :
+    MonadUnliftIO<Flow<ALG, RQ>>,
+    Fallible<Error, Flow<ALG, RQ>>,
+    Alternative<Flow<ALG, RQ>>,
+    MonoidK<Flow<ALG, RQ>>,
+    Final<Flow<ALG, RQ>>,
+    Readable<Flow<ALG, RQ>, (ALG, RQ)>
 {
     private Flow() {}
 }

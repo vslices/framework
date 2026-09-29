@@ -4,15 +4,15 @@ using VSlices.Monads;
 
 namespace VSlices.Monads
 {
-    public partial class Flow<RT, RQ>
+    public partial class Flow<ALG, RQ>
     {
-        public static Flow<RT, RQ, A> Lift<A>(Func<RQ, FinT<Eff<RT>, A>> fa) =>
+        public static Flow<ALG, RQ, A> Lift<A>(Func<RQ, FinT<Eff<ALG>, A>> fa) =>
             new((rt, rq) => fa(rq).Run().Bind(ma => ma).RunIO(rt));
 
-        public static Flow<RT, RQ, A> Lift<A>(Func<RQ, K<FinT<Eff<RT>>, A>> fa) =>
+        public static Flow<ALG, RQ, A> Lift<A>(Func<RQ, K<FinT<Eff<ALG>>, A>> fa) =>
             new((rt, rq) => fa(rq).Run().Bind(ma => ma).RunIO(rt));
 
-        public static Flow<RT, RQ, A> Lift<A>(K<FinT<Eff<RT>>, A> ma) =>
+        public static Flow<ALG, RQ, A> Lift<A>(K<FinT<Eff<ALG>>, A> ma) =>
             new((rt, _) => ma.Run().Bind(ma => ma).RunIO(rt));
     }
 }
@@ -21,13 +21,13 @@ namespace VSlices
 {
     public static partial class VSlicesPrelude
     {
-        public static Flow<RT, RQ, A> liftFlow<RT, RQ, A>(
-            Func<RQ, FinT<Eff<RT>, A>> fa) =>
-            Flow<RT, RQ>.Lift(fa);
+        public static Flow<ALG, RQ, A> liftFlow<ALG, RQ, A>(
+            Func<RQ, FinT<Eff<ALG>, A>> fa) =>
+            Flow<ALG, RQ>.Lift(fa);
 
-        public static Flow<RT, RQ, A> liftFlow<RT, RQ, A>(
-            Func<RQ, K<FinT<Eff<RT>>, A>> fa) =>
-            Flow<RT, RQ>.Lift(fa);
+        public static Flow<ALG, RQ, A> liftFlow<ALG, RQ, A>(
+            Func<RQ, K<FinT<Eff<ALG>>, A>> fa) =>
+            Flow<ALG, RQ>.Lift(fa);
     }
 }
 
@@ -35,35 +35,35 @@ namespace LanguageExt
 {
     public static partial class FinTEffModuleExtensions
     {
-        extension<RT>(FinT<Eff<RT>>)
+        extension<ALG>(FinT<Eff<ALG>>)
         {
-            public static Flow<RT, RQ, B> Bind<RQ, A, B>(
-                K<FinT<Eff<RT>>, A> mma,
-                Func<A, Flow<RT, RQ, B>> fb) =>
-                Flow<RT, RQ>.Bind(Flow<RT, RQ>.Lift(mma), fb);
+            public static Flow<ALG, RQ, B> Bind<RQ, A, B>(
+                K<FinT<Eff<ALG>>, A> mma,
+                Func<A, Flow<ALG, RQ, B>> fb) =>
+                Flow<ALG, RQ>.Bind(Flow<ALG, RQ>.Lift(mma), fb);
 
-            public static Flow<RT, RQ, B> Bind<RQ, A, B>(
-                K<FinT<Eff<RT>>, A> ma,
-                Func<A, K<Flow<RT, RQ>, B>> fb) =>
-                FinT<Eff<RT>>.Bind(ma, a => +fb(a));
+            public static Flow<ALG, RQ, B> Bind<RQ, A, B>(
+                K<FinT<Eff<ALG>>, A> ma,
+                Func<A, K<Flow<ALG, RQ>, B>> fb) =>
+                FinT<Eff<ALG>>.Bind(ma, a => +fb(a));
         }
     }
 
     public static partial class FinTEffFluentAPISyntax
     {
-        extension<RT, A>(K<FinT<Eff<RT>>, A> ma)
+        extension<ALG, A>(K<FinT<Eff<ALG>>, A> ma)
         {
-            public Flow<RT, RQ, B> Bind<RQ, B>(Func<A, Flow<RT, RQ, B>> fb) =>
-                FinT<Eff<RT>>.Bind(ma, fb);
+            public Flow<ALG, RQ, B> Bind<RQ, B>(Func<A, Flow<ALG, RQ, B>> fb) =>
+                FinT<Eff<ALG>>.Bind(ma, fb);
             
-            public Flow<RT, RQ, B> Bind<RQ, B>(Func<A, K<Flow<RT, RQ>, B>> fb) =>
-                FinT<Eff<RT>>.Bind(ma, fb);
+            public Flow<ALG, RQ, B> Bind<RQ, B>(Func<A, K<Flow<ALG, RQ>, B>> fb) =>
+                FinT<Eff<ALG>>.Bind(ma, fb);
         }
     }
 
     public static partial class FinTEffLinqSyntax
     {
-        extension<RT, A>(K<FinT<Eff<RT>>, A> ma)
+        extension<ALG, A>(K<FinT<Eff<ALG>>, A> ma)
         {
             /// <summary>
             ///
@@ -73,10 +73,10 @@ namespace LanguageExt
             /// <param name="fb"></param>
             /// <param name="fc"></param>
             /// <returns></returns>
-            public Flow<RT, RQ, C> SelectMany<RQ, B, C>(
-                Func<A, Flow<RT, RQ, B>> fb,
+            public Flow<ALG, RQ, C> SelectMany<RQ, B, C>(
+                Func<A, Flow<ALG, RQ, B>> fb,
                 Func<A, B, C> fc) =>
-                FinT<Eff<RT>>.Bind(ma, a => fb(a).Map(b => fc(a, b)));
+                FinT<Eff<ALG>>.Bind(ma, a => fb(a).Map(b => fc(a, b)));
 
             /// <summary>
             ///
@@ -86,8 +86,8 @@ namespace LanguageExt
             /// <param name="fb"></param>
             /// <param name="fc"></param>
             /// <returns></returns>
-            public Flow<RT, RQ, C> SelectMany<RQ, B, C>(
-                Func<A, K<Flow<RT, RQ>, B>> fb,
+            public Flow<ALG, RQ, C> SelectMany<RQ, B, C>(
+                Func<A, K<Flow<ALG, RQ>, B>> fb,
                 Func<A, B, C> fc) =>
                 ma.Bind(a => fb(a).Map(b => fc(a, b)));
         }
@@ -95,7 +95,7 @@ namespace LanguageExt
 
     public static partial class FinTEffOperatorSyntax
     {
-        extension<RT, RQ, A, B>(K<FinT<Eff<RT>>, A>)
+        extension<ALG, RQ, A, B>(K<FinT<Eff<ALG>>, A>)
         {
 
             /// <summary>
@@ -104,9 +104,9 @@ namespace LanguageExt
             /// <param name="ma"></param>
             /// <param name="f"></param>
             /// <returns></returns>
-            public static Flow<RT, RQ, B> operator >>(
-                K<FinT<Eff<RT>>, A> ma,
-                Func<A, K<Flow<RT, RQ>, B>> f) =>
+            public static Flow<ALG, RQ, B> operator >>(
+                K<FinT<Eff<ALG>>, A> ma,
+                Func<A, K<Flow<ALG, RQ>, B>> f) =>
                 ma.Bind(f);
 
             /// <summary>
@@ -115,9 +115,9 @@ namespace LanguageExt
             /// <param name="ma"></param>
             /// <param name="f"></param>
             /// <returns></returns>
-            public static Flow<RT, RQ, B> operator >>(
-                K<FinT<Eff<RT>>, A> ma,
-                Func<A, Flow<RT, RQ, B>> f) =>
+            public static Flow<ALG, RQ, B> operator >>(
+                K<FinT<Eff<ALG>>, A> ma,
+                Func<A, Flow<ALG, RQ, B>> f) =>
                 ma.Bind(f);
         }
     }

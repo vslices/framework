@@ -5,7 +5,7 @@ namespace VSlices;
 
 public static partial class FlowFluentAPISyntax
 {
-    extension<RT, RQ, A>(K<Flow<RT, RQ>, A> ma)
+    extension<ALG, RQ, A>(K<Flow<ALG, RQ>, A> ma)
     {
         /// <summary>
         ///
@@ -13,8 +13,8 @@ public static partial class FlowFluentAPISyntax
         /// <typeparam name="B"></typeparam>
         /// <param name="fb"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, B> Map<B>(Func<A, B> fb) =>
-            Flow<RT, RQ>.Map(fb, ma);
+        public Flow<ALG, RQ, B> Map<B>(Func<A, B> fb) =>
+            Flow<ALG, RQ>.Map(fb, ma);
 
         /// <summary>
         ///
@@ -22,8 +22,8 @@ public static partial class FlowFluentAPISyntax
         /// <typeparam name="B"></typeparam>
         /// <param name="b"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, B> ConstMap<B>(B b) =>
-            Flow<RT, RQ>.ConstMap(b, ma);
+        public Flow<ALG, RQ, B> ConstMap<B>(B b) =>
+            Flow<ALG, RQ>.ConstMap(b, ma);
 
         /// <summary>
         ///
@@ -31,21 +31,21 @@ public static partial class FlowFluentAPISyntax
         /// <typeparam name="B"></typeparam>
         /// <param name="pb"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, B> ConstMap<B>(Pure<B> pb) =>
-            Flow<RT, RQ>.ConstMap(pb.Value, ma);
+        public Flow<ALG, RQ, B> ConstMap<B>(Pure<B> pb) =>
+            Flow<ALG, RQ>.ConstMap(pb.Value, ma);
 
         /// <summary>
         ///
         /// </summary>
         /// <returns></returns>
-        public Flow<RT, RQ, Unit> Ignore() =>
+        public Flow<ALG, RQ, Unit> Ignore() =>
             ma.As().ConstMap(unit);
     }
 }
 
 public static partial class FlowOperatorSyntax
 {
-    extension<RT, RQ, A, B>(K<Flow<RT, RQ>, A> ma)
+    extension<ALG, RQ, A, B>(K<Flow<ALG, RQ>, A> ma)
     {
         /// <summary>
         ///
@@ -53,10 +53,10 @@ public static partial class FlowOperatorSyntax
         /// <param name="m"></param>
         /// <param name="f"></param>
         /// <returns></returns>
-        public static Flow<RT, RQ, B> operator *(
-            K<Flow<RT, RQ>, A> m,
+        public static Flow<ALG, RQ, B> operator *(
+            K<Flow<ALG, RQ>, A> m,
             Func<A, B> f) =>
-            +Flow<RT, RQ>.Map(f, m);
+            +Flow<ALG, RQ>.Map(f, m);
 
         /// <summary>
         ///
@@ -64,10 +64,10 @@ public static partial class FlowOperatorSyntax
         /// <param name="f"></param>
         /// <param name="m"></param>
         /// <returns></returns>
-        public static Flow<RT, RQ, B> operator *(
+        public static Flow<ALG, RQ, B> operator *(
             Func<A, B> f,
-            K<Flow<RT, RQ>, A> m) =>
-            +Flow<RT, RQ>.Map(f, m);
+            K<Flow<ALG, RQ>, A> m) =>
+            +Flow<ALG, RQ>.Map(f, m);
 
         /// <summary>
         ///
@@ -75,10 +75,10 @@ public static partial class FlowOperatorSyntax
         /// <param name="p"></param>
         /// <param name="m"></param>
         /// <returns></returns>
-        public static Flow<RT, RQ, B> operator *(
+        public static Flow<ALG, RQ, B> operator *(
             Pure<B> p,
-            K<Flow<RT, RQ>, A> m) =>
-            +Flow<RT, RQ>.ConstMap(p.Value, m);
+            K<Flow<ALG, RQ>, A> m) =>
+            +Flow<ALG, RQ>.ConstMap(p.Value, m);
 
         /// <summary>
         ///
@@ -86,16 +86,16 @@ public static partial class FlowOperatorSyntax
         /// <param name="m"></param>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static Flow<RT, RQ, B> operator *(
-            K<Flow<RT, RQ>, A> m,
+        public static Flow<ALG, RQ, B> operator *(
+            K<Flow<ALG, RQ>, A> m,
             Pure<B> p) =>
-            +Flow<RT, RQ>.ConstMap(p.Value, m);
+            +Flow<ALG, RQ>.ConstMap(p.Value, m);
     }
 }
 
 public static partial class FlowLinqSyntax
 {
-    extension<RT, RQ, A>(K<Flow<RT, RQ>, A> ma)
+    extension<ALG, RQ, A>(K<Flow<ALG, RQ>, A> ma)
     {
         /// <summary>
         ///
@@ -103,7 +103,7 @@ public static partial class FlowLinqSyntax
         /// <typeparam name="B"></typeparam>
         /// <param name="fb"></param>
         /// <returns></returns>
-        public Flow<RT, RQ, B> Select<B>(Func<A, B> fb) =>
+        public Flow<ALG, RQ, B> Select<B>(Func<A, B> fb) =>
             ma.Map(fb);
     }
 }

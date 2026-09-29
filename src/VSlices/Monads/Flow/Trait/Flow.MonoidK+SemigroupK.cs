@@ -4,13 +4,13 @@ using System.Text;
 
 namespace VSlices.Monads;
 
-public partial class Flow<RT, RQ>
+public partial class Flow<ALG, RQ>
 {
-    static K<Flow<RT, RQ>, A> SemigroupK<Flow<RT, RQ>>.Combine<A>(
-        K<Flow<RT, RQ>, A> lhs, K<Flow<RT, RQ>, A> rhs) =>
+    static K<Flow<ALG, RQ>, A> SemigroupK<Flow<ALG, RQ>>.Combine<A>(
+        K<Flow<ALG, RQ>, A> lhs, K<Flow<ALG, RQ>, A> rhs) =>
         lhs | @catch(e1 => rhs | @catch(e2 => Fail<A>(e1 + e2)));
 
-    static K<Flow<RT, RQ>, A> MonoidK<Flow<RT, RQ>>.Empty<A>() =>
+    static K<Flow<ALG, RQ>, A> MonoidK<Flow<ALG, RQ>>.Empty<A>() =>
         Fail<A>(Error.Empty);
 
     /// <summary>
@@ -20,8 +20,8 @@ public partial class Flow<RT, RQ>
     /// <param name="mx">The first liftFlow to combine.</param>
     /// <param name="my">The second liftFlow to combine.</param>
     /// <returns>A new liftFlow that represents the combination of the two input flows.</returns>
-    public static Flow<RT, RQ, A> Combine<A>(
-        K<Flow<RT, RQ>, A> mx,
-        K<Flow<RT, RQ>, A> my) =>
+    public static Flow<ALG, RQ, A> Combine<A>(
+        K<Flow<ALG, RQ>, A> mx,
+        K<Flow<ALG, RQ>, A> my) =>
         +SemigroupK.combine(mx, my);
 }

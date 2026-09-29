@@ -8,9 +8,9 @@ public static class FlowTransformSyntax
     /// Adapts a Flow to a larger or different runtime by projecting the
     /// runtime required by the child Flow.
     /// </summary>
-    public static Flow<RT2, RQ, A> MapRuntime<RT, RQ, A, RT2>(
-        this Flow<RT, RQ, A> flow,
-        Func<RT2, RT> map) =>
+    public static Flow<ALG2, RQ, A> MapRuntime<ALG, RQ, A, ALG2>(
+        this Flow<ALG, RQ, A> flow,
+        Func<ALG2, ALG> map) =>
         new((runtime, request) =>
             flow.RunFlow(map(runtime), request));
 
@@ -18,8 +18,8 @@ public static class FlowTransformSyntax
     /// Adapts a Flow to a different request by mapping the outer request
     /// into the request required by the child Flow.
     /// </summary>
-    public static Flow<RT, RQ2, A> MapRequest<RT, RQ, A, RQ2>(
-        this Flow<RT, RQ, A> flow,
+    public static Flow<ALG, RQ2, A> MapRequest<ALG, RQ, A, RQ2>(
+        this Flow<ALG, RQ, A> flow,
         Func<RQ2, RQ> map) =>
         new((runtime, request) =>
             flow.RunFlow(runtime, map(request)));
@@ -27,9 +27,9 @@ public static class FlowTransformSyntax
     /// <summary>
     /// Adapts both runtime and request while preserving the child result.
     /// </summary>
-    public static Flow<RT2, RQ2, A> ContraMap<RT, RQ, A, RT2, RQ2>(
-        this Flow<RT, RQ, A> flow,
-        Func<RT2, RT> mapRuntime,
+    public static Flow<ALG2, RQ2, A> ContraMap<ALG, RQ, A, ALG2, RQ2>(
+        this Flow<ALG, RQ, A> flow,
+        Func<ALG2, ALG> mapRuntime,
         Func<RQ2, RQ> mapRequest) =>
         new((runtime, request) =>
             flow.RunFlow(
