@@ -2,7 +2,7 @@
 
 > Status: executable capability substrate validated for current point/temporal cases; guarantees remain exploratory.
 >
-> The current Flow/algebra experiment validates point reading, writing and removal, temporal atoms, same-module Feature composition, cross-module `AlgebraSum` composition, and EF Core Grounding without a Free/interpreter layer. Guarantee representation, analyzers, laws, and guarantee-oriented VSIR syntax remain intentionally separate.
+> The current Flow/algebra experiment validates point reading, writing and removal, temporal atoms, same-module Feature composition, cross-module `AlgebraMix` composition, and EF Core Grounding without a Free/interpreter layer. Guarantee representation, analyzers, laws, and guarantee-oriented VSIR syntax remain intentionally separate.
 
 ## Motivation
 
@@ -135,15 +135,11 @@ Features execute directly through:
 Flow<TodoAlgebra, Request, Response>
 ```
 
-Grounding implements the atoms and may expose the completed algebra through:
-
-```csharp
-AlgebraIO<TodoAlgebra>
-```
+Grounding implements the atoms and may expose the completed algebra directly as a concrete property. No generic provider trait is currently justified.
 
 The previous trajectory through `Free<ALG,A>`, operation functors, `HasAlgebra`, and `AlgebraEnv` was useful experimental evidence, but those mechanisms are not part of the current Work model.
 
-Independent module algebras compose with `AlgebraSum<...>`. A parent Feature adapts the larger runtime to each child runtime via `MapRuntime`; request adaptation is orthogonal via `MapRequest`.
+Independent module algebras compose with `AlgebraMix<...>`. A parent Feature adapts the larger runtime to each child runtime via `MapRuntime`; request adaptation is orthogonal via `MapRequest`.
 
 The same shape is not limited to CRUD. `ClockIO` and `DelayIO` already act as executable temporal atoms and can be composed into a temporal algebra used directly by Flow.
 
@@ -345,13 +341,22 @@ A grounding may contribute laws for guarantees that VSlices.Grounding does not k
 
 The capability side now has a concrete typed shape.
 
-A service-owned algebra composes point capabilities and a Feature requires its interpreter through:
+A Work module owns an executable algebra composed from the capability atoms supported by current evidence:
 
 ```csharp
-where RT : HasAlgebra<AppAlgebra, RT>
+public sealed record AppAlgebra(
+    PointReader<Account, AccountId> Reader,
+    PointWriter<Account> Writer);
 ```
 
-Grounding supplies `AlgebraIO<AppAlgebra>`; the Feature never names the concrete Grounding implementation.
+A Feature names that algebra directly in its Flow contract:
+
+```csharp
+Feature<RenameAccount, AppAlgebra, Request, Response>
+Flow<AppAlgebra, Request, Response>
+```
+
+Grounding implements the atoms and may expose the assembled algebra directly; the Feature never names the concrete Grounding implementation. The previous `AlgebraIO<ALG>` marker was removed because no generic behavior consumed it.
 
 This preserves the original goal of making runtime requirements explicit without introducing pattern aliases such as `Repository`, `Store`, or `UnitOfWork` as semantic primitives.
 
@@ -359,7 +364,7 @@ The exact typed representation of guarantees remains intentionally open.
 
 ## Current scope decision
 
-The capability substrate required for point reading/writing and free algebra interpretation has been implemented because the experiment produced direct executable evidence for it.
+The executable capability substrate required for the demonstrated point and temporal cases has been implemented because the experiment produced direct executable evidence for it.
 
 The following remain deliberately deferred:
 

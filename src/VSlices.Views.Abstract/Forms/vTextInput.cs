@@ -6,7 +6,6 @@ using VSlices.Space.Traits;
 namespace VSlices.Views.Abstract.Forms;
 
 public abstract class vTextInput<T> : InputBase<T>
-    where T : Transformable<string, T>
 {
     private bool _subscribedToValidation;
 
@@ -28,7 +27,8 @@ public abstract class vTextInput<T> : InputBase<T>
         [MaybeNullWhen(false)] out T result,
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        var parsed = Transformable.Transform<string, T>(value ?? string.Empty);
+        var parsed = TransformAdapter<string, T>.Transform(
+            value ?? string.Empty);
 
         if (parsed.IsFail)
         {

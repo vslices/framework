@@ -51,7 +51,7 @@ A child Feature can be reused under a larger runtime:
 
 ```csharp
 child.MapRuntime(
-    (AlgebraSum<A, B> sum) => sum.A)
+    (AlgebraMix<A, B> sum) => sum.A)
 ```
 
 and under a different parent request:
@@ -97,7 +97,7 @@ Grounding owns:
     how those requirements contact the world
 ```
 
-`AlgebraIO<ALG>` is the optional Grounding-facing contract for exporting the completed executable algebra.
+No generic Grounding-to-algebra provider contract is currently required. A concrete Grounding may simply expose its assembled algebra as a property. The former `AlgebraIO<ALG>` marker was retired because no generic behavior consumed it.
 
 ## Feature composition
 
@@ -110,12 +110,12 @@ Features sharing the same algebra compose directly as Flows. Their requests can 
 A Feature that coordinates independently owned Work can currently use:
 
 ```text
-AlgebraSum<A, B, ...>
+AlgebraMix<A, B, ...>
 ```
 
 and project each child algebra with `MapRuntime`.
 
-The type name is retained from the previous experiment, but the current executable runtime is product-like: the parent contains all required child algebras and projects one out for each child Flow. Whether the type should eventually be renamed to reflect that mathematics remains open.
+`AlgebraMix` intentionally describes structural availability without claiming that the Framework has established a categorical product/coproduct abstraction. The parent contains the required child algebras and projects the one required by each child Flow.
 
 This preserves child ownership:
 

@@ -73,7 +73,7 @@ ALG
 
 Grounding
     -> implements those atoms
-    -> may expose the completed algebra through AlgebraIO<ALG>
+    -> assembles and may expose the completed algebra
 ```
 
 There is no Free-monad/interpreter layer in the current Work model.
@@ -111,34 +111,33 @@ Do not create a broad dependency bag. The algebra represents the executable voca
 
 Grounding implements capability atoms and assembles the algebra.
 
+A concrete Grounding may expose the assembled algebra through an ordinary property such as:
+
 ```csharp
-public interface AlgebraIO<ALG>
-{
-    ALG Algebra { get; }
-}
+public TodoAlgebra Algebra { get; }
 ```
 
-`AlgebraIO` is an export contract for an executable algebra, not an operation interpreter.
+Do not introduce a generic "algebra provider" trait merely because several Groundings expose such a property. The previous `AlgebraIO<ALG>` contract added no executable capability or semantic guarantee and has been retired. If later generic composition or provisioning requires a contract, rediscover the smallest truthful abstraction from that pressure.
 
 ### Feature composition
 
 Features sharing the same module algebra compose directly.
 
-Independent module algebras currently compose structurally with the historically named:
+Independent module algebras compose structurally with:
 
 ```text
-AlgebraSum<A, B>
+AlgebraMix<A, B>
 ...
-AlgebraSum<A, B, C, D, E, F, G>
+AlgebraMix<A, B, C, D, E, F, G>
 ```
 
-Important mathematical caveat: in the executable-runtime model this value contains all child algebras simultaneously and is eliminated by projection. Its current behavior is therefore **product-like**, unlike the actual coproduct/sum of instruction functors used by the earlier Free experiment. Preserve the current type name during this experiment, but do not claim that the representation is mathematically a sum.
+`AlgebraMix` is intentionally modest vocabulary: it means that independently owned executable algebras are available together to a composing Flow. It does not claim categorical product/coproduct semantics, ordering, priority, transactionality, or shared ownership.
 
 A child Flow is adapted to the parent runtime by projection:
 
 ```csharp
 child.MapRuntime(
-    (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+    (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
 ```
 
 Request adaptation is independent:
@@ -229,6 +228,21 @@ Current examples include:
 
 Do not create a semantic type merely because a primitive exists. `Completed` remains a plain `bool` in the current experiment because no evidence yet requires a separate space.
 
+### Presentation transform adaptation
+
+Presentation convenience must not redefine semantic transformation ownership.
+
+For `TransformAdapter<FROM, TO>`:
+
+- if `TO` already owns `Transformable<FROM, TO>`, use that transformation directly;
+- otherwise the adapter may mechanically establish `TO.Input` from `FROM` only when the validated single-input convention holds;
+- `TO.Input -> TO` remains owned by `TO.Transformation`;
+- do not infer missing values for multi-field Inputs;
+- do not make a semantic target implement a presentation-specific direct transform merely to satisfy a UI control;
+- keep the analyzer enabled so invalid adapter conventions fail during compilation when the closed target is visible.
+
+Reflection is a .NET realization detail and is cached per closed adapter pair. It is not semantic authority.
+
 ---
 
 ## Architecture
@@ -291,7 +305,7 @@ Do NOT:
 - infer transactions or stronger persistence guarantees from point read/write/remove;
 - replace the explicit module algebra runtime with an arbitrary dependency carrier without new evidence;
 - force every pure semantic transformation into a WorkPart;
-- extend `AlgebraSum` beyond the supported A..G arities without pressure;
+- extend `AlgebraMix` beyond the supported A..G arities without pressure;
 - use current implementation convenience as proof of universal Framework semantics.
 
 ---
@@ -304,7 +318,7 @@ Current evidence should include, where relevant:
 
 - direct tests of executable capability atoms;
 - Feature execution through `Flow<ALG, Request, Response>`;
-- composed Feature runtime projection through `AlgebraSum` and `MapRuntime`;
+- composed Feature runtime projection through `AlgebraMix` and `MapRuntime`;
 - compile/build evidence for dependent Framework surfaces;
 - presentation/API smoke behavior;
 - preservation of semantic state transitions.
@@ -320,7 +334,7 @@ VSlices.Work.Products build
 Work algebra tests
 SampleWorkflow API build
 composed Feature hoist/composition tests
-AlgebraSum A..G tests
+AlgebraMix A..G tests
 SampleFileRepo build
 cross-service SampleBFF composition tests
 CRUD smoke test

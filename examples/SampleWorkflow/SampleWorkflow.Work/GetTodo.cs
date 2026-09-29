@@ -13,6 +13,6 @@ public sealed class GetTodo :
 
     public static Flow<TodoAlgebra, Request, Response> Get() =>
         new((algebra, request) =>
-            algebra.Reader.Read(request.Id)
+            algebra.Reader.ReadOrDefault(request.Id).Run().As()
                 .Map(todo => new Response(todo)));
 }

@@ -12,7 +12,7 @@ namespace SampleBFF;
 public sealed class AttachFileToTodo :
     Feature<
         AttachFileToTodo,
-        AlgebraSum<FileAlgebra, TodoAlgebra>,
+        AlgebraMix<FileAlgebra, TodoAlgebra>,
         AttachFileToTodo.Request,
         AttachFileToTodo.Response>
 {
@@ -29,13 +29,13 @@ public sealed class AttachFileToTodo :
         Either<Error, Option<Attached>> Attachment);
 
     public static Flow<
-        AlgebraSum<FileAlgebra, TodoAlgebra>,
+        AlgebraMix<FileAlgebra, TodoAlgebra>,
         Request,
         Response> Get()
     {
         var addFile = AddFile
             .Get()
-            .MapRuntime((AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+            .MapRuntime((AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
             .MapRequest((Request request) =>
                 new AddFile.Request(
                     request.Name,
@@ -48,7 +48,7 @@ public sealed class AttachFileToTodo :
                     Succ: resource =>
                         AddAttachmentReference
                             .Get()
-                            .MapRuntime((AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.B)
+                            .MapRuntime((AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.B)
                             .MapRequest((Request request) =>
                                 new AddAttachmentReference.Request(
                                     request.TodoId,
@@ -71,7 +71,7 @@ public sealed class AttachFileToTodo :
                                                         stored.File)))))),
                     Fail: error =>
                         Flow<
-                            AlgebraSum<FileAlgebra, TodoAlgebra>,
+                            AlgebraMix<FileAlgebra, TodoAlgebra>,
                             Request>.Pure(
                             new Response(
                                 Either.Left<

@@ -8,7 +8,6 @@ using static LanguageExt.Prelude;
 namespace SampleWorkflow.Grounding;
 
 public sealed class InMemoryTodoWork :
-    AlgebraIO<TodoAlgebra>,
     PointReader<Todo, TodoId>,
     PointWriter<Todo>,
     PointRemover<Todo, TodoId>,
@@ -34,11 +33,12 @@ public sealed class InMemoryTodoWork :
                         Succ: IO.pure,
                         Fail: IO.fail<TodoId>));
 
-    public IO<Option<Todo>> Read(TodoId id) =>
-        IO.lift(() =>
-            points.TryGetValue(id, out var point)
-                ? Some(point)
-                : Option<Todo>.None);
+    public OptionT<IO, Todo> ReadOrDefault(TodoId id) =>
+        OptionT.lift<IO, Todo>(
+            IO.lift(() =>
+                points.TryGetValue(id, out var point)
+                    ? Some(point)
+                    : Option<Todo>.None));
 
     public IO<Unit> Write(Todo point) =>
         IO.lift(() =>

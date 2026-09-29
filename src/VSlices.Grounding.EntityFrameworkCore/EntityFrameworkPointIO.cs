@@ -26,12 +26,10 @@ public sealed class EntityFrameworkPointIO<TContext, POINT, ID, TProjection>(
 {
     private readonly DbSet<TProjection> set = context.Set<TProjection>();
 
-    public IO<Option<POINT>> Read(ID id) =>
+    public OptionT<IO, POINT> ReadOrDefault(ID id) =>
         set.AsNoTracking()
             .SingleOrNoneIO(byId(id))
-            .Run()
-            .As()
-            .Map(option => option.Map(toPoint));
+            .Map(toPoint);
 
     public IO<Unit> Write(POINT point) =>
         from projection in IO.lift(() => toProjection(point))

@@ -39,7 +39,9 @@ The smallest supported vocabulary preserves continuity from documentary evidence
 ```csharp
 public interface PointReader<POINT, ID>
 {
-    IO<Option<POINT>> Read(ID id);
+    OptionT<IO, POINT> ReadOrDefault(ID id);
+
+    IO<POINT> Read(ID id) => ...;
 }
 ```
 
@@ -61,7 +63,11 @@ public interface PointRemover<POINT, ID>
 }
 ```
 
-The `IO` result makes world contact explicit while leaving realization to Grounding.
+`ReadOrDefault` is the primitive a Grounding must realize. It keeps absence explicit as `OptionT<IO, POINT>` and carries an at-most-one law: if the realization can observe more than one point for the same identity, it should fail the effect rather than choose one. This completes the intended `SingleOrDefault`-like semantics.
+
+`Read` is a default required-value view over that primitive. If the point is absent it fails exceptionally, matching the distinction between LINQ `Single` and `SingleOrDefault`. An implementation may declare its own `Read` when required lookup needs more specific failure or retrieval semantics, but the override should preserve the meaning that the point is required to exist.
+
+The `IO` foundation keeps world contact explicit while leaving realization to Grounding.
 
 ## Work algebra
 
@@ -83,7 +89,10 @@ public sealed class GetTodo :
 {
     public static Flow<TodoAlgebra, Request, Response> Get() =>
         new((algebra, request) =>
-            algebra.Reader.Read(request.Id)
+            algebra.Reader
+                .ReadOrDefault(request.Id)
+                .Run()
+                .As()
                 .Map(todo => new Response(todo)));
 }
 ```
@@ -99,7 +108,6 @@ Grounding implements the atoms and assembles the algebra.
 
 ```csharp
 public sealed class InMemoryTodoWork :
-    AlgebraIO<TodoAlgebra>,
     PointReader<Todo, TodoId>,
     PointWriter<Todo>,
     PointRemover<Todo, TodoId>
@@ -108,16 +116,7 @@ public sealed class InMemoryTodoWork :
 }
 ```
 
-`AlgebraIO<ALG>` means that the Grounding exports one executable realization of the algebra:
-
-```csharp
-public interface AlgebraIO<ALG>
-{
-    ALG Algebra { get; }
-}
-```
-
-It is not an operation interpreter.
+The `Algebra` property is currently an ordinary concrete export. No Framework trait is needed merely to state that a Grounding exposes an assembled algebra. The former `AlgebraIO<ALG>` marker was retired because nothing consumed it generically.
 
 ## Entity Framework Core
 
@@ -139,20 +138,20 @@ semantic point != EF projection
 
 ## Algebra composition
 
-If a Feature consumes Work owned by independent modules, its runtime can use the historically named:
+If a Feature consumes Work owned by independent modules, its runtime can mix those executable algebras structurally:
 
 ```csharp
-AlgebraSum<FileAlgebra, TodoAlgebra>
+AlgebraMix<FileAlgebra, TodoAlgebra>
 ```
 
-Despite the name, the current executable-runtime representation is product-like: it contains both child algebras simultaneously. This differs materially from the earlier Free model, where `AlgebraSum` was an actual coproduct of instruction functors.
+`AlgebraMix` deliberately states only that the child algebras are available together for projection. It does not import the coproduct semantics of the earlier Free instruction model or claim a stronger mathematical construction than current evidence requires.
 
 The child Flow is lifted into that larger runtime by runtime projection:
 
 ```csharp
 AddFile.Get()
     .MapRuntime(
-        (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+        (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
 ```
 
 This is a contravariant adaptation of the Flow runtime: the parent runtime knows how to provide the smaller runtime required by the child.
@@ -164,11 +163,11 @@ Requests are adapted separately with `MapRequest`.
 The experiment currently exercises:
 
 1. point atoms directly through a Feature Flow;
-2. a seven-way `AlgebraSum`;
+2. a seven-way `AlgebraMix`;
 3. temporal capability atoms as a Flow runtime;
 4. a CRUD SampleWorkflow using one module algebra;
 5. same-module Feature composition;
-6. cross-service BFF composition using `AlgebraSum<FileAlgebra, TodoAlgebra>`;
+6. cross-service BFF composition using `AlgebraMix<FileAlgebra, TodoAlgebra>`;
 7. in-memory Groundings;
 8. Entity Framework Core point Grounding.
 

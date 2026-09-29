@@ -80,7 +80,7 @@ input
 -> zero or more integrations
 ```
 
-The current `Feature<F, RT, REQ, RES>` and `Flow<RT, REQ, RES>` already recover the executable core more explicitly.
+The current `Feature<F, ALG, REQ, RES>` and `Flow<ALG, REQ, RES>` recover the executable core while making the Work-module algebra explicit.
 
 The remaining problem is to rediscover the relation between executable work and the concrete mechanisms that make that work reachable.
 
@@ -193,13 +193,13 @@ For point-oriented external work, the validated atoms are:
 - `PointWriter<POINT>`;
 - `PointRemover<POINT, ID>`.
 
-Grounding implements those atoms directly and may export the completed module algebra through `AlgebraIO<ALG>`.
+Grounding implements those atoms directly and may expose the completed module algebra through an ordinary concrete property. No generic algebra-provider trait is currently required.
 
 Entity Framework Core realizes the same point atoms through `EntityFrameworkPointIO` rather than through `DatabaseIO`, Repository, or a Free-operation interpreter.
 
 Temporal Work follows the same executable-atom direction: `ClockIO` and `DelayIO` can be composed directly into a temporal Work algebra and used as a `Flow` runtime.
 
-Independent module algebras compose structurally through `AlgebraSum<...>`. Child Flows adapt to a larger runtime through `MapRuntime`, while request adaptation remains independent through `MapRequest`.
+Independent module algebras compose structurally through `AlgebraMix<...>`. Child Flows adapt to a larger runtime through `MapRuntime`, while request adaptation remains independent through `MapRequest`.
 
 The recovery objective remains to retain the expressive power of the old effectful runtime while making capability requirements, algebraic structure, and grounding boundaries smaller, explicit, and independently justified.
 

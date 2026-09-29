@@ -34,7 +34,7 @@ public sealed class CrossServiceFeatureCompositionTests
                 () => throw new InvalidOperationException(
                     "Expected setup Todo to be created.")));
 
-        var algebra = new AlgebraSum<FileAlgebra, TodoAlgebra>(
+        var algebra = new AlgebraMix<FileAlgebra, TodoAlgebra>(
             files.Algebra,
             todo.Algebra);
 
@@ -94,7 +94,7 @@ public sealed class CrossServiceFeatureCompositionTests
             .RunFin(Guid.NewGuid())
             .ThrowIfFail();
 
-        var algebra = new AlgebraSum<FileAlgebra, TodoAlgebra>(
+        var algebra = new AlgebraMix<FileAlgebra, TodoAlgebra>(
             files.Algebra,
             todo.Algebra);
 
