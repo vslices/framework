@@ -1,8 +1,8 @@
 # Capabilities and Guarantees
 
-> Status: capability substrate partially validated; guarantees remain exploratory.
+> Status: executable capability substrate validated for current point/temporal cases; guarantees remain exploratory.
 >
-> The Point Algebra experiment validated and implemented the capability side for reading and writing semantic points. Guarantee representation, analyzers, laws, and guarantee-oriented VSIR syntax remain intentionally deferred while the immediate priority is producing useful migration/refactoring material for the September 25 delivery.
+> The current Flow/algebra experiment validates point reading, writing and removal, temporal atoms, same-module Feature composition, cross-module `AlgebraSum` composition, and EF Core Grounding without a Free/interpreter layer. Guarantee representation, analyzers, laws, and guarantee-oriented VSIR syntax remain intentionally separate.
 
 ## Motivation
 
@@ -109,32 +109,45 @@ Atomic concepts allow knowledge to accumulate across Structure, Behavior, Consis
 
 ## Validated capability substrate
 
-The earlier provisional vocabulary based on `Reading` and `Managing` was refined by implementation pressure into point-oriented capabilities.
+Implementation pressure refined the capability model into **executable algebraic atoms**.
 
-The current validated primitives are:
-
-```text
-PointReader<ALG, POINT, ID>
-PointWriter<ALG, POINT>
-```
-
-A service-owned algebra composes these capabilities across the semantic spaces it needs and implements `Functor<ALG>`.
-
-Operations are lifted into `Free<ALG, A>`, so a Feature can construct an inert program before any Grounding is chosen.
-
-Grounding supplies an `AlgebraIO<ALG>` interpreter, and Work requires it through:
+The current validated point atoms are:
 
 ```text
-HasAlgebra<ALG, RT>
+PointReader<POINT, ID>
+PointWriter<POINT>
+PointRemover<POINT, ID>
 ```
 
-The experiment demonstrated that the same free program can be interpreted by different Groundings, that one algebra can span multiple point spaces, and that the resulting program composes inside the existing `Feature -> Flow` model.
+A Work module composes those atoms into a simple executable algebra value:
 
-See [Point Algebras](../point-algebras.md).
+```csharp
+public sealed record TodoAlgebra(
+    PointReader<Todo, TodoId> Reader,
+    PointWriter<Todo> Writer,
+    PointRemover<Todo, TodoId> Remover,
+    TodoIdSource Ids);
+```
 
-Deletion/removal remains open. It has not been folded into `PointWriter` merely because CRUD traditionally groups those operations.
+Features execute directly through:
 
-Persistence-boundary questions such as staged versus autonomous persistence also remain open because they depend on additional semantics and guarantees rather than on reading/writing capability alone.
+```text
+Flow<TodoAlgebra, Request, Response>
+```
+
+Grounding implements the atoms and may expose the completed algebra through:
+
+```csharp
+AlgebraIO<TodoAlgebra>
+```
+
+The previous trajectory through `Free<ALG,A>`, operation functors, `HasAlgebra`, and `AlgebraEnv` was useful experimental evidence, but those mechanisms are not part of the current Work model.
+
+Independent module algebras compose with `AlgebraSum<...>`. A parent Feature adapts the larger runtime to each child runtime via `MapRuntime`; request adaptation is orthogonal via `MapRequest`.
+
+The same shape is not limited to CRUD. `ClockIO` and `DelayIO` already act as executable temporal atoms and can be composed into a temporal algebra used directly by Flow.
+
+Persistence-boundary questions such as staged versus autonomous persistence remain open because they depend on additional semantics and guarantees rather than on point capabilities alone.
 
 ## Tracking
 

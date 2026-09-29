@@ -2,17 +2,21 @@
 
 This example is a small CRUD API used to pressure the current VSlices Work model.
 
-The current experiment treats:
+The current model is:
 
 ```text
-Feature == WorkFlow == Free<ALG, Response>
+Feature
+    -> Flow<TodoAlgebra, Request, Response>
 
-ALG
-    contains the WorkParts that the Feature can express
-    and may itself be a composition of child Feature algebras
+TodoAlgebra
+    -> executable capability atoms
+
+Grounding
+    -> implements those atoms
+    -> exposes TodoAlgebra
 ```
 
-There is no separate executable `WorkProcess` abstraction. A Feature that reuses other Features remains a normal Feature whose `ALG` is composed.
+There is no Free-monad/interpreter layer and no separate executable `WorkProcess` abstraction.
 
 ## Structure
 
@@ -23,132 +27,83 @@ SampleWorkflow.Spaces
     Todo : Evolvable<Todo, Todo.State>
 
 SampleWorkflow.Work
-    CreateTodo Feature / WorkFlow
-        CreateTodo.Algebra
-        NextId / Read / Write WorkParts
+    TodoAlgebra
+        PointReader<Todo, TodoId>
+        PointWriter<Todo>
+        PointRemover<Todo, TodoId>
+        TodoIdSource
 
-    GetTodo Feature / WorkFlow
-        GetTodo.Algebra
-        Read WorkPart
-
-    UpdateTodo Feature / WorkFlow
-        UpdateTodo.Algebra
-        Read / Write WorkParts
-
-    DeleteTodo Feature / WorkFlow
-        DeleteTodo.Algebra
-        Read / Remove WorkParts
-
-    AddAttachmentReference Feature / WorkFlow
-        AddAttachmentReference.Algebra
-        Read / Write WorkParts
+    CreateTodo
+    GetTodo
+    UpdateTodo
+    DeleteTodo
+    AddAttachmentReference
 
 SampleWorkflow.Grounding
     InMemoryTodoWork
-        interprets the Todo-owned WorkFlow algebras
+        implements the executable atoms
+        exposes TodoAlgebra
 
 SampleWorkflow.Process
-    CreateAndGetTodo Feature
-        ALG = AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
-        reuses CreateTodo and GetTodo by hoisting both child programs
+    CreateAndGetTodo
+        composes CreateTodo and GetTodo over the same TodoAlgebra
 
 SampleWorkflow.Api
     HTTP presentation
-    DI supplies the default interpreter for each WorkFlow algebra
+    obtains TodoAlgebra from Grounding and executes Feature Flows
 ```
 
-## Feature as Free Monad
+## Module algebra
 
-A Feature does not own a runtime `RT` or return `Flow<RT, REQ, RES>`.
-
-Its semantic contract is:
-
-```text
-Request
-    -> Free<ALG, Response>
-```
-
-The Feature itself contains the WorkFlow. There is no parallel `TodoPrograms` layer.
-
-## Feature composition through ALG
-
-`CreateAndGetTodo` demonstrates that composition does not need another Feature category.
-
-Its contract is still:
-
-```text
-Feature<CreateAndGetTodo, Algebra, Request, Response>
-```
-
-with:
-
-```text
-Algebra =
-    AlgebraSum<
-        CreateTodo.Algebra,
-        GetTodo.Algebra>
-```
-
-The child programs remain independently defined:
-
-```text
-CreateTodo.Get(...)
-    -> Free<CreateTodo.Algebra, ...>
-
-GetTodo.Get(...)
-    -> Free<GetTodo.Algebra, ...>
-```
-
-and the composing Feature embeds them into its larger vocabulary:
+The Work module owns one executable algebra:
 
 ```csharp
-Algebra.FromA(CreateTodo.Get(...))
-Algebra.FromB(GetTodo.Get(...))
+public sealed record TodoAlgebra(
+    PointReader<Todo, TodoId> Reader,
+    PointWriter<Todo> Writer,
+    PointRemover<Todo, TodoId> Remover,
+    TodoIdSource Ids);
 ```
 
-`FromA` / `FromB` are ergonomic hoist helpers. The mathematical mechanism remains an external natural transformation plus `Free` hoisting.
+The algebra is the runtime of the module's Features. Individual Features use only the atoms they require.
 
-The child WorkFlows do not know which later Feature may reuse them.
+For example:
 
-## AlgebraSum arities
-
-VSlices currently offers positional sums following the A..G convention:
-
-```text
-AlgebraSum<A, B>
-AlgebraSum<A, B, C>
-AlgebraSum<A, B, C, D>
-AlgebraSum<A, B, C, D, E>
-AlgebraSum<A, B, C, D, E, F>
-AlgebraSum<A, B, C, D, E, F, G>
+```csharp
+public sealed class GetTodo :
+    Feature<GetTodo, TodoAlgebra, GetTodo.Request, GetTodo.Response>
+{
+    public static Flow<TodoAlgebra, Request, Response> Get() =>
+        new((algebra, request) =>
+            algebra.Reader.Read(request.Id)
+                .Map(todo => new Response(todo)));
+}
 ```
 
-Each arity exposes the corresponding `FromA` ... `FromG` helpers and `InjectA` ... `InjectG` natural transformations.
+## Same-module Feature composition
 
-The positional structure is mechanism. It does not imply semantic priority between child WorkFlows.
+`CreateAndGetTodo` demonstrates that Features sharing the same module algebra compose directly.
 
-## Interpretation
+The child Features keep ownership of their own request/response contracts. The composing Feature adapts requests with `MapRequest` and composes the resulting Flows.
 
-A Grounding may provide one implementation that satisfies several independent WorkFlow algebras:
+No algebra hoisting or interpreter composition is required.
+
+## Grounding
+
+`InMemoryTodoWork` implements the executable atoms and exports the completed algebra:
 
 ```text
 InMemoryTodoWork
-    AlgebraIO<CreateTodo.Algebra>
-    AlgebraIO<GetTodo.Algebra>
-    AlgebraIO<UpdateTodo.Algebra>
-    AlgebraIO<DeleteTodo.Algebra>
-    AlgebraIO<AddAttachmentReference.Algebra>
+    PointReader<Todo, TodoId>
+    PointWriter<Todo>
+    PointRemover<Todo, TodoId>
+    TodoIdSource
+        |
+        v
+    TodoAlgebra
 ```
 
-A composed algebra can combine the already-existing interpreters:
-
-```text
-CreateTodo interpreter --\
-                        +--> AlgebraSumIO<CreateTodo.Algebra, GetTodo.Algebra>
-GetTodo interpreter ----/
-```
-
-The composed interpreter only redirects operations. It does not reimplement either WorkFlow.
+The same Work algebra could be exposed by a different Grounding without changing the Feature contracts.
 
 ## CRUD API
 
@@ -162,3 +117,17 @@ DELETE /todos/{id}
 `TodoDetail` covers only the semantic string. `Completed` remains a plain `bool`.
 
 `Todo` is `Evolvable<Todo, Todo.State>`; PUT reads the current point, proposes the next state with `Todo.Update(...)`, and writes only the accepted evolved point.
+
+## What this sample does not imply
+
+Point capability atoms do not imply:
+
+- Repository;
+- Unit of Work;
+- transactions;
+- atomicity;
+- isolation;
+- durability;
+- tracking.
+
+Those remain independent semantic questions.

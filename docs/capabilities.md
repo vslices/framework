@@ -1,86 +1,139 @@
 # Capabilities
 
-## What is a Capability?
+## Current meaning
 
-A Capability is a typed description of an operation or behavior that Work may require.
+A Work capability is the smallest executable operation for which current evidence justifies an independent contract.
 
-Capabilities are inspired by LanguageExt typeclasses. Runtime constraints provide compile-time evidence that the required capability vocabulary can be interpreted or supplied.
+Capabilities are not service classes, managers, repositories, DI bags, or broad infrastructure abstractions.
 
-They are used to express requirements like:
-- time access
-- persistence
-- transactions
-- event dispatch
-- identity generation
-- external integrations (but think more of a capability to call an external service, not the service client itself)
+Current examples include:
 
-## What a Capability is not
+```text
+PointReader<POINT, ID>
+PointWriter<POINT>
+PointRemover<POINT, ID>
+ClockIO
+DelayIO
+```
 
-A Capability is not:
-- a service layer object
-- a helper class
-- a manager
-- a static singleton
-- a dependency injected directly into feature classes
+These are **executable algebraic capability atoms**.
 
-## Main Rule
+## Algebra
 
-A feature must declare the minimum capability requirements it needs from `RT`.
+A Work module composes the atoms it exposes into a simple algebra value.
 
-For simple capabilities this can be a direct `Has*` requirement. For point capabilities, atomic operations compose into a Work-owned algebra and the Feature requires `HasAlgebra<ALG, RT>` as evidence that the runtime can interpret that vocabulary.
+For example:
 
-Capabilities and their runtime evidence should remain explicit in types.
+```csharp
+public sealed record TodoAlgebra(
+    PointReader<Todo, TodoId> Reader,
+    PointWriter<Todo> Writer,
+    PointRemover<Todo, TodoId> Remover,
+    TodoIdSource Ids);
+```
 
-## Why
+The algebra is the runtime of Features owned by that Work module:
 
-This allows:
-- compile-time verification of runtime requirements
-- composable features
-- small and honest dependencies
-- easier testing through runtime substitution
-- less hidden infrastructure coupling
+```text
+Feature
+    -> Flow<TodoAlgebra, Request, Response>
+```
 
-## Preferred Style
+This gives the runtime a structural meaning: it is the algebra of executable operations available to that module, rather than an arbitrary collection of dependencies.
 
-Prefer:
-- small capability constraints
-- explicit effect composition
-- typed failures
-- runtime-driven composition
+## Grounding
 
-Avoid:
-- constructor-injected feature dependencies
-- large façade services
-- hidden infrastructure access
-- global mutable access patterns
+Grounding implements the atoms.
 
-## Tie-breaker Rule
+A grounding can expose a complete executable algebra through:
 
-When deciding between:
-- introducing a service abstraction
-- expressing a requirement as a runtime capability
+```csharp
+public interface AlgebraIO<ALG>
+{
+    ALG Algebra { get; }
+}
+```
 
-prefer the runtime capability, unless there is a strong and explicit reason not to.
+For example:
 
-## Point Algebras
+```text
+InMemoryTodoWork
+    implements PointReader<Todo, TodoId>
+    implements PointWriter<Todo>
+    implements PointRemover<Todo, TodoId>
+    implements TodoIdSource
+    exposes TodoAlgebra
+```
 
-For Work operations over points of semantic spaces, the current capability model is based on atomic point capabilities composed by service-owned algebras.
+A different Grounding may expose the same Work algebra through different mechanisms.
 
-The first validated point capabilities are:
+## Composition
 
-- `PointReader<ALG, POINT, ID>`;
-- `PointWriter<ALG, POINT>`.
+A consumer that needs multiple independently owned algebras composes them structurally:
 
-A service-owned algebra composes only the operations it needs, `Free<ALG, A>` describes programs over that vocabulary without executing them, and `HasAlgebra<ALG, RT>` keeps the interpreter requirement explicit in the Feature runtime contract.
+```csharp
+AlgebraSum<FileAlgebra, TodoAlgebra>
+```
 
-See [Point Algebras](point-algebras.md).
+Child Flows are adapted by projection:
 
-## Capabilities and Guarantees
+```csharp
+AddFile.Get()
+    .MapRuntime(
+        (AlgebraSum<FileAlgebra, TodoAlgebra> sum) => sum.A)
+```
 
-Capabilities describe what Work can request.
+This makes the relationship explicit:
 
-Guarantees describe additional semantic properties that an admissible realization must preserve. Tracking, atomicity, isolation, ordering, and durability are examples of potential guarantees rather than independent capabilities.
+```text
+larger algebra -> child algebra
+```
 
-The point-algebra capability substrate is now validated and implemented. The guarantee model remains exploratory and deliberately unimplemented while current delivery work has priority.
+Request adaptation is separate:
 
-See [Capabilities and Guarantees](notes/capabilities-and-guarantees.md).
+```csharp
+.MapRequest(
+    (ParentRequest request) =>
+        new ChildRequest(...))
+```
+
+## Point capability atoms
+
+The current point vocabulary is intentionally small:
+
+```csharp
+public interface PointReader<POINT, ID>
+{
+    IO<Option<POINT>> Read(ID id);
+}
+
+public interface PointWriter<POINT>
+{
+    IO<Unit> Write(POINT point);
+}
+
+public interface PointRemover<POINT, ID>
+{
+    IO<Unit> Remove(ID id);
+}
+```
+
+Reading, writing and removal do not imply Repository, tracking, transactions, atomicity, durability, enumeration, or Unit of Work semantics.
+
+Introduce new atoms only from real pressure.
+
+## Capabilities and guarantees
+
+Capabilities answer:
+
+```text
+what operation can Work execute?
+```
+
+Guarantees answer different questions:
+
+```text
+what properties must an admissible realization preserve?
+```
+
+Atomicity, isolation, ordering, durability and similar properties remain separate from the capability vocabulary until evidence supports a guarantee model.

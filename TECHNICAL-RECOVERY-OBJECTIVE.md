@@ -139,12 +139,12 @@ work
 The current framework now separates the first two temporal concerns explicitly:
 
 - `Feature` owns the executable WorkFlow;
-- `Clock<ALG>` expresses observation of the current semantic `Moment`;
-- `Delay<ALG>` expresses waiting for a `Duration<double>` or until a `Moment`;
-- `ClockIO` and `DelayIO` are reusable Grounding contracts;
+- a Work module may compose `ClockIO` and `DelayIO` into its executable algebra;
+- `ClockIO` observes the current semantic `Moment`;
+- `DelayIO` expresses waiting for a `Duration<double>` or until a `Moment`;
 - `SystemTimeIO` realizes both through `TimeProvider`.
 
-The old `HasClock<RT>` / `ClockEnv<RT>` carrier has been removed.
+The old `HasClock<RT>` / `ClockEnv<RT>` carrier and the temporary Free-oriented `Clock<ALG>` / `Delay<ALG>` instruction surfaces have been removed.
 
 Scheduling, recurring invocation, and host lifecycle remain deliberately unresolved and should be discovered from real scheduling cases instead of introduced speculatively.
 
@@ -174,32 +174,34 @@ A shared runtime exposed capabilities such as dependency resolution and file-sys
 
 This was technically expressive but allowed work to depend indirectly on broad runtime access.
 
-The current Work model has moved further away from broad runtime access:
+The current Work model has moved further away from broad runtime access and from the temporary Free-WorkFlow experiment:
 
 ```text
 Feature<F, ALG, REQ, RES>
-    -> Free<ALG, RES>
+    -> Flow<ALG, REQ, RES>
+
+ALG
+    -> executable Work-module algebra
+    -> composed from minimal executable capability atoms
 ```
 
-Feature-owned algebras declare only the operations required by the WorkFlow.
+The algebra is the Feature runtime. It is a structural description of executable operations available to the owning Work module rather than an arbitrary dependency carrier.
 
-For point-oriented external work, the validated vocabulary is:
+For point-oriented external work, the validated atoms are:
 
-- `PointReader<ALG, POINT, ID>`;
-- `PointWriter<ALG, POINT>`;
-- `PointRemover<ALG, POINT, ID>`.
+- `PointReader<POINT, ID>`;
+- `PointWriter<POINT>`;
+- `PointRemover<POINT, ID>`.
 
-Reusable concrete realization is expressed independently through Grounding contracts such as:
+Grounding implements those atoms directly and may export the completed module algebra through `AlgebraIO<ALG>`.
 
-- `PointReaderIO<POINT, ID>`;
-- `PointWriterIO<POINT>`;
-- `PointRemoverIO<POINT, ID>`.
+Entity Framework Core realizes the same point atoms through `EntityFrameworkPointIO` rather than through `DatabaseIO`, Repository, or a Free-operation interpreter.
 
-Entity Framework Core now realizes these capabilities through `EntityFrameworkPointIO` rather than through `DatabaseIO` or a Repository abstraction.
+Temporal Work follows the same executable-atom direction: `ClockIO` and `DelayIO` can be composed directly into a temporal Work algebra and used as a `Flow` runtime.
 
-Temporal Work now follows the same direction: Feature-owned algebras express `Clock` and `Delay`, while `ClockIO` and `DelayIO` belong to Grounding rather than an ambient runtime carrier.
+Independent module algebras compose structurally through `AlgebraSum<...>`. Child Flows adapt to a larger runtime through `MapRuntime`, while request adaptation remains independent through `MapRequest`.
 
-The recovery objective is to retain the expressive power of the old effectful runtime while making capability requirements and grounding boundaries smaller, explicit, and independently justified.
+The recovery objective remains to retain the expressive power of the old effectful runtime while making capability requirements, algebraic structure, and grounding boundaries smaller, explicit, and independently justified.
 
 ### 5. Host and lifecycle
 

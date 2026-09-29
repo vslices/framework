@@ -18,9 +18,9 @@ public sealed class EntityFrameworkPointIO<TContext, POINT, ID, TProjection>(
     Func<TProjection, POINT> toPoint,
     Func<POINT, ID> identity,
     Func<ID, Expression<Func<TProjection, bool>>> byId)
-    : PointReaderIO<POINT, ID>,
-      PointWriterIO<POINT>,
-      PointRemoverIO<POINT, ID>
+    : PointReader<POINT, ID>,
+      PointWriter<POINT>,
+      PointRemover<POINT, ID>
     where TContext : DbContext
     where TProjection : class
 {

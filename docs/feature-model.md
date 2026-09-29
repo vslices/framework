@@ -1,281 +1,163 @@
 # Feature Model
 
-Features are the main executable unit of application behavior in VSlices.
+Features are the main executable unit of Work in VSlices.
 
-A Feature represents one explicit slice of behavior with:
+A Feature owns:
 
-- one feature-owned request type;
-- one feature-owned response type;
-- one runtime capability contract;
-- controlled effectful execution;
-- explicit failure propagation.
-
-A Feature is not a controller, handler, service class, manager, or presentation adapter.
+- one nominal request type;
+- one nominal response type;
+- one executable runtime algebra;
+- one `Flow` that relates those three surfaces.
 
 ## Core shape
 
-C# does not currently expose associated types directly. VSlices therefore keeps the request and response as generic bindings while requiring the concrete Feature to own their nominal definitions.
-
-Canonical shape:
-
 ```csharp
-public sealed class SomeFeature<RT> :
-    Feature<SomeFeature<RT>, RT, SomeFeature<RT>.Request, SomeFeature<RT>.Response>
+public sealed class SomeFeature :
+    Feature<
+        SomeFeature,
+        SomeAlgebra,
+        SomeFeature.Request,
+        SomeFeature.Response>
 {
     public sealed record Request(...);
     public sealed record Response(...);
 
-    public static Flow<RT, Request, Response> Get() => ...;
+    public static Flow<SomeAlgebra, Request, Response> Get() => ...;
 }
 ```
 
 Conceptually:
 
-```txt
+```text
 Feature
-├── Request   associated contract
-├── Response  associated contract
-└── Get       RT + Request -> effectful Response
+├── Request
+├── Response
+└── Flow<Algebra, Request, Response>
 ```
 
-`Request` and `Response` belong nominally to the Feature even when they are composed almost entirely from domain types.
+The runtime channel is not an arbitrary dependency carrier. For capability-backed Work it is the executable algebra exposed by the owning Work module.
 
-Prefer:
+## Runtime and request are distinct channels
+
+```text
+ALG = executable operations available to Work
+REQ = input for this execution
+RES = result of this execution
+```
+
+They compose independently.
+
+A child Feature can be reused under a larger runtime:
 
 ```csharp
-public sealed record Request(SrvIdentity.Input Identity);
+child.MapRuntime(
+    (AlgebraSum<A, B> sum) => sum.A)
 ```
 
-over treating the domain input itself as the Feature request.
-
-This keeps two meanings separate:
-
-```txt
-Domain Input      data required to construct/refine a domain value
-Feature Request   data required to execute an application operation
-Feature Response  value produced by that application operation
-```
-
-`RT` remains part of the Feature type because runtime constraints belong to execution rather than to the request/response contract.
-
-## Service specialization
-
-A service-owned Feature is modeled with:
+and under a different parent request:
 
 ```csharp
-ServiceFeature<F, RT, REQ, RES>
+child.MapRequest(
+    (Parent.Request request) =>
+        new Child.Request(...))
 ```
 
-A concrete `ServiceFeature` must declare:
+`ContraMap` adapts both channels together when that is clearer.
+
+Result transformation remains ordinary `Map`.
+
+## Module algebra
+
+A `[concept].Work` module should define the algebra used by its Features.
+
+Prefer a small record composed from executable capability atoms:
 
 ```csharp
-static abstract string UniqueName { get; }
-static abstract string Description { get; }
+public sealed record TodoAlgebra(
+    PointReader<Todo, TodoId> Reader,
+    PointWriter<Todo> Writer,
+    PointRemover<Todo, TodoId> Remover,
+    TodoIdSource Ids);
 ```
 
-and receives a default claim through:
+Do not create one algebra per Feature merely because Features consume different subsets. The module algebra represents the executable vocabulary owned by that Work module; individual Features simply use the operations they need.
 
-```csharp
-static virtual ServiceClaim Claim
+Do not inflate the algebra with hypothetical capabilities.
+
+## Grounding
+
+A `[concept].Grounding` realization implements the algebraic atoms and assembles the module algebra.
+
+```text
+Work owns:
+    TodoAlgebra
+    PointReader/Writer/Remover requirements
+
+Grounding owns:
+    how those requirements contact the world
 ```
 
-The default Claim is derived from the Feature metadata. A concrete Feature may override `Claim` only when it intentionally represents an already-established claim or requires exceptional claim construction.
+`AlgebraIO<ALG>` is the optional Grounding-facing contract for exporting the completed executable algebra.
 
-`UniqueName` is the stable machine-facing identity of the service capability. `Description` is mandatory human/agent-facing metadata.
+## Feature composition
 
-## ServiceClaim
+### Same module
 
-`ServiceClaim` is a sealed value, not a subtype hierarchy.
+Features sharing the same algebra compose directly as Flows. Their requests can be adapted with `MapRequest`.
 
-Its identity is:
+### Independent modules
 
-```txt
-UniqueName
+A Feature that coordinates independently owned Work can currently use:
+
+```text
+AlgebraSum<A, B, ...>
 ```
 
-Its descriptive metadata is:
+and project each child algebra with `MapRuntime`.
 
-```txt
-Description
+The type name is retained from the previous experiment, but the current executable runtime is product-like: the parent contains all required child algebras and projects one out for each child Flow. Whether the type should eventually be renamed to reflect that mathematics remains open.
+
+This preserves child ownership:
+
+```text
+child Feature
+    knows only its own algebra
+
+parent Feature
+    owns the composition and projection
+
+Grounding
+    realizes the child atoms
 ```
 
-`Description` does not participate in equality or hashing. It can evolve without changing the authorization identity.
+## Presentation
 
-Claims are created through:
-
-```csharp
-ServiceClaim.New<OWNER>(uniqueName, description)
-```
-
-The runtime registry is idempotent for the same owner and key, and throws when a different owner attempts to register the same `UniqueName` in the same process.
-
-For generic Features, ownership is normalized to the open generic type so different runtime instantiations of the same Feature share one claim.
-
-The runtime registry is a local safety mechanism. Global uniqueness across independently running services must eventually be validated by build/tooling that inspects the complete claim universe.
-
-## Product specialization
-
-A product behavior is modeled with:
-
-```csharp
-ProductFeature<F, RT, REQ, RES>
-```
-
-and exposes its product authorization through:
-
-```csharp
-static abstract ProductRole ExecutableBy { get; }
-```
-
-Service claims and product roles intentionally have different ownership semantics.
-
-## Request and runtime are different channels
-
-A `Flow` receives two independent inputs:
-
-```txt
-RT  = runtime capability carrier
-REQ = request for this execution
-```
-
-The current `Flow` reader keeps the request channel explicit:
-
-```csharp
-Flow<RT, REQ>.Asks(static request => request)
-```
-
-When an operation genuinely needs both channels, `Flow<RT, REQ>.Asks((request, runtime) => ...)` can project from both.
-
-Do not model the request as a runtime capability.
-
-## Runtime capabilities
-
-Features declare only the runtime capabilities they require.
-
-```csharp
-public sealed class CreateIdentity<RT> :
-    ServiceFeature<
-        CreateIdentity<RT>,
-        RT,
-        CreateIdentity<RT>.Request,
-        CreateIdentity<RT>.Response>
-    where RT : HasAlgebra<IdentityAlgebra, RT>
-```
-
-Capabilities remain type-level execution requirements.
-
-For point operations, a Feature can build a free program over a service-owned algebra and interpret it through:
-
-```csharp
-AlgebraEnv<IdentityAlgebra, RT>.run(program)
-```
-
-The algebra defines the operation vocabulary; the runtime provides the Grounding interpreter. See [Point Algebras](point-algebras.md).
-
-Prefer this explicit runtime requirement over constructor injection, service bags, or service-location patterns.
-
-## Feature body
-
-Prefer a small declarative pipeline:
-
-```csharp
-public static Flow<RT, Request, Response> Get() =>
-    Flow<RT, Request>.Asks(static request => request) >>
-    Validate >>
-    Persist;
-```
-
-Use `>>` for linear composition when each step naturally consumes the previous result. Use lambdas only when projection, matching, capture, or return adaptation is required.
-
-## Canonical service example
-
-```csharp
-public sealed class CreateIdentity<RT> :
-    ServiceFeature<
-        CreateIdentity<RT>,
-        RT,
-        CreateIdentity<RT>.Request,
-        CreateIdentity<RT>.Response>
-    where RT : HasAlgebra<IdentityAlgebra, RT>
-{
-    public sealed record Request(SrvIdentity.Input Identity);
-
-    public readonly record struct Response;
-
-    public static string UniqueName =>
-        "Identities.Create";
-
-    public static string Description =>
-        "Permite crear una identidad";
-
-    public static Flow<RT, Request, Response> Get() =>
-        Flow<RT, Request>.Asks(static request => request) >>
-        (request => request.Identity.Match(
-            Natural: n => CreateNatural<RT>.Invariants.RunEff(n).MapSuper(),
-            Legal: l => CreateLegal<RT>.Invariants.RunEff(l).MapSuper())) >>
-        (identity => AlgebraEnv<IdentityAlgebra, RT>
-            .run(IdentityPrograms.write(identity))
-            .Map(_ => new Response()));
-}
-```
-
-The default reading is:
-
-```txt
-Feature.Request
--> eliminate/adapt request structure
--> enforce contextual invariants
--> execute capability-backed effect
--> construct Feature.Response
-```
-
-## Closed domain variants
-
-When a request or domain type models a closed sum and provides `Match`, prefer it over a C# type switch.
-
-## ReqK execution
-
-When a completed `ReqK<Eff<RT>, ...>` is executed from application code, use:
-
-```csharp
-rules.RunEff(input)
-```
-
-## Presentation adapters
-
-Presentation adapters should only:
+Presentation adapters should:
 
 1. receive external input;
-2. refine/translate it into `Feature.Request`;
-3. execute the Feature;
-4. translate `Feature.Response` into the presentation response.
+2. transform/refine it into the Feature request;
+3. obtain the required executable algebra from Grounding;
+4. run the Feature Flow;
+5. translate the Feature response outward.
 
-Features must not contain HTTP, UI, worker, or transport-specific concerns.
+HTTP, UI, workers and transports do not define Feature semantics.
 
-## Side effects and failures
+## Failures
 
-Side effects occur through explicit runtime capabilities and effect values.
-Expected domain and application failures remain explicit values.
+Expected failures remain explicit values or effect failures.
 
-Do not throw exceptions for normal failure paths. The duplicate-claim exception is a framework configuration/programming error, not a domain failure.
+Transport-specific status codes do not belong to the base Feature error model. Presentation decides how semantic/application outcomes map to HTTP or another transport.
 
-## Testing
+## Current rules
 
-Test Features through the same `Flow` contract used in production and prefer test runtimes that implement the required capabilities.
+A Feature should:
 
-## Rules
+- own nominal Request and Response types;
+- expose `Flow<ALG, Request, Response>`;
+- use an executable Work algebra as its capability-backed runtime;
+- remain presentation-independent;
+- compose child Features rather than reimplementing them;
+- adapt runtime, request and result through explicit mappings;
+- avoid Free-monad/interpreter layers unless future evidence independently justifies a different mechanism.
 
-A Feature must:
-
-- own nominal `Request` and `Response` types;
-- bind those types through the current generic interface until C# supports associated types;
-- use `Flow<RT, Request, Response>` as its execution model;
-- keep `RT` constraints explicit;
-- keep orchestration local and readable;
-- remain presentation-independent.
-
-A ServiceFeature must additionally:
-
-- expose a globally intended `UniqueName`;
-- expose a useful `Description`;
-- use the default derived `Claim` unless an exceptional override is semantically required.
+The implementation remains evidence. These rules are current and revisable.
