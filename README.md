@@ -17,8 +17,38 @@
   </a>
 </p>
 
+# Scope
+
+This repository contains the current **.NET realization of VSlices Framework**.
+
+It is not the complete semantic definition of VSlices Framework.
+
+The broader Framework responsibility is to represent or condense software intent so that it can serve as a basis for later realizations, derivations, transformations, validation, testing, reuse, or production. A runtime library, C# API, source generator, analyzer, VSIR representation, lowering pipeline, or other executable mechanism is one possible realization of that responsibility.
+
+Therefore:
+
+```text
+VSlices Framework
+!=
+this .NET implementation
+
+Framework
+!=
+runtime
+
+Framework
+!=
+mandatory IR
+
+Tooling executes or assists mechanisms
+!=
+semantic authority over Framework
+```
+
+This repository should describe the guarantees and behavior of the .NET realization while suite- and product-level definitions remain authoritative for the broader responsibility.
+
 # About
-VSlices is a high-level, develop in C#, modular framework  that aims to a faster but clean and pragmatic software developtment Is heavy inspired in the vertical slices architecture and the functional programming. Is also Domain Driven Development friendly.
+This .NET realization is a high-level modular framework for C# inspired by vertical slice architecture and functional programming, with support for domain-driven design practices. Its implementation explores how software semantics and guarantees can be expressed through .NET types, APIs, effects, runtime mechanisms, analyzers, generators, tests, and related ecosystem capabilities.
 
 **Unofficial motto:** *feel the semantics*
 
