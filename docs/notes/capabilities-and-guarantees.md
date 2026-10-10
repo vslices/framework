@@ -333,7 +333,7 @@ The capability side now has a concrete typed shape.
 A Feature-owned algebra composes point capabilities directly in the `ALG` parameter of:
 
 ```csharp
-Feature<F, ALG, REQ, RES>
+Feature<ALG, REQ, RES>
 ```
 
 The Feature returns `Free<ALG, RES>`. Grounding supplies `AlgebraIO<ALG>`; the Feature never names the concrete Grounding implementation.

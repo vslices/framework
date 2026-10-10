@@ -2,34 +2,32 @@ using SampleWorkflow.Grounding;
 using SampleWorkflow.Process;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
+using SampleWorkflow.Work.Algebras;
 using VSlices.Work;
+using VSlices.Space.Traits;
 using Xunit;
 
 namespace SampleWorkflow.Process.Tests;
 
-public sealed class ComposedFeatureHoistTests
+public sealed class ComposedFeatureModuleAlgebraTests
 {
     [Fact]
-    public async Task Feature_composes_WorkFlow_algebras_by_hoisting_child_Features()
+    public async Task Feature_composes_child_WorkFlows_in_the_shared_module_algebra()
     {
-        var detail = TodoDetail.Transformation
-            .RunFin("composed through hoist")
+        var detail = Transformable
+            .Transform<string, TodoDetail>(
+                "composed through shared module algebra")
             .ThrowIfFail();
 
         var service = new InMemoryTodoWork();
 
-        var interpreter =
-            new AlgebraSumIO<CreateTodo.Algebra, GetTodo.Algebra>(
-                service,
-                service);
-
         var response = await FreeAlgebra
             .interpret(
-                CreateAndGetTodo.Get(
+                CreateAndGetTodo.Describe(
                     new CreateAndGetTodo.Request(
                         detail,
                         Completed: false)),
-                interpreter)
+                (AlgebraIO<TodoAlgebra>)service)
             .RunAsync();
 
         var todo = response.Todo
@@ -39,7 +37,7 @@ public sealed class ComposedFeatureHoistTests
                     () => throw new InvalidOperationException(
                         "Expected the Process to return the created Todo.")));
 
-        Assert.Equal("composed through hoist", todo.Detail.Value);
+        Assert.Equal("composed through shared module algebra", todo.Detail.Value);
         Assert.False(todo.Completed);
     }
 }

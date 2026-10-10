@@ -18,7 +18,7 @@ public sealed class TemporalAlgebraTests
         var temporal = new RecordingTemporalIO(origin);
         var interpreter = new TemporalProbeIO(temporal, temporal);
 
-        var program = TemporalProbe.Get(
+        var program = TemporalProbe.Describe(
             new TemporalProbe.Request(
                 new Duration<double>(2),
                 new Duration<double>(5)));
@@ -38,7 +38,6 @@ public sealed class TemporalAlgebraTests
 
 public sealed class TemporalProbe :
     Feature<
-        TemporalProbe,
         TemporalProbe.Algebra,
         TemporalProbe.Request,
         TemporalProbe.Response>
@@ -106,7 +105,7 @@ public sealed class TemporalProbe :
             };
     }
 
-    public static Free<Algebra, Response> Get(Request request) =>
+    public static Free<Algebra, Response> Describe(Request request) =>
         from now in Clock.now<Algebra>()
         from _ in Delay.forDuration<Algebra>(request.DelayFor)
         from __ in Delay.until<Algebra>(

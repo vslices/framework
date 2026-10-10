@@ -15,7 +15,7 @@ public sealed class FreePointAlgebraTests
         var original = new Account(id, "before");
         var grounding = new InMemoryAppAlgebra(accounts: [original]);
 
-        var program = RenameAccount.Get(
+        var program = RenameAccount.Describe(
             new RenameAccount.Request(id, "after"));
 
         Assert.Empty(grounding.Trace);
@@ -33,7 +33,7 @@ public sealed class FreePointAlgebraTests
     public async Task The_same_Feature_can_be_interpreted_by_a_different_Grounding()
     {
         var id = new AccountId(Guid.NewGuid());
-        var program = RenameAccount.Get(
+        var program = RenameAccount.Describe(
             new RenameAccount.Request(id, "after"));
 
         var existing = new InMemoryAppAlgebra(
@@ -52,7 +52,7 @@ public sealed class FreePointAlgebraTests
 }
 
 public sealed class RenameAccount :
-    Feature<RenameAccount, AppAlgebra, RenameAccount.Request, RenameAccount.Response>
+    Feature<AppAlgebra, RenameAccount.Request, RenameAccount.Response>
 {
     public sealed record Request(
         AccountId AccountId,
@@ -60,7 +60,7 @@ public sealed class RenameAccount :
 
     public sealed record Response(Option<Account> Account);
 
-    public static Free<AppAlgebra, Response> Get(Request request) =>
+    public static Free<AppAlgebra, Response> Describe(Request request) =>
         from current in PointReader.read<AppAlgebra, Account, AccountId>(
             request.AccountId)
         from _ in current.Match(

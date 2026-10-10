@@ -2,17 +2,15 @@
 
 This example is a small CRUD API used to pressure the current VSlices Work model.
 
-The current experiment treats:
+The current executable relationship is:
 
 ```text
-Feature == WorkFlow == Free<ALG, Response>
-
-ALG
-    contains the WorkParts that the Feature can express
-    and may itself be a composition of child Feature algebras
+Feature<ALG, Request, Response>
+    Describe(request)
+        -> Free<ALG, Response>
 ```
 
-There is no separate executable `WorkProcess` abstraction. A Feature that reuses other Features remains a normal Feature whose `ALG` is composed.
+`Describe` builds an inert description of Work. It does not execute, interpret, lower, or ground that Work.
 
 ## Structure
 
@@ -22,133 +20,168 @@ SampleWorkflow.Spaces
     TodoDetail
     Todo : Evolvable<Todo, Todo.State>
 
+SampleWorkflow.Work.Algebras
+    TodoAlgebra
+        NextTodoId
+        ReadTodo
+        WriteTodo
+        RemoveTodo
+
 SampleWorkflow.Work
-    CreateTodo Feature / WorkFlow
-        CreateTodo.Algebra
-        NextId / Read / Write WorkParts
+    CreateTodo
+    GetTodo
+    UpdateTodo
+    DeleteTodo
+    AddAttachmentReference
 
-    GetTodo Feature / WorkFlow
-        GetTodo.Algebra
-        Read WorkPart
-
-    UpdateTodo Feature / WorkFlow
-        UpdateTodo.Algebra
-        Read / Write WorkParts
-
-    DeleteTodo Feature / WorkFlow
-        DeleteTodo.Algebra
-        Read / Remove WorkParts
-
-    AddAttachmentReference Feature / WorkFlow
-        AddAttachmentReference.Algebra
-        Read / Write WorkParts
+    each Feature describes a different program in TodoAlgebra
 
 SampleWorkflow.Grounding
     InMemoryTodoWork
-        interprets the Todo-owned WorkFlow algebras
+        AlgebraIO<TodoAlgebra>
 
 SampleWorkflow.Process
-    CreateAndGetTodo Feature
-        ALG = AlgebraSum<CreateTodo.Algebra, GetTodo.Algebra>
-        reuses CreateTodo and GetTodo by hoisting both child programs
+    CreateAndGetTodo
+        composes CreateTodo + GetTodo directly
+        because both already speak TodoAlgebra
 
 SampleWorkflow.Api
     HTTP presentation
-    DI supplies the default interpreter for each WorkFlow algebra
+    DI supplies AlgebraIO<TodoAlgebra>
 ```
 
-## Feature as Free Monad
+## Module-owned algebra
 
-A Feature does not own a runtime `RT` or return `Flow<RT, REQ, RES>`.
-
-Its semantic contract is:
+The Todo module owns its default Work vocabulary:
 
 ```text
-Request
-    -> Free<ALG, Response>
+TodoAlgebra
+    NextTodoId
+    ReadTodo
+    WriteTodo
+    RemoveTodo
 ```
 
-The Feature itself contains the WorkFlow. There is no parallel `TodoPrograms` layer.
+Features do not need to define a new algebra merely because they are separate use cases.
 
-## Feature composition through ALG
-
-`CreateAndGetTodo` demonstrates that composition does not need another Feature category.
-
-Its contract is still:
+Instead:
 
 ```text
-Feature<CreateAndGetTodo, Algebra, Request, Response>
+CreateTodo
+    uses NextTodoId + ReadTodo + WriteTodo
+
+GetTodo
+    uses ReadTodo
+
+UpdateTodo
+    uses ReadTodo + WriteTodo
+
+DeleteTodo
+    uses ReadTodo + RemoveTodo
 ```
 
-with:
+The algebra describes what the module can express. The individual Free program reveals which subset a particular Feature actually uses.
 
-```text
-Algebra =
-    AlgebraSum<
-        CreateTodo.Algebra,
-        GetTodo.Algebra>
-```
+A Feature-specific algebra remains valid when a real case requires a smaller or semantically distinct language. It is a specialization rather than the default ownership rule.
 
-The child programs remain independently defined:
+## Feature as a Work description
 
-```text
-CreateTodo.Get(...)
-    -> Free<CreateTodo.Algebra, ...>
+A Feature does not own an ambient runtime and does not execute Work directly.
 
-GetTodo.Get(...)
-    -> Free<GetTodo.Algebra, ...>
-```
-
-and the composing Feature embeds them into its larger vocabulary:
+For example:
 
 ```csharp
-Algebra.FromA(CreateTodo.Get(...))
-Algebra.FromB(GetTodo.Get(...))
+public sealed class GetTodo :
+    Feature<
+        TodoAlgebra,
+        GetTodo.Request,
+        GetTodo.Response>
+{
+    public static Free<TodoAlgebra, Response> Describe(Request request) =>
+        from todo in TodoAlgebra.Read(request.Id)
+        select new Response(todo);
+}
 ```
 
-`FromA` / `FromB` are ergonomic hoist helpers. The mathematical mechanism remains an external natural transformation plus `Free` hoisting.
+The Feature speaks the module language directly. It does not need to know the generic `PointReader` lifting machinery used to construct that language.
 
-The child WorkFlows do not know which later Feature may reuse them.
-
-## AlgebraSum arities
-
-VSlices currently offers positional sums following the A..G convention:
+Conceptually:
 
 ```text
-AlgebraSum<A, B>
-AlgebraSum<A, B, C>
-AlgebraSum<A, B, C, D>
-AlgebraSum<A, B, C, D, E>
-AlgebraSum<A, B, C, D, E, F>
-AlgebraSum<A, B, C, D, E, F, G>
+Feature
+    owns the Work description
+
+TodoAlgebra
+    owns the module vocabulary
+
+AlgebraIO<TodoAlgebra>
+    owns interpretation boundary
+
+Grounding
+    owns concrete realization
 ```
 
-Each arity exposes the corresponding `FromA` ... `FromG` helpers and `InjectA` ... `InjectG` natural transformations.
+## Same-module composition
 
-The positional structure is mechanism. It does not imply semantic priority between child WorkFlows.
+`CreateAndGetTodo` demonstrates that Features sharing one module language compose without an algebra sum:
+
+```csharp
+from created in CreateTodo.Describe(...)
+from read in GetTodo.Describe(...)
+select ...
+```
+
+Both child descriptions are already:
+
+```text
+Free<TodoAlgebra, ...>
+```
+
+so no hoist is required.
+
+This gives `AlgebraSum` a narrower role: composing genuinely different languages rather than routinely composing use cases from the same module.
+
+## Cross-language composition
+
+When Work crosses module or service vocabularies, `AlgebraSum` remains useful.
+
+For example the SampleBFF composes:
+
+```text
+AddFile.Algebra
++
+TodoAlgebra
+```
+
+through:
+
+```text
+AlgebraSum<AddFile.Algebra, TodoAlgebra>
+```
+
+The positional A..G structure is mechanism. It does not imply semantic priority.
 
 ## Interpretation
 
-A Grounding may provide one implementation that satisfies several independent WorkFlow algebras:
+The default in-memory realization is:
 
 ```text
 InMemoryTodoWork
-    AlgebraIO<CreateTodo.Algebra>
-    AlgebraIO<GetTodo.Algebra>
-    AlgebraIO<UpdateTodo.Algebra>
-    AlgebraIO<DeleteTodo.Algebra>
-    AlgebraIO<AddAttachmentReference.Algebra>
+    AlgebraIO<TodoAlgebra>
 ```
 
-A composed algebra can combine the already-existing interpreters:
+The same `TodoAlgebra` can later have different Groundings:
 
 ```text
-CreateTodo interpreter --\
-                        +--> AlgebraSumIO<CreateTodo.Algebra, GetTodo.Algebra>
-GetTodo interpreter ----/
+InMemory
+Entity Framework Core
+direct SQL
+Dapper
+ADO.NET
+or another realization
 ```
 
-The composed interpreter only redirects operations. It does not reimplement either WorkFlow.
+without changing Feature semantics.
 
 ## CRUD API
 
@@ -159,6 +192,21 @@ PUT    /todos/{id}
 DELETE /todos/{id}
 ```
 
-`TodoDetail` covers only the semantic string. `Completed` remains a plain `bool`.
+`TodoDetail` covers the semantic string. `Completed` remains a plain `bool`.
 
 `Todo` is `Evolvable<Todo, Todo.State>`; PUT reads the current point, proposes the next state with `Todo.Update(...)`, and writes only the accepted evolved point.
+
+## Performance baseline
+
+The maintained performance baseline executes the current `UpdateTodo` end-to-end against a real PostgreSQL 17 instance:
+
+```text
+UpdateTodo.Describe
+    -> Free<TodoAlgebra, Response>
+    -> AlgebraIO<TodoAlgebra>
+    -> EntityFrameworkPointIO
+    -> Npgsql
+    -> PostgreSQL
+```
+
+This baseline exists to compare future implementation and Work-decomposition experiments without changing the meaning of the current Feature.

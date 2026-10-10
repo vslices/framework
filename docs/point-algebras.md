@@ -175,7 +175,7 @@ public interface AlgebraIO<ALG>
 The maintained execution boundary is direct:
 
 ```text
-Feature.Get(request)
+Feature.Describe(request)
     -> Free<ALG, RES>
     -> AlgebraIO<ALG>
     -> IO<RES>

@@ -55,10 +55,9 @@ SampleFileId
 
 ```text
 Feature<
-    AttachFileToTodo,
     AlgebraSum<
         AddFile.Algebra,
-        AddAttachmentReference.Algebra>,
+        TodoAlgebra>,
     Request,
     Response>
 ```
@@ -66,8 +65,8 @@ Feature<
 The implementation aliases the composed vocabulary locally as `Algebra` and embeds each child WorkFlow with:
 
 ```csharp
-Algebra.FromA(AddFile.Get(...))
-Algebra.FromB(AddAttachmentReference.Get(...))
+Algebra.FromA(AddFile.Describe(...))
+Algebra.FromB(AddAttachmentReference.Describe(...))
 ```
 
 This keeps the call site independent of the internal natural-transformation details.
