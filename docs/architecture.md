@@ -13,7 +13,7 @@ Current examples include:
 - category/arrow traits;
 - literals and small cross-cutting primitives.
 
-## VSlices.Space
+## VSlices.Spaces
 
 Owns semantic meaning.
 

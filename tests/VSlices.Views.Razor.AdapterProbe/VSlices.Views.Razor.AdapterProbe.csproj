@@ -13,8 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\VSlices.Views.Abstract\VSlices.Views.Abstract.csproj" />
-    <ProjectReference Include="..\..\src\VSlices.Space\VSlices.Space.csproj" />
-    <ProjectReference Include="..\..\src\VSlices.Space.Analyzers\VSlices.Space.Analyzers.csproj"
+    <ProjectReference Include="..\..\src\VSlices.Spaces\VSlices.Spaces.csproj" />
+    <ProjectReference Include="..\..\src\VSlices.Spaces.Analyzers\VSlices.Spaces.Analyzers.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
   </ItemGroup>

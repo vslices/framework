@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using VSlices.Space.Traits;
+using VSlices.Spaces.Traits;
 
 namespace VSlices.Views.Abstract.Forms;
 

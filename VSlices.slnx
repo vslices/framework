@@ -16,7 +16,7 @@
     <Project Path="examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj" />
   </Folder>
   <Folder Name="/examples/space-modeling/">
-    <Project Path="examples/VSlices.Space.Modeling/VSlices.Space.Modeling.csproj" />
+    <Project Path="examples/VSlices.Spaces.Modeling/VSlices.Spaces.Modeling.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="AGENTS.md" />
@@ -31,10 +31,10 @@
     <File Path="src/Directory.Build.props" />
     <Project Path="src/VSlices.Grounding.EntityFrameworkCore/VSlices.Grounding.EntityFrameworkCore.csproj" />
     <Project Path="src/VSlices.Grounding/VSlices.Grounding.csproj" />
-    <Project Path="src/VSlices.Space.Products/VSlices.Space.Products.csproj" />
-    <Project Path="src/VSlices.Space.Services/VSlices.Space.Services.csproj" />
-    <Project Path="src/VSlices.Space/VSlices.Space.csproj" />
-    <Project Path="src/VSlices.Space.Analyzers/VSlices.Space.Analyzers.csproj" />
+    <Project Path="src/VSlices.Spaces.Products/VSlices.Spaces.Products.csproj" />
+    <Project Path="src/VSlices.Spaces.Services/VSlices.Spaces.Services.csproj" />
+    <Project Path="src/VSlices.Spaces/VSlices.Spaces.csproj" />
+    <Project Path="src/VSlices.Spaces.Analyzers/VSlices.Spaces.Analyzers.csproj" />
     <Project Path="src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj" />
     <Project Path="src/VSlices.Work.Products/VSlices.Work.Products.csproj" />
     <Project Path="src/VSlices.Work.Services/VSlices.Work.Services.csproj" />
@@ -44,9 +44,9 @@
   <Folder Name="/tests/">
     <Project Path="tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj" />
-    <Project Path="tests/VSlices.Space.Modeling.Tests/VSlices.Space.Modeling.Tests.csproj" />
-    <Project Path="tests/VSlices.Space.Tests/VSlices.Space.Tests.csproj" />
-    <Project Path="tests/VSlices.Space.Analyzers.Tests/VSlices.Space.Analyzers.Tests.csproj" />
+    <Project Path="tests/VSlices.Spaces.Modeling.Tests/VSlices.Spaces.Modeling.Tests.csproj" />
+    <Project Path="tests/VSlices.Spaces.Tests/VSlices.Spaces.Tests.csproj" />
+    <Project Path="tests/VSlices.Spaces.Analyzers.Tests/VSlices.Spaces.Analyzers.Tests.csproj" />
     <Project Path="tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj" />
     <Project Path="tests/VSlices.Views.Razor.AdapterProbe/VSlices.Views.Razor.AdapterProbe.csproj" />
     <Project Path="tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj" />

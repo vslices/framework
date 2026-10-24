@@ -15,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\VSlices.Space\VSlices.Space.csproj" />
+		<ProjectReference Include="..\VSlices.Spaces\VSlices.Spaces.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -24,7 +24,7 @@
 		<Using Include="VSlices" />
 		<Using Include="VSlices.Monads" />
 		<Using Include="VSlices.Arrows" />
-		<Using Include="VSlices.Space.Traits" />
+		<Using Include="VSlices.Spaces.Traits" />
 	</ItemGroup>
 
 </Project>

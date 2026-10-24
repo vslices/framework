@@ -29,18 +29,18 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Build modeling probe
-        run: dotnet build examples/VSlices.Space.Modeling/VSlices.Space.Modeling.csproj
+        run: dotnet build examples/VSlices.Spaces.Modeling/VSlices.Spaces.Modeling.csproj
 
       - name: Run Space tests
-        run: dotnet test tests/VSlices.Space.Tests/VSlices.Space.Tests.csproj
+        run: dotnet test tests/VSlices.Spaces.Tests/VSlices.Spaces.Tests.csproj
 
       - name: Run modeling behavioral tests
-        run: dotnet test tests/VSlices.Space.Modeling.Tests/VSlices.Space.Modeling.Tests.csproj
+        run: dotnet test tests/VSlices.Spaces.Modeling.Tests/VSlices.Spaces.Modeling.Tests.csproj
 
       - name: Verify invalid usage does not compile
         shell: bash
         run: |
-          if dotnet build examples/VSlices.Space.Modeling/VSlices.Space.Modeling.csproj -p:DefineConstants=MODELING_INVALID_USAGE; then
+          if dotnet build examples/VSlices.Spaces.Modeling/VSlices.Spaces.Modeling.csproj -p:DefineConstants=MODELING_INVALID_USAGE; then
             echo "::error::The invalid modeling probe compiled successfully; expected C# accessibility barriers were not enforced."
             exit 1
           fi
