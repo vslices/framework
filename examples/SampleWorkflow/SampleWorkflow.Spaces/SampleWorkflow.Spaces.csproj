@@ -6,6 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\VSlices.Space\VSlices.Space.csproj" />
+    <ProjectReference Include="..\..\..\src\VSlices.Spaces\VSlices.Spaces.csproj" />
   </ItemGroup>
 </Project>

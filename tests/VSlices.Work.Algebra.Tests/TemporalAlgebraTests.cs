@@ -1,7 +1,7 @@
 using LanguageExt;
 using VSlices.Monads;
-using VSlices.Space.Quantities;
-using VSlices.Space.Temporal;
+using VSlices.Spaces.Quantities;
+using VSlices.Spaces.Temporal;
 using VSlices.Work;
 using Xunit;
 

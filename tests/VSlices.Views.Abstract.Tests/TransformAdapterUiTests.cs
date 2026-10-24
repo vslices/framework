@@ -1,5 +1,5 @@
 using VSlices.Arrows;
-using VSlices.Space.Traits;
+using VSlices.Spaces.Traits;
 using VSlices.Views.Abstract.Forms;
 using Xunit;
 

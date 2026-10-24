@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\VSlices.Spaces\VSlices.Spaces.csproj" />
+  </ItemGroup>
+</Project>

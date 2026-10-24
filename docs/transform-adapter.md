@@ -113,7 +113,7 @@ A target whose `Input` requires several independent values is deliberately not a
 
 ## Analyzer
 
-The `VSlices.Space` package ships the analyzer as a compiler asset.
+The `VSlices.Spaces` package ships the analyzer as a compiler asset.
 
 Current diagnostics are:
 

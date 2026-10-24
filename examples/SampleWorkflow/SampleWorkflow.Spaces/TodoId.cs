@@ -1,6 +1,6 @@
 using VSlices.Arrows;
-using VSlices.Space;
-using VSlices.Space.Traits;
+using VSlices.Spaces;
+using VSlices.Spaces.Traits;
 
 namespace SampleWorkflow.Spaces;
 

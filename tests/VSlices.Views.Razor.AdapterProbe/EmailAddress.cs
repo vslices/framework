@@ -1,5 +1,5 @@
 using VSlices.Arrows;
-using VSlices.Space.Traits;
+using VSlices.Spaces.Traits;
 
 namespace VSlices.Views.Razor.AdapterProbe;
 
