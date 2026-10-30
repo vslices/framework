@@ -26,13 +26,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Checkout functional EF Core against ForkExt
-        uses: actions/checkout@v4
-        with:
-          repository: vslices/functional-ef-core
-          ref: refactor/use-vslices-forkext
-          path: functional-ef-core
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
