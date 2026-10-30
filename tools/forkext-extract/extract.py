@@ -142,7 +142,6 @@ def apply(selection: set[str] | None) -> None:
                         "using ForkExt.Common;\\n"
                         "using ForkExt.Traits;\\n"
                         "using ForkExt.Effects;\\n"
-                        "using ForkExt.Pretty;\\n"
                         "using ForkExt.Traits.Domain;\\n"
                         "using static ForkExt.Prelude;\\n"
                         "using VSlices;\\n"
