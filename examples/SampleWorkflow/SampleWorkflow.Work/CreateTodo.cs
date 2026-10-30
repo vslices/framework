@@ -17,8 +17,7 @@ public sealed class CreateTodo :
         new((algebra, request) =>
             algebra.Ids.Next()
                 .Bind(id =>
-                    Todo.Transformation
-                        .RunFin(new Todo.Input(id, request.Detail, request.Completed))
+                    Todo.Transform(new Todo.Input(id, request.Detail, request.Completed))
                         .Match(
                             Succ: todo =>
                                 algebra.Reader.ReadOrDefault(todo.Id).Run().As()
