@@ -22,7 +22,22 @@ jobs:
       - name: Restore workspace
         run: dotnet restore VSlices.slnx
       - name: Run Roslyn audit
-        run: dotnet run --project tools/languageext-audit/semantic/LanguageExt.SemanticAudit.csproj -- --root . --out docs/audits/languageext-2026-10/semantic
+        shell: bash
+        run: |
+          set +e
+          dotnet run --project tools/languageext-audit/semantic/LanguageExt.SemanticAudit.csproj -- --root . --out docs/audits/languageext-2026-10/semantic
+          status=$?
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('docs/audits/languageext-2026-10/semantic/summary.json')
+          if p.exists():
+              s = json.loads(p.read_text())
+              print('AUDIT: ' + json.dumps({k:s.get(k) for k in ('scannedProjectFiles','loadedProjects','analyzedDocuments','attributedReferences','assemblies')},indent=2))
+              print('COMPILATION ERRORS: ' + json.dumps(s.get('compilationErrors',[]),indent=2))
+              print('PROJECT FAILURES: ' + json.dumps(s.get('projectFailures',[]),indent=2))
+          PY
+          exit "$status"
       - name: Persist semantic evidence
         if: always()
         shell: bash
@@ -32,6 +47,7 @@ jobs:
           git add docs/audits/languageext-2026-10/semantic/ || true
           if ! git diff --cached --quiet; then
             git commit -m "docs: record compiler-bound LanguageExt references"
+            git pull --rebase origin docs/audit-languageext-usage-2026-10
             git push
           fi
       - uses: actions/upload-artifact@v4
