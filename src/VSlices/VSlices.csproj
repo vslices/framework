@@ -1,35 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <DefineConstants>$(DefineConstants);CONTRACTS_FULL</DefineConstants>
-	</PropertyGroup>
-
-	<ItemGroup>
-
-	</ItemGroup>
-
-	<ItemGroup>
-
-
-
-
-
-
-
-
-
-
-	</ItemGroup>
-
-  <ItemGroup>
-    <None Update="Fork/LICENSE.ForkExt.MIT" Pack="true" PackagePath="licenses/ForkExt-MIT.txt" />
-    <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />
-    <None Update="Fork/MANIFEST.json" Pack="true" PackagePath="licenses/ForkExt-MANIFEST.json" />
-  </ItemGroup>
+  </PropertyGroup>
   <ItemGroup>
     <None Update="Fork/LICENSE.LanguageExt.MIT" Pack="true" PackagePath="licenses/LanguageExt-MIT.txt" />
     <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />
