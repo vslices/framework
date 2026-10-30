@@ -8,7 +8,7 @@ concurrency:
   group: forkext-extraction-${{ github.ref }}
   cancel-in-progress: true
 permissions:
-  contents: read
+  contents: write
 jobs:
   verify-extraction:
     runs-on: ubuntu-latest
@@ -42,6 +42,52 @@ jobs:
           exit "$status"
       - name: Restore and build solution
         run: dotnet build VSlices.slnx -p:GeneratePackageOnBuild=false -v:q
+      - name: Verify dependency graph is free of LanguageExt
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet list VSlices.slnx package --include-transitive > /tmp/forkext-packages.txt
+          if grep -Ei 'LanguageExt.Core|VSlices.EntityFrameworkCore.Functional' /tmp/forkext-packages.txt; then
+            echo "::error::Original LanguageExt dependency still appears in NuGet graph"
+            exit 1
+          fi
+      - name: Run Space tests
+        run: dotnet test tests/VSlices.Spaces.Tests/VSlices.Spaces.Tests.csproj --no-build
+      - name: Run modeling tests
+        run: dotnet test tests/VSlices.Spaces.Modeling.Tests/VSlices.Spaces.Modeling.Tests.csproj --no-build
+      - name: Run Work algebra tests
+        run: dotnet run --no-build --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
+      - name: Run composed feature tests
+        run: dotnet run --no-build --project examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj
+      - name: Run cross-service BFF tests
+        run: dotnet run --no-build --project examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj
+      - name: Run UI adapter tests
+        run: dotnet run --no-build --project tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj
+      - name: Run EF grounding tests
+        run: dotnet run --no-build --project tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj
+      - name: Verify third-party MIT notice ships in package
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet pack src/VSlices/VSlices.csproj --no-build -p:GeneratePackageOnBuild=false -o /tmp/forkext-nupkg
+          package=$(find /tmp/forkext-nupkg -name '*.nupkg' | head -n 1)
+          test -n "$package"
+          unzip -l "$package" | grep -F 'licenses/LanguageExt-MIT.txt'
+          unzip -l "$package" | grep -F 'licenses/ForkExt-MANIFEST.json'
+      - name: Persist verified source extraction
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/forkext-selection.txt tools/forkext-extract/selection.txt
+          cp /tmp/forkext-selection.json tools/forkext-extract/selection.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A src examples tests tools/forkext-extract/selection.txt tools/forkext-extract/selection.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'refactor: vendor compiler-required ForkExt source and migrate consumers'
+            git pull --rebase origin refactor/forkext-extract-minimal
+            git push origin HEAD:refactor/forkext-extract-minimal
+          fi
       - name: Record extraction diagnostics
         if: always()
         uses: actions/upload-artifact@v4
