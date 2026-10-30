@@ -109,32 +109,24 @@ def apply(selection: set[str] | None) -> None:
                 old = item.read_text(encoding="utf-8-sig")
                 new = namespace_rewrite(old)
                 if item == ROOT / "src/VSlices/VSlices.csproj":
-                    new = re.sub(
-                        r"^\s*<PackageReference\s+Include=\"LanguageExt.Core\"[^>]*/>\s*\n",
-                        "\n", new, flags=re.MULTILINE)
-                    new = re.sub(r'^\s*<Using Include="[^"]+"[^>]*/>\s*\n', "\n", new, flags=re.MULTILINE)
-                    # The replacement is also done after namespace_rewrite, which
-                    # changes the literal package name in the csproj XML.
-                    new = re.sub(
-                        r"^\s*<PackageReference\s+Include=\"ForkExt.Core\"[^>]*/>\s*\n",
-                        "\n", new, flags=re.MULTILINE)
-                    if "LICENSE.LanguageExt.MIT" not in new:
-                        new = new.replace(
-                            "</Project>",
-                            '  <ItemGroup>\n'
-                            '    <None Update="Fork/LICENSE.LanguageExt.MIT" Pack="true" PackagePath="licenses/LanguageExt-MIT.txt" />\n'
-                            '    <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />\n'
-                            '    <None Update="Fork/MANIFEST.json" Pack="true" PackagePath="licenses/ForkExt-MANIFEST.json" />\n'
-                            '  </ItemGroup>\n'
-                            '</Project>'
-                        )
-                    if "CONTRACTS_FULL" not in new:
-                        new = new.replace(
-                        "<Nullable>enable</Nullable>",
-                        "<Nullable>enable</Nullable>\n"
-                        "    <ImplicitUsings>disable</ImplicitUsings>\n"
-                        "    <DefineConstants>$(DefineConstants);CONTRACTS_FULL</DefineConstants>"
-                    )
+                    # Canonical and idempotent first-party project configuration.
+                    # The extracted upstream C# files are changed only by the
+                    # namespace-root rename; their original project defaults
+                    # must not be inherited accidentally from VSlices.
+                    new = """<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DefineConstants>$(DefineConstants);CONTRACTS_FULL</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="Fork/LICENSE.LanguageExt.MIT" Pack="true" PackagePath="licenses/LanguageExt-MIT.txt" />
+    <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />
+    <None Update="Fork/MANIFEST.json" Pack="true" PackagePath="licenses/ForkExt-MANIFEST.json" />
+  </ItemGroup>
+</Project>
+"""
                 # The pinned upstream project builds without SDK implicit imports.
                 # Avoid injecting System.Collections.Generic.HashSet<T> globally into ForkExt.
                 # Keep normal BCL usings local to VSlices-authored source only.
