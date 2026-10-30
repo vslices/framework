@@ -3,10 +3,10 @@
 **Method:** exhaustive lexical scan of tracked-like source/config files; NOT Roslyn-bound symbol attribution.
 Files and line numbers refer to the pinned checkout commit.
 
-- Files scanned: **210**
-- Candidate/reference location rows: **1637**
-- Files with matches: **108**
-- Files with explicit LanguageExt imports/references: **58**
+- Files scanned: **211**
+- Candidate/reference location rows: **1642**
+- Files with matches: **109**
+- Files with explicit LanguageExt imports/references: **59**
 
 ## Classification and caveats
 
@@ -26,7 +26,7 @@ Files and line numbers refer to the pinned checkout commit.
 | `Eff` | 92 |
 | `Map` | 52 |
 | `Unit` | 51 |
-| `Error` | 49 |
+| `Error` | 50 |
 | `RunAsync` | 48 |
 | `FinT` | 45 |
 | `Match` | 40 |
@@ -50,6 +50,7 @@ Files and line numbers refer to the pinned checkout commit.
 | `ThrowIfFail` | 8 |
 | `Left` | 6 |
 | `IfNone` | 6 |
+| `Select` | 6 |
 | `Applicative` | 6 |
 | `fail` | 5 |
 | `RunIO` | 5 |
@@ -57,7 +58,6 @@ Files and line numbers refer to the pinned checkout commit.
 | `ArrowApply` | 5 |
 | `Fallible` | 4 |
 | `Kleisli` | 4 |
-| `Select` | 3 |
 | `Alternative` | 3 |
 | `Final` | 3 |
 | `Functor` | 3 |
@@ -183,6 +183,7 @@ Files and line numbers refer to the pinned checkout commit.
 | [`tests/VSlices.Work.Algebra.Tests/FlowTransformTests.cs`](../../../../tests/VSlices.Work.Algebra.Tests/FlowTransformTests.cs) | 12 | 13 |
 | [`tests/VSlices.Work.Algebra.Tests/PointAlgebraTests.cs`](../../../../tests/VSlices.Work.Algebra.Tests/PointAlgebraTests.cs) | 34 | 49 |
 | [`tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs`](../../../../tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs) | 13 | 21 |
+| [`tools/languageext-audit/semantic/Program.cs`](../../../../tools/languageext-audit/semantic/Program.cs) | 5 | 5 |
 
 ## Outputs
 

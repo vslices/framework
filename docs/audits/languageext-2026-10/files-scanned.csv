@@ -209,3 +209,4 @@ tests/VSlices.Work.Algebra.Tests/PointAlgebraTests.cs
 tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs
 tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
 tools/languageext-audit/semantic/LanguageExt.SemanticAudit.csproj
+tools/languageext-audit/semantic/Program.cs
