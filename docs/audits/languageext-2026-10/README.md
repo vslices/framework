@@ -3,7 +3,7 @@
 **Method:** exhaustive lexical scan of tracked-like source/config files; NOT Roslyn-bound symbol attribution.
 Files and line numbers refer to the pinned checkout commit.
 
-- Files scanned: **209**
+- Files scanned: **210**
 - Candidate/reference location rows: **1637**
 - Files with matches: **108**
 - Files with explicit LanguageExt imports/references: **58**
