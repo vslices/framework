@@ -112,6 +112,7 @@ def apply(selection: set[str] | None) -> None:
                     new = re.sub(
                         r"^\s*<PackageReference\s+Include=\"LanguageExt.Core\"[^>]*/>\s*\n",
                         "\n", new, flags=re.MULTILINE)
+                    new = re.sub(r'^\\s*<Using Include="[^"]+"[^>]*/>\\s*\\n', "\\n", new, flags=re.MULTILINE)
                     # The replacement is also done after namespace_rewrite, which
                     # changes the literal package name in the csproj XML.
                     new = re.sub(
@@ -135,6 +136,16 @@ def apply(selection: set[str] | None) -> None:
                         "using System.Net.Http;\\n"
                         "using System.Threading;\\n"
                         "using System.Threading.Tasks;\\n"
+                        "using ForkExt;\\n"
+                        "using ForkExt.Common;\\n"
+                        "using ForkExt.Traits;\\n"
+                        "using ForkExt.Effects;\\n"
+                        "using ForkExt.Pretty;\\n"
+                        "using ForkExt.Traits.Domain;\\n"
+                        "using static ForkExt.Prelude;\\n"
+                        "using VSlices;\\n"
+                        "using VSlices.Monads;\\n"
+                        "using static VSlices.VSlicesPrelude;\\n"
                     )
                     new = bcl.replace("\\n", "\n") + new
                 if new != old:
