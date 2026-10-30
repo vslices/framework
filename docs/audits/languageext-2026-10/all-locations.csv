@@ -1,4 +1,7 @@
 path,line,column,kind,symbol,confidence,source
+.github/workflows/languageext-semantic-audit.yml,1,7,explicit_namespace,LanguageExt,certain,name: LanguageExt semantic audit
+.github/workflows/languageext-semantic-audit.yml,25,68,explicit_namespace,LanguageExt.SemanticAudit.csproj,certain,run: dotnet run --project tools/languageext-audit/semantic/LanguageExt.SemanticAudit.csproj -- --root . --out docs/audits/languageext-2026-10/semantic
+.github/workflows/languageext-semantic-audit.yml,34,56,explicit_namespace,LanguageExt,certain,"git commit -m ""docs: record compiler-bound LanguageExt references"""
 .github/workflows/languageext-usage-audit.yml,1,7,explicit_namespace,LanguageExt,certain,name: LanguageExt usage audit
 .github/workflows/languageext-usage-audit.yml,27,43,explicit_namespace,LanguageExt,certain,"git commit -m ""docs: generate LanguageExt inventory from audit script"""
 examples/SampleBFF/SampleBFF/AttachFileToTodo.cs,1,7,explicit_namespace,LanguageExt,certain,using LanguageExt;
@@ -1636,8 +1639,8 @@ tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs,81,12,candidate_prelude
 tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs,82,9,candidate_type,IO,requires_symbol_resolution,IO.lift(() =>
 tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs,82,12,candidate_prelude,lift,requires_symbol_resolution,IO.lift(() =>
 tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs,85,28,candidate_type,Unit,requires_symbol_resolution,return default(Unit);
-tools/languageext-audit/semantic/Program.cs,38,54,candidate_type,Error,requires_symbol_resolution,.Where(d => d.Severity == DiagnosticSeverity.Error).Take(80)
-tools/languageext-audit/semantic/Program.cs,39,9,candidate_extension,Select,requires_symbol_resolution,".Select(d => project.Name + "": "" + d.ToString()));"
-tools/languageext-audit/semantic/Program.cs,82,39,explicit_namespace,LanguageExt,certain,"if (!assembly.StartsWith(""LanguageExt"", StringComparison.OrdinalIgnoreCase)) return;"
-tools/languageext-audit/semantic/Program.cs,96,78,candidate_extension,Select,requires_symbol_resolution,"r.Column.ToString(),r.Kind,r.Symbol,r.Definition,r.Assembly,r.Expression}.Select(Escape)));"
-tools/languageext-audit/semantic/Program.cs,103,9,candidate_extension,Select,requires_symbol_resolution,".Select(g=>new {symbol=g.Key,locations=g.Count()}).ToList(),"
+tools/languageext-audit/semantic/Program.cs,44,54,candidate_type,Error,requires_symbol_resolution,.Where(d => d.Severity == DiagnosticSeverity.Error).Take(80)
+tools/languageext-audit/semantic/Program.cs,45,9,candidate_extension,Select,requires_symbol_resolution,".Select(d => project.Name + "": "" + d.ToString()));"
+tools/languageext-audit/semantic/Program.cs,89,39,explicit_namespace,LanguageExt,certain,"if (!assembly.StartsWith(""LanguageExt"", StringComparison.OrdinalIgnoreCase)) return;"
+tools/languageext-audit/semantic/Program.cs,104,78,candidate_extension,Select,requires_symbol_resolution,"r.Column.ToString(),r.Kind,r.Symbol,r.Definition,r.Assembly,r.Expression}.Select(Escape)));"
+tools/languageext-audit/semantic/Program.cs,111,9,candidate_extension,Select,requires_symbol_resolution,".Select(g=>new {symbol=g.Key,locations=g.Count()}).ToList(),"

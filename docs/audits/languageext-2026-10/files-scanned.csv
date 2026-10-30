@@ -1,6 +1,7 @@
 path
 .github/workflows/feature-flow-recovery.yml
 .github/workflows/grounding-entity-framework.yml
+.github/workflows/languageext-semantic-audit.yml
 .github/workflows/languageext-usage-audit.yml
 .github/workflows/simple-workflow-crud.yml
 .github/workflows/space-modeling.yml

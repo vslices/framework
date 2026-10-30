@@ -3,10 +3,10 @@
 **Method:** exhaustive lexical scan of tracked-like source/config files; NOT Roslyn-bound symbol attribution.
 Files and line numbers refer to the pinned checkout commit.
 
-- Files scanned: **211**
-- Candidate/reference location rows: **1642**
-- Files with matches: **109**
-- Files with explicit LanguageExt imports/references: **59**
+- Files scanned: **212**
+- Candidate/reference location rows: **1645**
+- Files with matches: **110**
+- Files with explicit LanguageExt imports/references: **60**
 
 ## Classification and caveats
 
@@ -75,6 +75,7 @@ Files and line numbers refer to the pinned checkout commit.
 
 | File | Lines with matches | Raw matches |
 |---|---:|---:|
+| [`.github/workflows/languageext-semantic-audit.yml`](../../../../.github/workflows/languageext-semantic-audit.yml) | 3 | 3 |
 | [`.github/workflows/languageext-usage-audit.yml`](../../../../.github/workflows/languageext-usage-audit.yml) | 2 | 2 |
 | [`examples/SampleBFF/SampleBFF.Tests/CrossServiceProcessTests.cs`](../../../../examples/SampleBFF/SampleBFF.Tests/CrossServiceProcessTests.cs) | 14 | 14 |
 | [`examples/SampleBFF/SampleBFF/AttachFileToTodo.cs`](../../../../examples/SampleBFF/SampleBFF/AttachFileToTodo.cs) | 18 | 23 |
