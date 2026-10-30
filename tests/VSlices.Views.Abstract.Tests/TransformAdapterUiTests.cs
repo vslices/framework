@@ -77,12 +77,10 @@ public sealed class TransformAdapterUiTests
 
         public string Value { get; }
 
-        public static Req<string, LocationName>.Full Transformation =>
-            Req<string, LocationName>.Ensure<string>(
-                static value => !string.IsNullOrWhiteSpace(value),
-                "A location name cannot be empty.") >>
-            Req<string, LocationName>.Transform<string, LocationName>(
-                static value => new LocationName(value.Trim()));
+        public static Fin<LocationName> Transform(string value) =>
+            string.IsNullOrWhiteSpace(value)
+                ? LanguageExt.Common.Error.New("A location name cannot be empty.")
+                : new LocationName(value.Trim());
     }
 
     public sealed record EmailAddress :
