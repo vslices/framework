@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\VSlices.Work\VSlices.Work.csproj" />
+    <ProjectReference Include="..\..\functional-ef-core\EntityFrameworkCore.Functional\EntityFrameworkCore.Functional.csproj" />
   </ItemGroup>
 
   <ItemGroup>
