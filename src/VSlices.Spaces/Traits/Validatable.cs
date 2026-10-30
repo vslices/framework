@@ -1,5 +1,4 @@
 using LanguageExt;
-using VSlices.Arrows;
 
 namespace VSlices.Spaces.Traits;
 
@@ -15,7 +14,7 @@ public interface Validatable<CTX, SPACE>
     /// <summary>
     /// Gets the rules that determine whether a value from the space may be used in this context.
     /// </summary>
-    static abstract Req<SPACE>.Full Validation { get; }
+    static abstract Fin<SPACE> Validate(SPACE value);
 }
 
 /// <summary>
@@ -25,5 +24,5 @@ public static class Validatable
 {
     public static Fin<SPACE> Check<CTX, SPACE>(SPACE value)
         where CTX : Validatable<CTX, SPACE> =>
-        CTX.Validation.RunFin(value);
+        CTX.Validate(value);
 }
