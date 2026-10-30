@@ -124,15 +124,15 @@ The current `Transformable` vocabulary distinguishes ownership from realization:
 Transformable<CTX,FROM,TO>
     declares which semantic authority owns a canonical rule
 
-Transformation
-    is currently the Req<FROM,TO>.Full rule exposed by that owner
+Transform(FROM source)
+    returns Fin<TO> from that authority
 ```
 
-An `ExchangeRate` is not itself a `Transformable` and is not itself that `Req`. Instead it is concrete evidence that can parameterize a conversion rule. An established rate can materialize the corresponding rule explicitly:
+An `ExchangeRate` is not itself a `Transformable`. Instead it is concrete evidence that can parameterize a conversion rule. An established rate can materialize the corresponding rule explicitly:
 
 ```csharp
 rate.ToTransformation()
-    -> Req<Money<FROM,T>, Money<TO,T>>.Full
+    -> Func<Money<FROM,T>, Fin<Money<TO,T>>>
 ```
 
 This keeps the distinction visible:
@@ -141,14 +141,14 @@ This keeps the distinction visible:
 ExchangeRate
     evidence consumed by the rule
 
-Req<Money<FROM>, Money<TO>>
+Func<Money<FROM>, Fin<Money<TO>>>
     the materialized transformation rule
 
 Transformable
     ownership of a canonical transformation rule
 ```
 
-No new general `Transformation<A,B>` abstraction is introduced by this case; `Req<FROM,TO>.Full` remains the concrete transformation vocabulary currently recognized by `Transformable`.
+No new general `Transformation<A,B>` abstraction is introduced by this case; a function returning `Fin<TO>` represents the transformation..
 
 Grounding may later own acquisition details such as quote source, observation time, market, or policy. Those details are not currently intrinsic to the established `ExchangeRate` value itself.
 
