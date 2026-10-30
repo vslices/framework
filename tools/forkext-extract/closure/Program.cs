@@ -100,6 +100,21 @@ async Task Scan(Document document, string from)
     analyzed++;
     foreach (var node in syntax.DescendantNodesAndSelf())
     {
+        // A namespace import must still resolve after dropping unselected files,
+        // even if no member from that namespace is used in this file.
+        if (node is UsingDirectiveSyntax u && u.Name is { } imported &&
+            imported.ToString().StartsWith("ForkExt", StringComparison.Ordinal))
+        {
+            var importedSymbol = model.GetSymbolInfo(imported).Symbol;
+            if (importedSymbol is INamespaceSymbol ns)
+            {
+                foreach (var member in ns.GetTypeMembers().Take(1))
+                {
+                    var anchor = Canonical(member);
+                    if (anchor != null) Include(anchor, from, "namespace import");
+                }
+            }
+        }
         bool symbolCandidate =
             node is SimpleNameSyntax or InvocationExpressionSyntax or
             ObjectCreationExpressionSyntax or BinaryExpressionSyntax or
