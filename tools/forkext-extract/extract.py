@@ -125,7 +125,7 @@ def apply(selection: set[str] | None) -> None:
                             '    <None Update="Fork/LICENSE.LanguageExt.MIT" Pack="true" PackagePath="licenses/LanguageExt-MIT.txt" />\n'
                             '    <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />\n'
                             '    <None Update="Fork/MANIFEST.json" Pack="true" PackagePath="licenses/ForkExt-MANIFEST.json" />\n'
-                            '  </ItemGroup>\\n'
+                            '  </ItemGroup>\n'
                             '</Project>'
                         )
                     if "CONTRACTS_FULL" not in new:
