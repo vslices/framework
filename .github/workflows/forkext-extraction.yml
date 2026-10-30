@@ -1,0 +1,48 @@
+name: ForkExt extraction pilot
+on:
+  push:
+    branches:
+      - refactor/forkext-extract-minimal
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-extraction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Stage upstream source with provenance
+        run: python tools/forkext-extract/extract.py
+      - name: Restore Framework
+        run: dotnet restore src/VSlices/VSlices.csproj
+      - name: Build extracted core
+        shell: bash
+        run: |
+          set +e
+          dotnet build src/VSlices/VSlices.csproj --no-restore -p:GeneratePackageOnBuild=false -v:q > /tmp/forkext-core.log 2>&1
+          status=$?
+          echo '--- errors and relevant warnings ---'
+          grep -E 'error CS[0-9]+|error MSB|error NU[0-9]+|Build (FAILED|succeeded)|Warning\(s\)|Error\(s\)' /tmp/forkext-core.log | head -150 || true
+          echo "--- last lines ---"
+          tail -25 /tmp/forkext-core.log
+          exit "$status"
+      - name: Restore and build solution
+        run: dotnet build VSlices.slnx -p:GeneratePackageOnBuild=false -v:q
+      - name: Record extraction diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: forkext-pilot-logs
+          path: |
+            /tmp/forkext-core.log
+            src/VSlices/Fork/MANIFEST.json
+          if-no-files-found: warn
