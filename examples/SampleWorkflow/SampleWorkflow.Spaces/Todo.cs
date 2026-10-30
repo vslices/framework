@@ -1,5 +1,5 @@
+using LanguageExt;
 using System.Runtime.CompilerServices;
-using VSlices.Arrows;
 using VSlices.Spaces;
 using VSlices.Spaces.Traits;
 
@@ -70,18 +70,16 @@ public sealed class Todo :
         bool completed,
         IReadOnlyList<ResourceReference> attachments);
 
-    public static Req<Input, Todo>.Full Transformation =>
-        Req<Input, Todo>.Transform<Input, Todo>(
-            input => new Todo(
+    public static Fin<Todo> Transform(Input input) =>
+        new Todo(
                 NewState(
                     input.Id,
                     input.Detail,
                     input.Completed,
-                    input.Attachments)));
+                    input.Attachments));
 
-    public static Req<State, Todo>.Full Evolution =>
-        Req<State, Todo>.Transform<State, Todo>(
-            state => new Todo(state));
+    public static Fin<Todo> Evolve(State state) =>
+        new Todo(state);
 
     public bool Equals(Todo? other) =>
         Id.Equals(other?.Id);
