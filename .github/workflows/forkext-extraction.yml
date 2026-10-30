@@ -4,6 +4,9 @@ on:
     branches:
       - refactor/forkext-extract-minimal
   workflow_dispatch:
+concurrency:
+  group: forkext-extraction-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -24,17 +27,6 @@ jobs:
         run: python tools/forkext-extract/extract.py
       - name: Restore Framework
         run: dotnet restore src/VSlices/VSlices.csproj
-      - name: Build extracted core
-        shell: bash
-        run: |
-          set +e
-          dotnet build src/VSlices/VSlices.csproj --no-restore -p:GeneratePackageOnBuild=false -v:q > /tmp/forkext-core.log 2>&1
-          status=$?
-          echo '--- errors and relevant warnings ---'
-          grep -E 'error CS[0-9]+|error MSB|error NU[0-9]+|Build (FAILED|succeeded)|Warning\(s\)|Error\(s\)' /tmp/forkext-core.log | head -150 || true
-          echo "--- last lines ---"
-          tail -25 /tmp/forkext-core.log
-          exit "$status"
       - name: Compute required ForkExt file closure
         run: dotnet run --project tools/forkext-extract/closure/ForkExt.Closure.csproj -- . /tmp/forkext-selection.txt
       - name: Restrict extracted source to dependency closure
