@@ -2,9 +2,9 @@
   "scannedProjectFiles": 32,
   "loadedProjects": 32,
   "analyzedDocuments": 295,
-  "attributedReferences": 2201,
+  "attributedReferences": 2231,
   "assemblies": {
-    "LanguageExt.Core": 2201
+    "LanguageExt.Core": 2231
   },
   "topSymbols": [
     {
@@ -32,12 +32,12 @@
       "locations": 95
     },
     {
-      "symbol": "pure\u003CA\u003E",
-      "locations": 75
+      "symbol": "global::LanguageExt.Fin\u003CA\u003E",
+      "locations": 78
     },
     {
-      "symbol": "global::LanguageExt.Fin\u003CA\u003E",
-      "locations": 74
+      "symbol": "pure\u003CA\u003E",
+      "locations": 75
     },
     {
       "symbol": "global::LanguageExt.Traits.Const\u003CTYPE\u003E",
@@ -48,12 +48,12 @@
       "locations": 62
     },
     {
-      "symbol": "global::LanguageExt.Eff\u003CA\u003E",
+      "symbol": "global::LanguageExt.Common.Error",
       "locations": 52
     },
     {
-      "symbol": "global::LanguageExt.Common.Error",
-      "locations": 48
+      "symbol": "global::LanguageExt.Eff\u003CA\u003E",
+      "locations": 52
     },
     {
       "symbol": "lift\u003CA\u003E",
@@ -76,6 +76,10 @@
       "locations": 39
     },
     {
+      "symbol": "New",
+      "locations": 33
+    },
+    {
       "symbol": "Value",
       "locations": 32
     },
@@ -92,12 +96,16 @@
       "locations": 27
     },
     {
-      "symbol": "New",
-      "locations": 27
-    },
-    {
       "symbol": "global::LanguageExt.Fin",
       "locations": 25
+    },
+    {
+      "symbol": "ThrowIfFail",
+      "locations": 24
+    },
+    {
+      "symbol": "global::LanguageExt.Common",
+      "locations": 23
     },
     {
       "symbol": "global::LanguageExt.Unit",
@@ -108,19 +116,11 @@
       "locations": 21
     },
     {
-      "symbol": "global::LanguageExt.Common",
-      "locations": 19
-    },
-    {
       "symbol": "Succ",
       "locations": 19
     },
     {
       "symbol": "Left\u003CL, R\u003E",
-      "locations": 18
-    },
-    {
-      "symbol": "ThrowIfFail",
       "locations": 18
     },
     {
@@ -132,6 +132,10 @@
       "locations": 18
     },
     {
+      "symbol": "implicit operator global::LanguageExt.Fin\u003CA\u003E",
+      "locations": 17
+    },
+    {
       "symbol": "global::LanguageExt.Either",
       "locations": 16
     },
@@ -140,8 +144,8 @@
       "locations": 16
     },
     {
-      "symbol": "implicit operator global::LanguageExt.Fin\u003CA\u003E",
-      "locations": 15
+      "symbol": "IsFail",
+      "locations": 16
     },
     {
       "symbol": "global::LanguageExt.FinT\u003CM\u003E",
@@ -169,10 +173,6 @@
     },
     {
       "symbol": "RunIO",
-      "locations": 12
-    },
-    {
-      "symbol": "IsFail",
       "locations": 12
     },
     {
@@ -348,6 +348,7 @@
     "VSlices.Spaces.Modeling.Tests": 22,
     "VSlices.Spaces.Products": 5,
     "VSlices.Spaces.Tests": 43,
+    "VSlices.TransformAdapter.AotProbe": 30,
     "VSlices.Views.Abstract": 12,
     "VSlices.Views.Abstract.Tests": 38,
     "VSlices.Views.Razor.AdapterProbe": 9,
@@ -360,17 +361,7 @@
     "[Warning] Duplicate source file \u0027/home/runner/work/framework/framework/src/VSlices.Spaces.Analyzers/AnalyzerReleases.Unshipped.md\u0027 in project \u0027/home/runner/work/framework/framework/src/VSlices.Spaces.Analyzers/VSlices.Spaces.Analyzers.csproj\u0027"
   ],
   "projectFailures": [],
-  "compilationErrors": [
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(1,7): error CS0246: The type or namespace name \u0027LanguageExt\u0027 could not be found (are you missing a using directive or an assembly reference?)",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(32,19): error CS0246: The type or namespace name \u0027Fin\u003C\u003E\u0027 could not be found (are you missing a using directive or an assembly reference?)",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(48,19): error CS0246: The type or namespace name \u0027Fin\u003C\u003E\u0027 could not be found (are you missing a using directive or an assembly reference?)",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(25,5): error CS0012: The type \u0027Fin\u003C\u003E\u0027 is defined in an assembly that is not referenced. You must add a reference to assembly \u0027LanguageExt.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null\u0027.",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(39,5): error CS0012: The type \u0027Fin\u003C\u003E\u0027 is defined in an assembly that is not referenced. You must add a reference to assembly \u0027LanguageExt.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null\u0027.",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(34,19): error CS0103: The name \u0027LanguageExt\u0027 does not exist in the current context",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(51,19): error CS0103: The name \u0027LanguageExt\u0027 does not exist in the current context",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(4,14): error CS0012: The type \u0027Fin\u003C\u003E\u0027 is defined in an assembly that is not referenced. You must add a reference to assembly \u0027LanguageExt.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null\u0027.",
-    "VSlices.TransformAdapter.AotProbe: /home/runner/work/framework/framework/tests/VSlices.TransformAdapter.AotProbe/Program.cs(13,15): error CS0012: The type \u0027Fin\u003C\u003E\u0027 is defined in an assembly that is not referenced. You must add a reference to assembly \u0027LanguageExt.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null\u0027."
-  ],
+  "compilationErrors": [],
   "analyzedDocumentsList": [
     "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/CrossServiceProcessTests.cs",
     "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/obj/Debug/net10.0/SampleBFF.Tests.GlobalUsings.g.cs",
