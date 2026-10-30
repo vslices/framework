@@ -1,5 +1,5 @@
 using System.Numerics;
-using LanguageExt;
+using ForkExt;
 using VSlices.Spaces.Quantities.Abstract;
 
 namespace VSlices.Spaces.Quantities;

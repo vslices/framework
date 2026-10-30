@@ -1,8 +1,8 @@
-using LanguageExt;
+using ForkExt;
 using VSlices.Monads;
 using VSlices.Work;
 using Xunit;
-using static LanguageExt.Prelude;
+using static ForkExt.Prelude;
 
 namespace VSlices.Work.Tests;
 

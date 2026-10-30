@@ -1,0 +1,545 @@
+Catch.cs
+Class Instances/Eq/EqArr.cs
+Class Instances/Eq/EqArray.cs
+Class Instances/Eq/EqDefault.cs
+Class Instances/Eq/EqEdit.cs
+Class Instances/Eq/EqEnumerable.cs
+Class Instances/Eq/EqHashSet.cs
+Class Instances/Eq/EqLong.cs
+Class Instances/Eq/EqLst.cs
+Class Instances/Eq/EqQue.cs
+Class Instances/Eq/EqSeq.cs
+Class Instances/Eq/EqSet.cs
+Class Instances/Eq/EqTrue.cs
+Class Instances/Hashable/HashableArr.cs
+Class Instances/Hashable/HashableArray.cs
+Class Instances/Hashable/HashableDefault.cs
+Class Instances/Hashable/HashableEdit.cs
+Class Instances/Hashable/HashableEnumerable.cs
+Class Instances/Hashable/HashableHashSet.cs
+Class Instances/Hashable/HashableLong.cs
+Class Instances/Hashable/HashableLst.cs
+Class Instances/Hashable/HashablePair.cs
+Class Instances/Hashable/HashableQue.cs
+Class Instances/Hashable/HashableSeq.cs
+Class Instances/Hashable/HashableSet.cs
+Class Instances/Ord/OrdDefault.cs
+Class Instances/Ord/OrdTrue.cs
+Class Instances/Ord/OrdTupleFirst.cs
+Common/Error.cs
+Common/ErrorCodes.cs
+Common/ErrorException.cs
+Common/Errors.cs
+Common/Exceptions.cs
+Concurrency/Async/AsyncEnumerable/AsyncEnumberable.LINQ.Extensions.cs
+Concurrency/Atom/Atom.Metadata.cs
+Concurrency/Atom/Atom.cs
+Concurrency/Atom/AtomChangedEvent.cs
+Concurrency/AtomHashMap/AtomHashMap.Eq.cs
+Concurrency/AtomHashMap/AtomHashMap.Module.Eq.cs
+Concurrency/AtomHashMap/AtomHashMap.Module.cs
+Concurrency/AtomHashMap/AtomHashMap.cs
+Concurrency/AtomHashMap/Events.cs
+Concurrency/AtomSeq/AtomSeq.cs
+Concurrency/Prelude.Concurrency.cs
+Concurrency/STM/CommuteRef.cs
+Concurrency/STM/Isolation.cs
+Concurrency/STM/Ref.cs
+Concurrency/STM/STM.cs
+Concurrency/Task/Task.Extensions.cs
+Concurrency/Task/Task.Prelude.cs
+Concurrency/ValueTask/ValueTask.Extensions.cs
+DataTypes/Change/Change.cs
+DataTypes/Change/EntryAdded.cs
+DataTypes/Change/EntryMapped.cs
+DataTypes/Change/EntryRemoved.cs
+DataTypes/Change/NoChange.cs
+DataTypes/Fail/Fail.Extensions.cs
+DataTypes/Fail/Fail.cs
+DataTypes/Loop/Loop.cs
+DataTypes/Lower/Lower.cs
+DataTypes/MapPatch/HashMapPatch.cs
+DataTypes/Next/Next.Module.cs
+DataTypes/Next/Next.cs
+DataTypes/Patch/Edit.cs
+DataTypes/Patch/Patch.Internal.cs
+DataTypes/Patch/Patch.Module.cs
+DataTypes/Patch/Patch.cs
+DataTypes/Patch/PatchParams.cs
+DataTypes/Pure/Pure.cs
+DataTypes/Range/Range.Extensions.cs
+DataTypes/Range/Range.Module.cs
+DataTypes/Range/Range.Monad.cs
+DataTypes/Range/Range.cs
+DataTypes/Record/Attributes.cs
+DataTypes/Record/TypeInfoExt.cs
+DataTypes/SpanArray/SpanArray.cs
+DataTypes/Unit/Unit.Prelude.cs
+DataTypes/Unit/Unit.cs
+DataTypes/ValueTuple/Tuple2/ValueTuple2.Extensions.cs
+Deriving/Applicative.cs
+Deriving/Final.cs
+Deriving/Functor.cs
+Deriving/Monad.cs
+Deriving/MonadIO.cs
+Deriving/MonadUnliftIO.cs
+Deriving/Readable.cs
+Effects/Eff/Eff no runtime/Eff.Module.cs
+Effects/Eff/Eff no runtime/Eff.Monad.cs
+Effects/Eff/Eff no runtime/Eff.cs
+Effects/Eff/Eff no runtime/Extensions/Eff.Extensions.cs
+Effects/Eff/Eff no runtime/Operators/Eff.Operators.Final.cs
+Effects/Eff/Eff no runtime/Operators/Eff.Operators.cs
+Effects/Eff/Eff no runtime/Prelude/Eff.Prelude.cs
+Effects/Eff/Eff with runtime/Eff.Module.cs
+Effects/Eff/Eff with runtime/Eff.cs
+Effects/Eff/Eff with runtime/Extensions/Eff.Extensions.MapApply.cs
+Effects/Eff/Eff with runtime/Extensions/Eff.Extensions.cs
+Effects/Eff/Eff with runtime/Extensions/Eff.Guard.cs
+Effects/Eff/Eff with runtime/Operators/Eff.Operators.cs
+Effects/Eff/Eff with runtime/Prelude/Eff.Prelude.cs
+Effects/IO/DSL/IOAction.cs
+Effects/IO/DSL/IOActions.cs
+Effects/IO/DSL/IOApply.cs
+Effects/IO/DSL/IOBind.cs
+Effects/IO/DSL/IOBindAsync.cs
+Effects/IO/DSL/IOBindMap.cs
+Effects/IO/DSL/IOCatch.cs
+Effects/IO/DSL/IOCatchPop.cs
+Effects/IO/DSL/IOEmpty.cs
+Effects/IO/DSL/IOFail.cs
+Effects/IO/DSL/IOFinal.cs
+Effects/IO/DSL/IOFold.cs
+Effects/IO/DSL/IOFoldUntil.cs
+Effects/IO/DSL/IOFoldWhile.cs
+Effects/IO/DSL/IOLiftAsync.cs
+Effects/IO/DSL/IOLiftSync.cs
+Effects/IO/DSL/IOLocal2.cs
+Effects/IO/DSL/IOMap.cs
+Effects/IO/DSL/IOPure.cs
+Effects/IO/DSL/IOPureAsync.cs
+Effects/IO/DSL/IOTail.cs
+Effects/IO/DSL/IOTimeout.cs
+Effects/IO/DSL/IOToken.cs
+Effects/IO/DSL/IOUninterruptible.cs
+Effects/IO/DSL/InvokeAsync.cs
+Effects/IO/DSL/InvokeAsyncIO.cs
+Effects/IO/DSL/InvokeSync.cs
+Effects/IO/DSL/InvokeSyncIO.cs
+Effects/IO/EnvIO.cs
+Effects/IO/Extensions/IO.Extensions.MapApply.cs
+Effects/IO/Extensions/IO.Extensions.cs
+Effects/IO/Extensions/IO.Guard.cs
+Effects/IO/ForkIO.cs
+Effects/IO/IO.Module.cs
+Effects/IO/IO.Monad.cs
+Effects/IO/IO.cs
+Effects/IO/Operators/IO.Operators.Choice.cs
+Effects/IO/Operators/IO.Operators.Fallible.cs
+Effects/IO/Operators/IO.Operators.Functor.cs
+Effects/IO/Operators/IO.Operators.Monad.cs
+Effects/IO/Operators/IO.Operators.cs
+Effects/IO/Prelude/IO.Prelude.cs
+Effects/IO/Resources.cs
+Effects/MinRT.cs
+Effects/Prelude.cs
+Effects/Schedule/Duration.cs
+Effects/Schedule/Schedule.Constructors.cs
+Effects/Schedule/Schedule.DSL.cs
+Effects/Schedule/Schedule.cs
+Effects/Schedule/ScheduleTransformer.cs
+Effects/Schedule/SingletonRandom.cs
+Exceptions/Exceptions.cs
+Extensions/ObjectExt.cs
+Extensions/UnsafeValueAccess.cs
+Guard.cs
+Immutable Collections/Arr/Arr.Module.cs
+Immutable Collections/Arr/Arr.cs
+Immutable Collections/Arr/Extensions/Arr.Extensions.cs
+Immutable Collections/Arr/Operators/Arr.Operators.cs
+Immutable Collections/Arr/Trait/Arr.TraitImpl.cs
+Immutable Collections/HashMap/HashMap.Eq.cs
+Immutable Collections/HashMap/HashMap.Extensions.Eq.cs
+Immutable Collections/HashMap/HashMap.Extensions.cs
+Immutable Collections/HashMap/HashMap.Module.Eq.cs
+Immutable Collections/HashMap/HashMap.Module.cs
+Immutable Collections/HashMap/HashMap.Trait.Implementations.Eq.cs
+Immutable Collections/HashMap/HashMap.Trait.Implementations.cs
+Immutable Collections/HashMap/HashMap.cs
+Immutable Collections/HashSet/Extensions/HashSet.Extensions.cs
+Immutable Collections/HashSet/HashSet.Eq.cs
+Immutable Collections/HashSet/HashSet.Module.Eq.cs
+Immutable Collections/HashSet/HashSet.Module.cs
+Immutable Collections/HashSet/HashSet.cs
+Immutable Collections/HashSet/Operators/HashSet.Operators.cs
+Immutable Collections/HashSet/Trait/HashSet.TraitImpl.cs
+Immutable Collections/Iterable/DSL/Iterable.Add.cs
+Immutable Collections/Iterable/DSL/Iterable.AsyncEnumerable.cs
+Immutable Collections/Iterable/DSL/Iterable.Cast.cs
+Immutable Collections/Iterable/DSL/Iterable.Concat.cs
+Immutable Collections/Iterable/DSL/Iterable.Enumerable.cs
+Immutable Collections/Iterable/DSL/Iterable.Nil.cs
+Immutable Collections/Iterable/DSL/Iterable.Singleton.cs
+Immutable Collections/Iterable/DSL/Iterable.Strict.cs
+Immutable Collections/Iterable/DSL/Iterable.Zip.cs
+Immutable Collections/Iterable/Extensions/Iterable.Extensions.cs
+Immutable Collections/Iterable/Iterable.Module.cs
+Immutable Collections/Iterable/Iterable.cs
+Immutable Collections/Iterable/Operators/Iterable.Operators.cs
+Immutable Collections/Iterable/Trait/Iterable.TraitImpl.cs
+Immutable Collections/IterableNE/Extensions/IterableNE.Extensions.cs
+Immutable Collections/IterableNE/IterableNE.Module.cs
+Immutable Collections/IterableNE/IterableNE.cs
+Immutable Collections/IterableNE/Operators/IterableNE.Operators.cs
+Immutable Collections/IterableNE/Trait/IterableNE.TraitImpl.cs
+Immutable Collections/Iterator/DSL/Iterator.Cons.cs
+Immutable Collections/Iterator/DSL/Iterator.ConsFirst.cs
+Immutable Collections/Iterator/DSL/Iterator.ConsValue.cs
+Immutable Collections/Iterator/DSL/Iterator.ConsValueEnum.cs
+Immutable Collections/Iterator/DSL/Iterator.ConsValueLazy.cs
+Immutable Collections/Iterator/DSL/Iterator.Nil.cs
+Immutable Collections/Iterator/Extensions/Iterator.Extensions.cs
+Immutable Collections/Iterator/Iterator.Module.cs
+Immutable Collections/Iterator/Iterator.cs
+Immutable Collections/Iterator/Operators/Iterator.Operators.cs
+Immutable Collections/Iterator/Trait/Iterator.TraitImpl.cs
+Immutable Collections/IteratorAsync/DSL/IteratorAsync.Cons.cs
+Immutable Collections/IteratorAsync/DSL/IteratorAsync.ConsFirst.cs
+Immutable Collections/IteratorAsync/DSL/IteratorAsync.ConsValue.cs
+Immutable Collections/IteratorAsync/DSL/IteratorAsync.ConsValueEnum.cs
+Immutable Collections/IteratorAsync/DSL/IteratorAsync.ConsValueLazy.cs
+Immutable Collections/IteratorAsync/DSL/IteratorAsync.Nil.cs
+Immutable Collections/IteratorAsync/Extensions/IteratorAsync.Extensions.cs
+Immutable Collections/IteratorAsync/IteratorAsync.Module.cs
+Immutable Collections/IteratorAsync/IteratorAsync.cs
+Immutable Collections/IteratorAsync/Operators/IteratorAsync.Operators.cs
+Immutable Collections/IteratorAsync/Trait/IteratorAsync.TraitImpl.cs
+Immutable Collections/List/Extensions/Lst.Extensions.cs
+Immutable Collections/List/Internal/Lst.Internal.cs
+Immutable Collections/List/ListInfo.cs
+Immutable Collections/List/Lst.Module.cs
+Immutable Collections/List/Lst.cs
+Immutable Collections/List/Trait/Lst.TraitImpl.cs
+Immutable Collections/Map/Map.EnumeratorK.cs
+Immutable Collections/Map/Map.EnumeratorKV.cs
+Immutable Collections/Map/Map.EnumeratorV.cs
+Immutable Collections/Map/Map.Extensions.cs
+Immutable Collections/Map/Map.Internal.cs
+Immutable Collections/Map/Map.Module.Ord.cs
+Immutable Collections/Map/Map.Module.cs
+Immutable Collections/Map/Map.Ord.cs
+Immutable Collections/Map/Map.Trait.Implementations.cs
+Immutable Collections/Map/Map.cs
+Immutable Collections/Prelude.Collections.cs
+Immutable Collections/Queue/Que.Internal.cs
+Immutable Collections/Queue/Que.cs
+Immutable Collections/Queue/Queue.Module.cs
+Immutable Collections/Seq/DSL/Enum.cs
+Immutable Collections/Seq/DSL/ISeqInternal.cs
+Immutable Collections/Seq/DSL/SeqConcat.cs
+Immutable Collections/Seq/DSL/SeqEmptyInternal.cs
+Immutable Collections/Seq/DSL/SeqLazy.cs
+Immutable Collections/Seq/DSL/SeqStrict.cs
+Immutable Collections/Seq/Extensions/Seq.Extensions.cs
+Immutable Collections/Seq/Operators/Seq.Operators.cs
+Immutable Collections/Seq/Seq.Module.cs
+Immutable Collections/Seq/Seq.cs
+Immutable Collections/Seq/SeqEmpty.cs
+Immutable Collections/Seq/SeqLoan.cs
+Immutable Collections/Seq/Trait/Seq.TraitImpl.cs
+Immutable Collections/Set/Extensions/Set.Extensions.cs
+Immutable Collections/Set/Internal/Set.Internal.cs
+Immutable Collections/Set/Set.Module.cs
+Immutable Collections/Set/Set.Ord.Module.cs
+Immutable Collections/Set/Set.Ord.cs
+Immutable Collections/Set/Set.cs
+Immutable Collections/Set/Trait/Set.TraitImpl.cs
+Immutable Collections/Stack/Stack.Extensions.cs
+Immutable Collections/Stack/Stack.Module.cs
+Immutable Collections/Stack/Stck.Internal.cs
+Immutable Collections/Stack/Stck.cs
+Immutable Collections/TrackingHashMap/TrackingHashMap.Eq.cs
+Immutable Collections/TrackingHashMap/TrackingHashMap.Module.Eq.cs
+Immutable Collections/TrackingHashMap/TrackingHashMap.Module.cs
+Immutable Collections/TrackingHashMap/TrackingHashMap.cs
+Immutable Collections/TrieMap/TrieMap.cs
+Immutable Collections/TrieSet/TrieSet.cs
+Lens/LensAB.cs
+Memo/Memo.F.cs
+Memo/Memo.Module.cs
+Memo/Memo.cs
+Memo/Operators/Memo.Operators.cs
+Memo/Prelude.Memoize.cs
+Monads/Alternative Monads/Either/Either.Left.cs
+Monads/Alternative Monads/Either/Either.Module.cs
+Monads/Alternative Monads/Either/Either.Right.cs
+Monads/Alternative Monads/Either/Either.cs
+Monads/Alternative Monads/Either/Extensions/Either.Extensions.Apply.cs
+Monads/Alternative Monads/Either/Extensions/Either.Extensions.cs
+Monads/Alternative Monads/Either/Extensions/Either.Guard.cs
+Monads/Alternative Monads/Either/IEither.cs
+Monads/Alternative Monads/Either/Operators/Either.Operators.cs
+Monads/Alternative Monads/Either/Prelude/Either.Prelude.cs
+Monads/Alternative Monads/Either/Trait/Either.TraitImpl.2.cs
+Monads/Alternative Monads/Either/Trait/Either.TraitImpl.cs
+Monads/Alternative Monads/EitherT/EitherT.Module.cs
+Monads/Alternative Monads/EitherT/EitherT.cs
+Monads/Alternative Monads/EitherT/Extensions/EitherT.Extensions.cs
+Monads/Alternative Monads/EitherT/Operators/EitherT.Operators.cs
+Monads/Alternative Monads/EitherT/Trait/EitherT.TraitImpl.2.cs
+Monads/Alternative Monads/EitherT/Trait/EitherT.TraitImpl.cs
+Monads/Alternative Monads/Fin/Extensions/Fin.Extensions.Apply.cs
+Monads/Alternative Monads/Fin/Extensions/Fin.Extensions.cs
+Monads/Alternative Monads/Fin/Extensions/Fin.Guard.cs
+Monads/Alternative Monads/Fin/Fin.Fail.cs
+Monads/Alternative Monads/Fin/Fin.Module.cs
+Monads/Alternative Monads/Fin/Fin.Succ.cs
+Monads/Alternative Monads/Fin/Fin.cs
+Monads/Alternative Monads/Fin/Operators/Fin.Operators.cs
+Monads/Alternative Monads/Fin/Trait/Fin.TraitImpl.cs
+Monads/Alternative Monads/FinT/Extensions/FinT.Extensions.cs
+Monads/Alternative Monads/FinT/FinT.Module.cs
+Monads/Alternative Monads/FinT/FinT.cs
+Monads/Alternative Monads/FinT/Operators/FinT.Operators.cs
+Monads/Alternative Monads/FinT/Trait/FinT.TraitImpl.cs
+Monads/Alternative Monads/Option/Extensions/Option.Extensions.cs
+Monads/Alternative Monads/Option/Operators/Option.Operators.cs
+Monads/Alternative Monads/Option/Option.Module.cs
+Monads/Alternative Monads/Option/Option.cs
+Monads/Alternative Monads/Option/Prelude/Option.Prelude.cs
+Monads/Alternative Monads/Option/Shared/IOptional.cs
+Monads/Alternative Monads/Option/Shared/SomeContext.cs
+Monads/Alternative Monads/Option/Shared/SomeUnitContext.cs
+Monads/Alternative Monads/Option/Trait/Option.TraitImpl.cs
+Monads/Alternative Monads/OptionT/Extensions/OptionT.Extensions.cs
+Monads/Alternative Monads/OptionT/Operators/OptionT.Operators.cs
+Monads/Alternative Monads/OptionT/OptionT.Module.cs
+Monads/Alternative Monads/OptionT/OptionT.cs
+Monads/Alternative Monads/OptionT/Trait/OptionT.TraitImpl.cs
+Monads/Alternative Monads/These/Extensions/These.Extensions.cs
+Monads/Alternative Monads/These/Operators/These.Operators.cs
+Monads/Alternative Monads/These/Prelude/These.Prelude.cs
+Monads/Alternative Monads/These/These.Both.cs
+Monads/Alternative Monads/These/These.Module.cs
+Monads/Alternative Monads/These/These.That.cs
+Monads/Alternative Monads/These/These.This.cs
+Monads/Alternative Monads/These/These.cs
+Monads/Alternative Monads/These/Trait/These.TraitImpl.cs
+Monads/Alternative Monads/Try/Extensions/Try.Extensions.MapApply.cs
+Monads/Alternative Monads/Try/Extensions/Try.Extensions.cs
+Monads/Alternative Monads/Try/Operators/Try.Operators.cs
+Monads/Alternative Monads/Try/Trait/Try.TraitImpl.cs
+Monads/Alternative Monads/Try/Try.Module.cs
+Monads/Alternative Monads/Try/Try.cs
+Monads/Alternative Monads/TryT/Extensions/TryT.Extensions.cs
+Monads/Alternative Monads/TryT/Operators/TryT.Operators.cs
+Monads/Alternative Monads/TryT/Trait/TryT.TraitImpl.cs
+Monads/Alternative Monads/TryT/TryT.Module.cs
+Monads/Alternative Monads/TryT/TryT.cs
+Monads/Alternative Monads/Validation/Extensions/Validation.Extensions.Apply.cs
+Monads/Alternative Monads/Validation/Extensions/Validation.Extensions.cs
+Monads/Alternative Monads/Validation/Extensions/Validation.Guard.cs
+Monads/Alternative Monads/Validation/Operators/Validation.Operators.cs
+Monads/Alternative Monads/Validation/Prelude/Validation.Prelude.cs
+Monads/Alternative Monads/Validation/Trait/Validation.TraitImpl.2.cs
+Monads/Alternative Monads/Validation/Trait/Validation.TraitImpl.cs
+Monads/Alternative Monads/Validation/Validation.Fail.cs
+Monads/Alternative Monads/Validation/Validation.Module.cs
+Monads/Alternative Monads/Validation/Validation.Success.cs
+Monads/Alternative Monads/Validation/Validation.cs
+Monads/Alternative Monads/ValidationT/Extensions/ValidationT.Extensions.cs
+Monads/Alternative Monads/ValidationT/Extensions/ValidationT.Guard.cs
+Monads/Alternative Monads/ValidationT/Operators/ValidationT.Operators.cs
+Monads/Alternative Monads/ValidationT/Trait/ValidationT.TraitImpl.2.cs
+Monads/Alternative Monads/ValidationT/Trait/ValidationT.TraitImpl.cs
+Monads/Alternative Monads/ValidationT/ValidationT.Module.cs
+Monads/Alternative Monads/ValidationT/ValidationT.cs
+Monads/Identity/Extensions/Identity.Extensions.cs
+Monads/Identity/Identity.Module.cs
+Monads/Identity/Identity.cs
+Monads/Identity/Operators/Identity.Operators.cs
+Monads/Identity/Trait/Identity.TraitImpl.cs
+Monads/IdentityT/IdentityT.Extensions.cs
+Monads/IdentityT/IdentityT.Module.cs
+Monads/IdentityT/IdentityT.Monad.cs
+Monads/IdentityT/IdentityT.cs
+Monads/Lifting/Lift.Extensions.cs
+Monads/Lifting/Lift.Prelude.cs
+Monads/Lifting/Lift.cs
+Monads/Prelude.cs
+Monads/State and Environment Monads/RWS/RWST/Extensions/RWST.Extensions.cs
+Monads/State and Environment Monads/RWS/RWST/Operators/RWST.Operators.cs
+Monads/State and Environment Monads/RWS/RWST/RWST.cs
+Monads/State and Environment Monads/RWS/RWST/Trait/RWST.TraitImpl.cs
+Monads/State and Environment Monads/Reader/Ask.cs
+Monads/State and Environment Monads/Reader/Reader/Extensions/Reader.Extensions.cs
+Monads/State and Environment Monads/Reader/Reader/Operators/Reader.Operators.cs
+Monads/State and Environment Monads/Reader/Reader/Reader.cs
+Monads/State and Environment Monads/Reader/Reader/Trait/Reader.TraitImpl.cs
+Monads/State and Environment Monads/Reader/ReaderT/Extensions/ReaderT.Extensions.cs
+Monads/State and Environment Monads/Reader/ReaderT/Operators/ReaderT.Operators.cs
+Monads/State and Environment Monads/Reader/ReaderT/ReaderT.Module.cs
+Monads/State and Environment Monads/Reader/ReaderT/ReaderT.cs
+Monads/State and Environment Monads/Reader/ReaderT/Trait/ReaderT.TraitImpl.cs
+Monads/State and Environment Monads/State/PutGet.cs
+Monads/State and Environment Monads/State/State/Extensions/State.Extensions.cs
+Monads/State and Environment Monads/State/State/Operators/State.Operators.cs
+Monads/State and Environment Monads/State/State/State.Module.cs
+Monads/State and Environment Monads/State/State/State.cs
+Monads/State and Environment Monads/State/State/Trait/State.TraitImpl.cs
+Monads/State and Environment Monads/State/StateT/Extensions/StateT.Extensions.cs
+Monads/State and Environment Monads/State/StateT/Operators/StateT.Operators.cs
+Monads/State and Environment Monads/State/StateT/StateT.Module.cs
+Monads/State and Environment Monads/State/StateT/StateT.cs
+Monads/State and Environment Monads/State/StateT/Trait/StateT.TraitImpl.cs
+Monads/State and Environment Monads/Writer/Tell.cs
+Monads/State and Environment Monads/Writer/Writer/Extensions/Writer.Extensions.cs
+Monads/State and Environment Monads/Writer/Writer/Operators/Writer.Operators.cs
+Monads/State and Environment Monads/Writer/Writer/Trait/Writer.TraitImpl.cs
+Monads/State and Environment Monads/Writer/Writer/Writer.Module.cs
+Monads/State and Environment Monads/Writer/Writer/Writer.cs
+Monads/State and Environment Monads/Writer/WriterT/Extensions/WriterT.Extensions.cs
+Monads/State and Environment Monads/Writer/WriterT/Operators/WriterT.Operators.cs
+Monads/State and Environment Monads/Writer/WriterT/Trait/WriterT.TraitImpl.cs
+Monads/State and Environment Monads/Writer/WriterT/WriterT.Module.cs
+Monads/State and Environment Monads/Writer/WriterT/WriterT.cs
+Obsolete and Deprecated/Change.cs
+Opt.cs
+Prelude/Currying and Partial Application/Prelude.Curry.cs
+Prelude/Hash code functions/Prelude.Hash.cs
+Prelude/Lambda function inference/Prelude.Func.cs
+Prelude/Prelude.cs
+Traits/Alternative/Alternative.Module.cs
+Traits/Alternative/Alternative.Trait.cs
+Traits/Applicative/Applicative.Trait.cs
+Traits/Applicative/Extensions/Applicative.Extensions.Action.cs
+Traits/Applicative/Extensions/Applicative.Extensions.Apply.cs
+Traits/Applicative/Extensions/Applicative.Extensions.Memo.Apply.cs
+Traits/Applicative/Extensions/Applicative.Extensions.Zip.cs
+Traits/Applicative/Module/Applicative.Module.Action.cs
+Traits/Applicative/Module/Applicative.Module.Apply.cs
+Traits/Applicative/Module/Applicative.Module.Lift.cs
+Traits/Applicative/Module/Applicative.Module.Memo.Lift.cs
+Traits/Applicative/Module/Applicative.Module.cs
+Traits/Applicative/Operators/Applicative.Memo.Operators.cs
+Traits/Applicative/Operators/Applicative.Operators.cs
+Traits/Applicative/Prelude/Applicative.Prelude.cs
+Traits/Arithmetic/Arithmetic.Prelude.cs
+Traits/Arithmetic/Arithmetic.cs
+Traits/Bifunctor/Bifunctor.Module.cs
+Traits/Bifunctor/Bifunctor.Trait.cs
+Traits/Bimonad/Bimonad.Module.cs
+Traits/Bimonad/Bimonad.Trait.cs
+Traits/Choice/Choice.Module.cs
+Traits/Choice/Choice.Trait.cs
+Traits/Choice/Extensions/Choice.Extensions.cs
+Traits/Choice/Operators/Choice.Operators.cs
+Traits/Const/Const.cs
+Traits/Coproduct/Coproduct.Extensions.cs
+Traits/Coproduct/Coproduct.Trait.cs
+Traits/CoproductCons/CoproductCons.Trait.cs
+Traits/CoproductK/CoproductK.Trait.cs
+Traits/Domain/Amount.cs
+Traits/Domain/DomainType.cs
+Traits/Domain/Identifier.cs
+Traits/Domain/VectorSpace.cs
+Traits/Eq/Eq.Module.cs
+Traits/Eq/Eq.Prelude.cs
+Traits/Eq/Eq.cs
+Traits/Fallible/Fallible.Extensions.Catch.E.cs
+Traits/Fallible/Fallible.Extensions.Catch.cs
+Traits/Fallible/Fallible.Module.cs
+Traits/Fallible/Fallible.Operators.cs
+Traits/Fallible/Fallible.Prelude.Catch.E.cs
+Traits/Fallible/Fallible.Prelude.Catch.cs
+Traits/Fallible/Fallible.Trait.cs
+Traits/Final/Final.Extensions.cs
+Traits/Final/Final.Trait.cs
+Traits/Final/Finally.cs
+Traits/Foldable/Fold.Module.cs
+Traits/Foldable/Fold.cs
+Traits/Foldable/Foldable.Extensions.cs
+Traits/Foldable/Foldable.Module.cs
+Traits/Foldable/Foldable.Trait.cs
+Traits/Functor/Extensions/Functor.Extensions.cs
+Traits/Functor/Extensions/Functor.MemoExtensions.cs
+Traits/Functor/Functor.Module.cs
+Traits/Functor/Functor.Trait.cs
+Traits/Functor/Operators/Functor.MemoOperators.cs
+Traits/Functor/Operators/Functor.Operators.cs
+Traits/Functor/Prelude/Functor.Prelude.cs
+Traits/Hashable/Hashable.Trait.cs
+Traits/K.Extensions.cs
+Traits/K.cs
+Traits/Maybe Traits/MonadIO/MonadIO.Trait.cs
+Traits/Maybe Traits/MonadUnliftIO/MonadUnliftIO.Extensions.cs
+Traits/Maybe Traits/MonadUnliftIO/MonadUnliftIO.Trait.cs
+Traits/Monads/Monad/Monad.Extensions.cs
+Traits/Monads/Monad/Monad.Module.cs
+Traits/Monads/Monad/Monad.Operators.cs
+Traits/Monads/Monad/Monad.Trait.cs
+Traits/Monads/MonadIO/MonadIO.Extensions.cs
+Traits/Monads/MonadIO/MonadIO.Module.cs
+Traits/Monads/MonadIO/MonadIO.Trait.cs
+Traits/Monads/MonadT/MonadT.Trait.cs
+Traits/Monads/MonadUnliftIO/MonadUnliftIO.Extensions.cs
+Traits/Monads/MonadUnliftIO/MonadUnliftIO.Module.cs
+Traits/Monads/MonadUnliftIO/MonadUnliftIO.Trait.cs
+Traits/Monoid/Monoid.Instance.cs
+Traits/Monoid/Monoid.Prelude.cs
+Traits/Monoid/Monoid.cs
+Traits/MonoidK/MonoidK.cs
+Traits/Natural/CoNatural.Module.cs
+Traits/Natural/CoNatural.cs
+Traits/Natural/Natural.Module.cs
+Traits/Natural/Natural.cs
+Traits/Natural/NaturalEpi.cs
+Traits/Natural/NaturalMono.cs
+Traits/Num/Num.Prelude.cs
+Traits/Num/Num.cs
+Traits/Ord/Ord.cs
+Traits/Ord/OrdComparer.cs
+Traits/Readable/Readable.Extensions.cs
+Traits/Readable/Readable.Module.cs
+Traits/Readable/Readable.Trait.cs
+Traits/Resolve/EqResolver.cs
+Traits/Resolve/HashableResolver.cs
+Traits/Resolve/OrdResolver.cs
+Traits/Resolve/Resolver.cs
+Traits/Semigroup/Semigroup.Instance.cs
+Traits/Semigroup/Semigroup.Module.cs
+Traits/Semigroup/Semigroup.cs
+Traits/SemigroupK/SemigroupK.Extensions.cs
+Traits/SemigroupK/SemigroupK.Module.cs
+Traits/SemigroupK/SemigroupK.Operators.cs
+Traits/SemigroupK/SemigroupK.cs
+Traits/Stateful/Stateful.Module.cs
+Traits/Stateful/Stateful.Trait.cs
+Traits/TokenStream/TokenStream.cs
+Traits/Trait.cs
+Traits/TraitAttribute.cs
+Traits/Traversable/Traversable.Extensions.cs
+Traits/Traversable/Traversable.Module.cs
+Traits/Traversable/Traversable.Trait.cs
+Traits/Writable/Writable.Module.cs
+Traits/Writable/Writable.Trait.cs
+Units of Measure/Accel.cs
+Units of Measure/Area.cs
+Units of Measure/Length.cs
+Units of Measure/Mass.cs
+Units of Measure/Module.cs
+Units of Measure/Temperature.cs
+Units of Measure/Time.cs
+Units of Measure/TimeSq.cs
+Units of Measure/Velocity.cs
+Units of Measure/VelocitySq.cs
+Utility/Box.cs
+Utility/Check.cs
+Utility/CollectionFormat.cs
+Utility/EnumerableOptimal.cs
+Utility/Fnv.cs
+Utility/IL.cs
+Utility/Pool.cs
+Utility/Reflect.cs
+Utility/SysInfo.cs
+Utility/WaitAsync.cs

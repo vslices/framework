@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
-using LanguageExt;
-using LanguageExt.Common;
+using ForkExt;
+using ForkExt.Common;
 
 namespace VSlices.Spaces.Traits;
 

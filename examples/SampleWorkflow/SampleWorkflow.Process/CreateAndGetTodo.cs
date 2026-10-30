@@ -1,5 +1,5 @@
-using LanguageExt;
-using LanguageExt.Common;
+using ForkExt;
+using ForkExt.Common;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using VSlices;

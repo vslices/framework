@@ -1,4 +1,4 @@
-using LanguageExt;
+using ForkExt;
 using VSlices.Spaces.Traits;
 
 namespace VSlices.Views.Razor.AdapterProbe;
@@ -16,5 +16,5 @@ public sealed record EmailAddress :
     public static Fin<EmailAddress> Transform(Input input) =>
             input.Value.Contains('@')
                 ? new EmailAddress(input.Value)
-                : LanguageExt.Common.Error.New("An email address must contain @.");
+                : ForkExt.Common.Error.New("An email address must contain @.");
 }

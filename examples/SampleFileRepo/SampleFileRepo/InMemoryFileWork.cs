@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using LanguageExt;
+using ForkExt;
 using VSlices.Work;
-using static LanguageExt.Prelude;
+using static ForkExt.Prelude;
 
 namespace SampleFileRepo;
 
