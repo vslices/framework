@@ -19,7 +19,7 @@ var loadErrors = new List<string>();
 workspace.WorkspaceFailed += (_, e) => loadErrors.Add(e.Diagnostic.ToString());
 
 var projects = Directory.EnumerateFiles(root, "*.csproj", SearchOption.AllDirectories)
-    .Where(p => !p.Split(Path.DirectorySeparatorChar).Any(x => x is "obj" or "bin" or ".git"))
+    .Where(p => !p.Split(Path.DirectorySeparatorChar).Any(x => x is "obj" or "bin" or ".git" or "language-ext"))
     .Where(p => !p.Contains("/tools/languageext-audit/semantic/") &&
                 !p.Contains("\\tools\\languageext-audit\\semantic\\"))
     .OrderBy(p => p).ToArray();
@@ -30,13 +30,20 @@ var projectFailures = new List<string>();
 foreach (var path in projects)
 {
     Project project;
-    try { project = await workspace.OpenProjectAsync(path); }
+    try {
+        project = workspace.CurrentSolution.Projects.FirstOrDefault(p =>
+            string.Equals(Path.GetFullPath(p.FilePath ?? ""), Path.GetFullPath(path),
+                StringComparison.OrdinalIgnoreCase))
+            ?? await workspace.OpenProjectAsync(path);
+    }
     catch (Exception e) { projectFailures.Add(path + ": " + e); continue; }
     var compilation = await project.GetCompilationAsync();
     if (compilation is null) { projectFailures.Add(path + ": null compilation"); continue; }
-    compilationErrors.AddRange(compilation.GetDiagnostics()
+    if (!project.Name.Contains("Invalid", StringComparison.OrdinalIgnoreCase))
+        compilationErrors.AddRange(compilation.GetDiagnostics()
         .Where(d => d.Severity == DiagnosticSeverity.Error).Take(80)
         .Select(d => project.Name + ": " + d.ToString()));
+    Console.WriteLine($"Analyzing {project.Name} ({project.Documents.Count()} documents)");
     foreach (var doc in project.Documents.Where(d => d.SourceCodeKind == SourceCodeKind.Regular))
     {
         var tree = await doc.GetSyntaxTreeAsync();
@@ -88,6 +95,7 @@ foreach (var path in projects)
         }
     }
 }
+results = results.Where(r => !r.File.StartsWith("language-ext/", StringComparison.OrdinalIgnoreCase)).ToList();
 results = results.Distinct().OrderBy(x => x.Project).ThenBy(x => x.File)
     .ThenBy(x => x.Line).ThenBy(x => x.Column).ThenBy(x => x.Symbol).ToList();
 static string Escape(string? s) => "\"" + (s ?? "").Replace("\"","\"\"") + "\"";
