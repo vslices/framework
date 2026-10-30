@@ -118,6 +118,16 @@ def apply(selection: set[str] | None) -> None:
                     new = re.sub(
                         r"^\s*<PackageReference\s+Include=\"ForkExt.Core\"[^>]*/>\s*\n",
                         "\n", new, flags=re.MULTILINE)
+                    if "LICENSE.LanguageExt.MIT" not in new:
+                        new = new.replace(
+                            "</Project>",
+                            '  <ItemGroup>\n'
+                            '    <None Update="Fork/LICENSE.LanguageExt.MIT" Pack="true" PackagePath="licenses/LanguageExt-MIT.txt" />\n'
+                            '    <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />\n'
+                            '    <None Update="Fork/MANIFEST.json" Pack="true" PackagePath="licenses/ForkExt-MANIFEST.json" />\n'
+                            '  </ItemGroup>\\n'
+                            '</Project>'
+                        )
                     if "CONTRACTS_FULL" not in new:
                         new = new.replace(
                         "<Nullable>enable</Nullable>",
