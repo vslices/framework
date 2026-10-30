@@ -1,29 +1,38 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <DefineConstants>$(DefineConstants);CONTRACTS_FULL</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-77" />
+
 	</ItemGroup>
 
 	<ItemGroup>
-		<Using Include="LanguageExt" />
-		<Using Include="LanguageExt.Common" />
-		<Using Include="LanguageExt.Traits" />
-		<Using Include="LanguageExt.Effects" />
-		<Using Include="LanguageExt.Pretty" />
-		<Using Include="LanguageExt.Traits.Domain" />
-		
-		<Using Include="LanguageExt.Prelude" Static="true" />
-		
-		<Using Include="VSlices" />
-		<Using Include="VSlices.Monads" />
-		<Using Include="VSlices.VSlicesPrelude" Static="true" />
-		
+
+
+
+
+
+
+
+
+
+
 	</ItemGroup>
 
+  <ItemGroup>
+    <None Update="Fork/LICENSE.ForkExt.MIT" Pack="true" PackagePath="licenses/ForkExt-MIT.txt" />
+    <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />
+    <None Update="Fork/MANIFEST.json" Pack="true" PackagePath="licenses/ForkExt-MANIFEST.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Fork/LICENSE.LanguageExt.MIT" Pack="true" PackagePath="licenses/LanguageExt-MIT.txt" />
+    <None Update="Fork/README.md" Pack="true" PackagePath="licenses/ForkExt-README.md" />
+    <None Update="Fork/MANIFEST.json" Pack="true" PackagePath="licenses/ForkExt-MANIFEST.json" />
+  </ItemGroup>
 </Project>

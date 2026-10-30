@@ -1,4 +1,4 @@
-using LanguageExt;
+using ForkExt;
 using VSlices.Spaces.Modeling.Quantities;
 using VSlices.Spaces.Traits;
 

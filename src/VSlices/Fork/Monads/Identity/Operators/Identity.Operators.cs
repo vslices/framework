@@ -1,0 +1,21 @@
+using ForkExt.Traits;
+
+namespace ForkExt;
+
+public static partial class IdentityExtensions
+{
+    extension<A>(K<Identity, A> _)
+    {
+        /// <summary>
+        /// Downcast operator
+        /// </summary>
+        public static Identity<A> operator +(K<Identity, A> ma) =>
+            (Identity<A>)ma;
+        
+        /// <summary>
+        /// Downcast operator
+        /// </summary>
+        public static Identity<A> operator >> (K<Identity, A> ma, Lower lower) =>
+            +ma;
+    }
+}

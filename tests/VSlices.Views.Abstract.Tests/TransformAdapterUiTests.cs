@@ -1,4 +1,4 @@
-using LanguageExt;
+using ForkExt;
 using VSlices.Spaces.Traits;
 using VSlices.Views.Abstract.Forms;
 using Xunit;
@@ -79,7 +79,7 @@ public sealed class TransformAdapterUiTests
 
         public static Fin<LocationName> Transform(string value) =>
             string.IsNullOrWhiteSpace(value)
-                ? LanguageExt.Common.Error.New("A location name cannot be empty.")
+                ? ForkExt.Common.Error.New("A location name cannot be empty.")
                 : new LocationName(value.Trim());
     }
 
@@ -96,6 +96,6 @@ public sealed class TransformAdapterUiTests
         public static Fin<EmailAddress> Transform(Input input) =>
             input.Value.Contains('@')
                 ? new EmailAddress(input.Value)
-                : LanguageExt.Common.Error.New("An email address must contain @.");
+                : ForkExt.Common.Error.New("An email address must contain @.");
     }
 }
