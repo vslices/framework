@@ -1,5 +1,4 @@
 using LanguageExt;
-using VSlices.Arrows;
 
 namespace VSlices.Spaces.Traits;
 
@@ -14,7 +13,7 @@ public interface TransformableM<CTX, M, FROM, TO>
     /// <summary>
     /// Gets the effectful rules that establish a target value from a source value.
     /// </summary>
-    static abstract ReqK<M, FROM, TO>.Full Transformation { get; }
+    static abstract FinT<M, TO> Transform(FROM source);
 }
 
 /// <summary>
@@ -33,10 +32,10 @@ public static class TransformableM
     public static FinT<M, TO> Transform<CTX, M, FROM, TO>(FROM source)
         where CTX : TransformableM<CTX, M, FROM, TO>
         where M : Monad<M> =>
-        CTX.Transformation.RunFinT(source);
+        CTX.Transform(source);
 
     public static FinT<M, TO> Transform<M, FROM, TO>(FROM source)
         where TO : TransformableM<M, FROM, TO>
         where M : Monad<M> =>
-        TO.Transformation.RunFinT(source);
+        TO.Transform(source);
 }
