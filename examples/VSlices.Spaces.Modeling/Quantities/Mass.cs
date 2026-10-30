@@ -20,9 +20,8 @@ public readonly record struct vMass :
     public double CanonValue =>
         quantity.CanonValue;
 
-    public static Req<Quantity<MassDimension, Kilo>, vMass>.Full Transformation =>
-        Req<Quantity<MassDimension, Kilo>, vMass>.Transform<Quantity<MassDimension, Kilo>, vMass>(
-            quantity => new vMass(quantity));
+    public static Fin<vMass> Transform(Quantity<MassDimension, Kilo> quantity) =>
+        new vMass(quantity);
 
     public static vMass AdditiveIdentity =>
         new(Quantity<MassDimension, Kilo>.AdditiveIdentity);
