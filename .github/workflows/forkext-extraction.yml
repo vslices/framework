@@ -35,6 +35,19 @@ jobs:
           echo "--- last lines ---"
           tail -25 /tmp/forkext-core.log
           exit "$status"
+      - name: Compute required ForkExt file closure
+        run: dotnet run --project tools/forkext-extract/closure/ForkExt.Closure.csproj -- . /tmp/forkext-selection.txt
+      - name: Restrict extracted source to dependency closure
+        run: python tools/forkext-extract/extract.py --selection /tmp/forkext-selection.txt
+      - name: Build restricted ForkExt
+        shell: bash
+        run: |
+          set +e
+          dotnet build src/VSlices/VSlices.csproj --no-restore -p:GeneratePackageOnBuild=false -v:q > /tmp/forkext-restricted.log 2>&1
+          status=$?
+          grep -E 'error CS[0-9]+|error MSB|error NU[0-9]+|Build (FAILED|succeeded)' /tmp/forkext-restricted.log | head -150 || true
+          tail -15 /tmp/forkext-restricted.log
+          exit "$status"
       - name: Restore and build solution
         run: dotnet build VSlices.slnx -p:GeneratePackageOnBuild=false -v:q
       - name: Record extraction diagnostics
@@ -44,5 +57,9 @@ jobs:
           name: forkext-pilot-logs
           path: |
             /tmp/forkext-core.log
+            /tmp/forkext-restricted.log
+            /tmp/forkext-selection.txt
+            /tmp/forkext-selection.json
+            /tmp/source-dependency-edges.tsv
             src/VSlices/Fork/MANIFEST.json
           if-no-files-found: warn
