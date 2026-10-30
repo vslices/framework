@@ -1,4 +1,4 @@
-using VSlices.Arrows;
+using LanguageExt;
 using VSlices.Spaces;
 using VSlices.Spaces.Traits;
 
@@ -17,9 +17,8 @@ public sealed record ResourceReference :
 
     public string Value { get; }
 
-    public static Req<string, ResourceReference>.Full Transformation =>
-        Req<string, ResourceReference>.Transform<string, ResourceReference>(
-            value => new ResourceReference(value));
+    public static Fin<ResourceReference> Transform(string value) =>
+        new ResourceReference(value);
 
     public override string ToString() =>
         Value;
