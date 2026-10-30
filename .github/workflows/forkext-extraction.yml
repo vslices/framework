@@ -69,7 +69,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          dotnet pack src/VSlices/VSlices.csproj --no-build -p:GeneratePackageOnBuild=false -o /tmp/forkext-nupkg
+          dotnet pack src/VSlices/VSlices.csproj --no-build -c Debug -p:GeneratePackageOnBuild=false -o /tmp/forkext-nupkg
           package=$(find /tmp/forkext-nupkg -name '*.nupkg' | head -n 1)
           test -n "$package"
           unzip -l "$package" | grep -F 'licenses/LanguageExt-MIT.txt'
