@@ -120,8 +120,23 @@ def apply(selection: set[str] | None) -> None:
                     new = new.replace(
                         "<Nullable>enable</Nullable>",
                         "<Nullable>enable</Nullable>\n"
+                        "    <ImplicitUsings>disable</ImplicitUsings>\n"
                         "    <DefineConstants>$(DefineConstants);CONTRACTS_FULL</DefineConstants>"
                     )
+                # The pinned upstream project builds without SDK implicit imports.
+                # Avoid injecting System.Collections.Generic.HashSet<T> globally into ForkExt.
+                # Keep normal BCL usings local to VSlices-authored source only.
+                if item.suffix == ".cs" and (ROOT / "src/VSlices") in item.parents:
+                    bcl = (
+                        "using System;\\n"
+                        "using System.Collections.Generic;\\n"
+                        "using System.IO;\\n"
+                        "using System.Linq;\\n"
+                        "using System.Net.Http;\\n"
+                        "using System.Threading;\\n"
+                        "using System.Threading.Tasks;\\n"
+                    )
+                    new = bcl.replace("\\n", "\n") + new
                 if new != old:
                     item.write_text(new, encoding="utf-8")
                     consumer_files += 1
