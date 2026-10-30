@@ -17,6 +17,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - uses: actions/checkout@v4
+        with:
+          repository: vslices/functional-ef-core
+          ref: refactor/use-vslices-forkext
+          path: functional-ef-core
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -47,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           dotnet list VSlices.slnx package --include-transitive > /tmp/forkext-packages.txt
-          if grep -Ei 'LanguageExt.Core|VSlices.EntityFrameworkCore.Functional' /tmp/forkext-packages.txt; then
+          if grep -Ei 'LanguageExt.Core' /tmp/forkext-packages.txt; then
             echo "::error::Original LanguageExt dependency still appears in NuGet graph"
             exit 1
           fi
