@@ -21,6 +21,8 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Restore workspace
         run: dotnet restore VSlices.slnx
+      - name: Restore AOT probe outside the solution
+        run: dotnet restore tests/VSlices.TransformAdapter.AotProbe/VSlices.TransformAdapter.AotProbe.csproj
       - name: Run Roslyn audit
         shell: bash
         run: |
