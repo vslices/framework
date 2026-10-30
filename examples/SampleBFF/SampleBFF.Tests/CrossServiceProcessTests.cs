@@ -15,8 +15,7 @@ public sealed class CrossServiceFeatureCompositionTests
         var todo = new InMemoryTodoWork();
         var files = new InMemoryFileWork();
 
-        var detail = TodoDetail.Transformation
-            .RunFin("todo with external file")
+        var detail = TodoDetail.Transform("todo with external file")
             .ThrowIfFail();
 
         var created = await CreateTodo
@@ -90,8 +89,7 @@ public sealed class CrossServiceFeatureCompositionTests
         var todo = new InMemoryTodoWork();
         var files = new InMemoryFileWork();
 
-        var missingTodoId = TodoId.Transformation
-            .RunFin(Guid.NewGuid())
+        var missingTodoId = TodoId.Transform(Guid.NewGuid())
             .ThrowIfFail();
 
         var algebra = new AlgebraMix<FileAlgebra, TodoAlgebra>(
