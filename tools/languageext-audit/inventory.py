@@ -20,14 +20,14 @@ EXTENSIONS = ("Bind Map Match MatchAsync MapFail MapError FailSpan ThrowIfFail I
               "RunFinT RunFin RunIO RunAsync Run As Fold Traverse Sequence SelectMany "
               "Select Flatten Iter Filter ForAll Do Choose ToFin ToOption ToEither "
               "IsSome IsNone IsFail IsSucc Lift MapIO MapT BindT BiMap").split()
-TOKENS = re.compile(r"\\b(?:"+"|".join(map(re.escape,SYMBOLS))+r")\\b")
-PRELUDE_CALL = re.compile(r"\\b(?:"+"|".join(map(re.escape,PRELUDE))+r")\\b(?=\\s*(?:\\(|<))")
-EXTENSION_CALL = re.compile(r"\\.\\s*(?:"+"|".join(map(re.escape,EXTENSIONS))+r")\\b(?=\\s*(?:\\(|<))")
-NAMESPACE = re.compile(r"\\bLanguageExt(?:\\.[A-Za-z_]\\w*)*")
-PACKAGE = re.compile(r'<PackageReference\\s+Include="([^"]+)"(?:[^>]*?Version="([^"]+)")?')
-GLOBAL_USING = re.compile(r'<Using\\s+Include="([^"]+)"([^>]*)>')
-PROJECT_REF = re.compile(r'<ProjectReference\\s+Include="([^"]+)"')
-DECL = re.compile(r'\\b(?:class|interface|struct|enum|record(?:\\s+(?:struct|class))?)\\s+([A-Za-z_]\\w*)')
+TOKENS = re.compile(r"\b(?:"+"|".join(map(re.escape,SYMBOLS))+r")\b")
+PRELUDE_CALL = re.compile(r"\b(?:"+"|".join(map(re.escape,PRELUDE))+r")\b(?=\s*(?:\(|<))")
+EXTENSION_CALL = re.compile(r"\.\s*(?:"+"|".join(map(re.escape,EXTENSIONS))+r")\b(?=\s*(?:\(|<))")
+NAMESPACE = re.compile(r"\bLanguageExt(?:\.[A-Za-z_]\w*)*")
+PACKAGE = re.compile(r'<PackageReference\s+Include="([^"]+)"(?:[^>]*?Version="([^"]+)")?')
+GLOBAL_USING = re.compile(r'<Using\s+Include="([^"]+)"([^>]*)>')
+PROJECT_REF = re.compile(r'<ProjectReference\s+Include="([^"]+)"')
+DECL = re.compile(r'\b(?:class|interface|struct|enum|record(?:\s+(?:struct|class))?)\s+([A-Za-z_]\w*)')
 CATEGORIES = {"explicit_namespace":"Certain textual reference","package":"Declared package",
               "implicit_import":"MSBuild global import","candidate_type":"Type or trait candidate",
               "candidate_prelude":"Prelude invocation candidate","candidate_extension":"Extension candidate"}
@@ -66,7 +66,7 @@ def main():
                 refs.append({"project":rel,"line":line_no,"reference":m.group(1)})
             if p.suffix in {".cs",".razor"}:
                 for m in TOKENS.finditer(line):
-                    if m.group()=="K" and not re.search(r"\\bK\\s*<",line[m.start():]): continue
+                    if m.group()=="K" and not re.search(r"\bK\s*<",line[m.start():]): continue
                     hits.append(("candidate_type",m.group(),m.start()+1))
                 for m in PRELUDE_CALL.finditer(line):
                     hits.append(("candidate_prelude",m.group(),m.start()+1))
@@ -93,7 +93,7 @@ def main():
           "location_rows":len(records),"files_with_candidates":len(by_file),
           "explicit_files":len(explicit),"counts":dict(counters),
           "local_declarations_colliding_with_candidates":sorted(own & set(SYMBOLS))}
-    (out/"summary.json").write_text(json.dumps(meta,indent=2,ensure_ascii=False)+"\\n",encoding="utf8")
+    (out/"summary.json").write_text(json.dumps(meta,indent=2,ensure_ascii=False)+"\n",encoding="utf8")
     lines=["# LanguageExt usage census", "",
            "**Method:** exhaustive lexical scan of tracked-like source/config files; NOT Roslyn-bound symbol attribution.",
            "Files and line numbers refer to the pinned checkout commit.", "",
@@ -118,6 +118,6 @@ def main():
                   "- `summary.json`: counters and collisions.","",
                   "Do not treat matching a token such as `Map`, `Error`, `Fin` or `Monad` as proof of LanguageExt ownership.",
                   "Separate reproduced implementation code from conceptual inspiration for licensing/attribution."])
-    (out/"README.md").write_text("\\n".join(lines)+"\\n",encoding="utf8")
+    (out/"README.md").write_text("\n".join(lines)+"\n",encoding="utf8")
     print(json.dumps(meta,ensure_ascii=False))
 if __name__=="__main__":main()
