@@ -60,7 +60,7 @@ string? Canonical(INamedTypeSymbol symbol)
     var matching = refs.Where(p =>
         string.Equals(Path.GetFileNameWithoutExtension(p), symbol.Name, StringComparison.OrdinalIgnoreCase))
         .OrderBy(p => p.Length).ToList();
-    return RelFork((matching.Count > 0 ? matching : refs.OrderBy(p => p.Length)).First());
+    return RelFork(matching.Count > 0 ? matching.First() : refs.OrderBy(p => p.Length).First());
 }
 
 void Link(ISymbol? symbol, string from, string reason)
