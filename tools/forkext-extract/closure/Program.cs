@@ -63,6 +63,22 @@ string? Canonical(INamedTypeSymbol symbol)
     return RelFork(matching.Count > 0 ? matching.First() : refs.OrderBy(p => p.Length).First());
 }
 
+void IncludeTypeContracts(INamedTypeSymbol type, string from, string reason)
+{
+    var canonical = Canonical(type);
+    if (canonical != null) Include(canonical, from, reason + " [type]");
+    // Typeclass implementations live in different partial declarations.
+    // They may be invoked only through generic constraints (no direct member
+    // reference), so retain every partial declaration with a base/interface list.
+    foreach (var declaration in type.DeclaringSyntaxReferences)
+    {
+        var syntax = declaration.GetSyntax();
+        if (syntax is TypeDeclarationSyntax part && part.BaseList is not null &&
+            IsFork(declaration.SyntaxTree.FilePath))
+            Include(RelFork(declaration.SyntaxTree.FilePath), from, reason + " [interface witness]");
+    }
+}
+
 void Link(ISymbol? symbol, string from, string reason)
 {
     if (symbol is null) return;
@@ -73,8 +89,7 @@ void Link(ISymbol? symbol, string from, string reason)
         symbol = original.OriginalDefinition;
     if (symbol is INamedTypeSymbol type)
     {
-        var file = Canonical(type);
-        if (file != null) Include(file, from, reason + " [type]");
+        IncludeTypeContracts(type, from, reason);
     }
     else
     {
@@ -85,8 +100,7 @@ void Link(ISymbol? symbol, string from, string reason)
         }
         if (symbol.ContainingType is { } container)
         {
-            var file = Canonical(container);
-            if (file != null) Include(file, from, reason + " [container]");
+            IncludeTypeContracts(container, from, reason + " [container]");
         }
     }
 }
