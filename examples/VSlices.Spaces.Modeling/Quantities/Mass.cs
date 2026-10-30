@@ -1,4 +1,4 @@
-using VSlices.Arrows;
+using LanguageExt;
 using VSlices.Spaces.Traits;
 
 namespace VSlices.Spaces.Modeling.Quantities;
