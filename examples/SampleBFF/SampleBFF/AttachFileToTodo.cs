@@ -42,8 +42,7 @@ public sealed class AttachFileToTodo :
                     request.Content));
 
         return addFile.Bind(stored =>
-            ResourceReference.Transformation
-                .RunFin(stored.File.Id.ToString())
+            ResourceReference.Transform(stored.File.Id.ToString())
                 .Match(
                     Succ: resource =>
                         AddAttachmentReference

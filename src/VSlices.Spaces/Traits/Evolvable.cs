@@ -1,5 +1,4 @@
 using LanguageExt;
-using VSlices.Arrows;
 
 namespace VSlices.Spaces;
 
@@ -19,7 +18,7 @@ public interface Evolvable<SELF, STATE>
     /// <summary>
     /// Gets the rules that determine whether a proposed state constitutes a valid next instance.
     /// </summary>
-    static abstract Req<STATE, SELF>.Full Evolution { get; }
+    static abstract Fin<SELF> Evolve(STATE state);
 
     /// <summary>
     /// Proposes a transformation over the current state and, when accepted,
@@ -27,7 +26,7 @@ public interface Evolvable<SELF, STATE>
     /// The source instance is not modified.
     /// </summary>
     Fin<SELF> Update(Func<STATE, STATE> update) =>
-        SELF.Evolution.RunFin(update(CurrentState));
+        SELF.Evolve(update(CurrentState));
 }
 
 public static class Evolvable

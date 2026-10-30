@@ -10,8 +10,7 @@ public sealed class ComposedFeatureFlowTests
     [Fact]
     public async Task Feature_composes_child_Features_over_the_same_algebra()
     {
-        var detail = TodoDetail.Transformation
-            .RunFin("composed through flow")
+        var detail = TodoDetail.Transform("composed through flow")
             .ThrowIfFail();
 
         var grounding = new InMemoryTodoWork();

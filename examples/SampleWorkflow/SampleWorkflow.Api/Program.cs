@@ -12,7 +12,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 app.MapPost("/todos", async (CreateTodoBody body, InMemoryTodoWork grounding) =>
 {
-    var detail = TodoDetail.Transformation.RunFin(body.Detail);
+    var detail = TodoDetail.Transform(body.Detail);
 
     return await detail.Match<Task<IResult>>(
         Succ: async semanticDetail =>
@@ -43,7 +43,7 @@ app.MapPost("/todos", async (CreateTodoBody body, InMemoryTodoWork grounding) =>
 
 app.MapGet("/todos/{id:guid}", async (Guid id, InMemoryTodoWork grounding) =>
 {
-    var semanticId = TodoId.Transformation.RunFin(id);
+    var semanticId = TodoId.Transform(id);
 
     return await semanticId.Match<Task<IResult>>(
         Succ: async todoId =>
@@ -70,8 +70,8 @@ app.MapPut("/todos/{id:guid}", async (
     InMemoryTodoWork grounding) =>
 {
     var input =
-        from semanticId in TodoId.Transformation.RunFin(id)
-        from detail in TodoDetail.Transformation.RunFin(body.Detail)
+        from semanticId in TodoId.Transform(id)
+        from detail in TodoDetail.Transform(body.Detail)
         select (semanticId, detail);
 
     return await input.Match<Task<IResult>>(
@@ -102,7 +102,7 @@ app.MapPut("/todos/{id:guid}", async (
 
 app.MapDelete("/todos/{id:guid}", async (Guid id, InMemoryTodoWork grounding) =>
 {
-    var semanticId = TodoId.Transformation.RunFin(id);
+    var semanticId = TodoId.Transform(id);
 
     return await semanticId.Match<Task<IResult>>(
         Succ: async todoId =>

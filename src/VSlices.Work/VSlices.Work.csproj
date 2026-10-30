@@ -10,6 +10,5 @@
     <Using Include="LanguageExt.Traits" />
     <Using Include="LanguageExt.Effects" />
     <Using Include="LanguageExt.Prelude" Static="true" />
-    <Using Include="VSlices.Arrows" />
   </ItemGroup>
 </Project>

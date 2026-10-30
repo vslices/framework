@@ -1,5 +1,5 @@
+using LanguageExt;
 using System.Runtime.CompilerServices;
-using VSlices.Arrows;
 using VSlices.Spaces.Traits;
 
 namespace VSlices.Spaces.Modeling;
@@ -16,15 +16,12 @@ public sealed record LocationName :
 
     public string Value { get; }
 
-    public static Req<string, LocationName>.Full Transformation =>
-        Req<string, LocationName>.Ensure<string>(
-            value => !string.IsNullOrWhiteSpace(value),
-            "A location name cannot be empty.") >>
-        Req<string, LocationName>.Ensure<string>(
-            value => value.Trim().Length <= 100,
-            "A location name cannot exceed 100 characters.") >>
-        Req<string, LocationName>.Transform<string, LocationName>(
-            value => new LocationName(value.Trim()));
+    public static Fin<LocationName> Transform(string value) =>
+        string.IsNullOrWhiteSpace(value)
+            ? LanguageExt.Common.Error.New("A location name cannot be empty.")
+            : value.Trim().Length > 100
+                ? LanguageExt.Common.Error.New("A location name cannot exceed 100 characters.")
+                : new LocationName(value.Trim());
 
     public override string ToString() =>
         Value;
@@ -67,11 +64,9 @@ public sealed class Location :
     [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
     private static extern State NewState(LocationName name, int x, int y);
 
-    public static Req<Input, Location>.Full Transformation =>
-        Req<Input, Location>.Transform<Input, Location>(
-            input => new Location(NewState(input.Name, input.X, input.Y)));
+    public static Fin<Location> Transform(Input input) =>
+        new Location(NewState(input.Name, input.X, input.Y));
 
-    public static Req<State, Location>.Full Evolution =>
-        Req<State, Location>.Transform<State, Location>(
-            state => new Location(state));
+    public static Fin<Location> Evolve(State state) =>
+        new Location(state);
 }

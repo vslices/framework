@@ -1,4 +1,4 @@
-using VSlices.Arrows;
+using LanguageExt;
 using VSlices.Spaces.Traits;
 
 var direct = TransformAdapter<string, LocationName>
@@ -29,9 +29,10 @@ public sealed record LocationName :
 
     public string Value { get; }
 
-    public static Req<string, LocationName>.Full Transformation =>
-        Req<string, LocationName>.Transform<string, LocationName>(
-            static value => new LocationName(value.Trim()));
+    public static Fin<LocationName> Transform(string value) =>
+            string.IsNullOrWhiteSpace(value)
+                ? LanguageExt.Common.Error.New("A location name cannot be empty.")
+                : new LocationName(value.Trim());
 }
 
 public sealed record EmailAddress :
@@ -44,10 +45,8 @@ public sealed record EmailAddress :
 
     public string Value { get; }
 
-    public static Req<Input, EmailAddress>.Full Transformation =>
-        Req<Input, EmailAddress>.Ensure<Input>(
-            static input => input.Value.Contains('@'),
-            "An email address must contain @.") >>
-        Req<Input, EmailAddress>.Transform<Input, EmailAddress>(
-            static input => new EmailAddress(input.Value));
+    public static Fin<EmailAddress> Transform(Input input) =>
+            input.Value.Contains('@')
+                ? new EmailAddress(input.Value)
+                : LanguageExt.Common.Error.New("An email address must contain @.");
 }

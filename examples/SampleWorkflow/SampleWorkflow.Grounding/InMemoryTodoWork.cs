@@ -27,8 +27,7 @@ public sealed class InMemoryTodoWork :
     public IO<TodoId> Next() =>
         IO.lift(Guid.NewGuid)
             .Bind(value =>
-                TodoId.Transformation
-                    .RunFin(value)
+                TodoId.Transform(value)
                     .Match(
                         Succ: IO.pure,
                         Fail: IO.fail<TodoId>));

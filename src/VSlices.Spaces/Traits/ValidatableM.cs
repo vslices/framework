@@ -1,5 +1,4 @@
 using LanguageExt;
-using VSlices.Arrows;
 
 namespace VSlices.Spaces.Traits;
 
@@ -16,7 +15,7 @@ public interface ValidatableM<CTX, M, SPACE>
     /// <summary>
     /// Gets the effectful rules that determine whether a value from the space may be used in this context.
     /// </summary>
-    static abstract ReqK<M, SPACE>.Full Validation { get; }
+    static abstract FinT<M, SPACE> Validate(SPACE value);
 }
 
 /// <summary>
@@ -27,5 +26,5 @@ public static class ValidatableM
     public static FinT<M, SPACE> Check<CTX, M, SPACE>(SPACE value)
         where CTX : ValidatableM<CTX, M, SPACE>
         where M : Monad<M> =>
-        CTX.Validation.RunFinT(value);
+        CTX.Validate(value);
 }

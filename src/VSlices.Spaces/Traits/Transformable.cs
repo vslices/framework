@@ -1,5 +1,4 @@
 using LanguageExt;
-using VSlices.Arrows;
 
 namespace VSlices.Spaces.Traits;
 
@@ -16,7 +15,7 @@ public interface Transformable<CTX, FROM, TO>
     /// <summary>
     /// Gets the rules that determine whether and how a source value can become a target value.
     /// </summary>
-    static abstract Req<FROM, TO>.Full Transformation { get; }
+    static abstract Fin<TO> Transform(FROM source);
 }
 
 /// <summary>
@@ -40,12 +39,12 @@ public static class Transformable
     /// </summary>
     public static Fin<TO> Transform<CTX, FROM, TO>(FROM source)
         where CTX : Transformable<CTX, FROM, TO> =>
-        CTX.Transformation.RunFin(source);
+        CTX.Transform(source);
 
     /// <summary>
     /// Attempts a transformation owned by its target space.
     /// </summary>
     public static Fin<TO> Transform<FROM, TO>(FROM source)
         where TO : Transformable<FROM, TO> =>
-        TO.Transformation.RunFin(source);
+        TO.Transform(source);
 }

@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using LanguageExt;
 using LanguageExt.Common;
-using VSlices.Arrows;
 
 namespace VSlices.Spaces.Traits;
 
@@ -29,28 +28,7 @@ public sealed class TransformAdapter<FROM, TO> :
 {
     private static readonly Func<FROM, Fin<TO>> Adapt = CreateAdapter();
 
-    public static Req<FROM, TO>.Full Transformation =>
-        new Req<FROM, TO, FROM, TO>(
-            (_, previous) =>
-                previous.Bind(state =>
-                {
-                    if (!state.IsValid)
-                    {
-                        return Either.Left<Error, ReqState<TO>>(
-                            state.Error);
-                    }
-
-                    return Adapt(state.Value).Match(
-                        Succ: value =>
-                            Either.Right<Error, ReqState<TO>>(
-                                ReqState.New(value)),
-                        Fail: error =>
-                            Either.Left<Error, ReqState<TO>>(
-                                error));
-                }));
-
-    public static Fin<TO> Transform(FROM source) =>
-        Transformation.RunFin(source);
+    public static Fin<TO> Transform(FROM source) => Adapt(source);
 
     private static Func<FROM, Fin<TO>> CreateAdapter()
     {
@@ -155,9 +133,7 @@ public sealed class TransformAdapter<FROM, TO> :
     private sealed class Probe :
         Transformable<object, Probe>
     {
-        public static Req<object, Probe>.Full Transformation =>
-            Req<object, Probe>.Transform<object, Probe>(
-                static _ => new Probe());
+        public static Fin<Probe> Transform(object source) => new Probe();
     }
 }
 
@@ -177,7 +153,7 @@ internal static class TransformAdapterBridge<TFrom, TInput, TTo>
             .Compile();
 
         return value =>
-            TTo.Transformation.RunFin(
+            TTo.Transform(
                 constructInput(value));
     }
 }
@@ -188,5 +164,5 @@ internal static class DirectTransformAdapterBridge<TFrom, TTo>
 {
     public static Func<TFrom, Fin<TTo>> Create() =>
         static value =>
-            TTo.Transformation.RunFin(value);
+            TTo.Transform(value);
 }
