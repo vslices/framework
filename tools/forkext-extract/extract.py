@@ -112,7 +112,7 @@ def apply(selection: set[str] | None) -> None:
                     new = re.sub(
                         r"^\s*<PackageReference\s+Include=\"LanguageExt.Core\"[^>]*/>\s*\n",
                         "\n", new, flags=re.MULTILINE)
-                    new = re.sub(r'^\\s*<Using Include="[^"]+"[^>]*/>\\s*\\n', "\\n", new, flags=re.MULTILINE)
+                    new = re.sub(r'^\s*<Using Include="[^"]+"[^>]*/>\s*\n', "\n", new, flags=re.MULTILINE)
                     # The replacement is also done after namespace_rewrite, which
                     # changes the literal package name in the csproj XML.
                     new = re.sub(
