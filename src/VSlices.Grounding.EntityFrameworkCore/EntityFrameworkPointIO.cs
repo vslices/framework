@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using EntityFrameworkCore.Functional;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using VSlices.Work;
@@ -8,9 +7,7 @@ namespace VSlices.Grounding.EntityFrameworkCore;
 
 /// <summary>
 /// Grounds point-oriented Work capabilities on an Entity Framework Core projection.
-///
-/// This type deliberately does not expose Repository semantics. It realizes only the
-/// point operations explicitly requested by Work.
+/// This type does not introduce repository semantics.
 /// </summary>
 public sealed class EntityFrameworkPointIO<TContext, POINT, ID, TProjection>(
     TContext context,
@@ -27,53 +24,55 @@ public sealed class EntityFrameworkPointIO<TContext, POINT, ID, TProjection>(
     private readonly DbSet<TProjection> set = context.Set<TProjection>();
 
     public OptionT<IO, POINT> ReadOrDefault(ID id) =>
-        set.AsNoTracking()
-            .SingleOrNoneIO(byId(id))
-            .Map(toPoint);
+        OptionT.lift<IO, POINT>(
+            Prelude.liftIO(async env =>
+            {
+                var projection = await set.AsNoTracking()
+                    .SingleOrDefaultAsync(byId(id), env.Token)
+                    .ConfigureAwait(false);
+
+                return projection is null
+                    ? Option<POINT>.None
+                    : Prelude.Some(toPoint(projection));
+            }));
 
     public IO<Unit> Write(POINT point) =>
-        from projection in IO.lift(() => toProjection(point))
-        from exists in set
-            .AsNoTracking()
-            .AnyIO(byId(identity(point)))
-        from entry in (
-            exists
-                ? context.UpdateIO(projection)
-                : context.AddIO(projection))
-        from _ in context.SaveChangesIO()
-        from __ in Detach(entry)
-        select default(Unit);
+        Prelude.liftIO(async env =>
+        {
+            var projection = toProjection(point);
+            var exists = await set.AsNoTracking()
+                .AnyAsync(byId(identity(point)), env.Token)
+                .ConfigureAwait(false);
+
+            var entry = exists
+                ? context.Update(projection)
+                : await context.AddAsync(projection, env.Token)
+                    .ConfigureAwait(false);
+
+            await context.SaveChangesAsync(env.Token).ConfigureAwait(false);
+            entry.State = EntityState.Detached;
+            return default(Unit);
+        });
 
     public IO<Unit> Remove(ID id) =>
-        from existing in set
-            .AsNoTracking()
-            .SingleOrNoneIO(byId(id))
-            .Run()
-            .As()
-        from removed in existing.Match(
-            Some: projection =>
-                from entry in context.RemoveIO(projection)
-                from _ in context.SaveChangesIO()
-                from __ in Detach(entry)
-                select default(Unit),
-            None: static () =>
-                IO.pure(default(Unit)))
-        select removed;
-
-    private static IO<TProjection> Detach(
-        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<TProjection> entry) =>
-        IO.lift(() =>
+        Prelude.liftIO(async env =>
         {
+            var existing = await set.AsNoTracking()
+                .SingleOrDefaultAsync(byId(id), env.Token)
+                .ConfigureAwait(false);
+
+            if (existing is null)
+                return default(Unit);
+
+            var entry = context.Remove(existing);
+            await context.SaveChangesAsync(env.Token).ConfigureAwait(false);
             entry.State = EntityState.Detached;
-            return entry.Entity;
+            return default(Unit);
         });
 }
 
 public static class EntityFrameworkPointIO
 {
-    /// <summary>
-    /// Creates point grounding when the semantic point is also the EF entity.
-    /// </summary>
     public static EntityFrameworkPointIO<TContext, POINT, ID, POINT>
         Direct<TContext, POINT, ID>(
             TContext context,
