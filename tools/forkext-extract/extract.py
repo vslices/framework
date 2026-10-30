@@ -118,7 +118,8 @@ def apply(selection: set[str] | None) -> None:
                     new = re.sub(
                         r"^\s*<PackageReference\s+Include=\"ForkExt.Core\"[^>]*/>\s*\n",
                         "\n", new, flags=re.MULTILINE)
-                    new = new.replace(
+                    if "CONTRACTS_FULL" not in new:
+                        new = new.replace(
                         "<Nullable>enable</Nullable>",
                         "<Nullable>enable</Nullable>\n"
                         "    <ImplicitUsings>disable</ImplicitUsings>\n"
@@ -127,7 +128,8 @@ def apply(selection: set[str] | None) -> None:
                 # The pinned upstream project builds without SDK implicit imports.
                 # Avoid injecting System.Collections.Generic.HashSet<T> globally into ForkExt.
                 # Keep normal BCL usings local to VSlices-authored source only.
-                if item.suffix == ".cs" and (ROOT / "src/VSlices") in item.parents:
+                if (item.suffix == ".cs" and (ROOT / "src/VSlices") in item.parents
+                        and "using ForkExt;" not in new):
                     bcl = (
                         "using System;\\n"
                         "using System.Collections.Generic;\\n"
