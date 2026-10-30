@@ -10,7 +10,6 @@
 		<RepositoryUrl>https://github.com/HernanFAR/vslices-framework</RepositoryUrl>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageIcon>icon lq.png</PackageIcon>
 
 		<ImplicitUsings>enable</ImplicitUsings>
