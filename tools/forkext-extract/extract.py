@@ -129,7 +129,7 @@ def apply(selection: set[str] | None) -> None:
                 # Avoid injecting System.Collections.Generic.HashSet<T> globally into ForkExt.
                 # Keep normal BCL usings local to VSlices-authored source only.
                 if (item.suffix == ".cs" and (ROOT / "src/VSlices") in item.parents
-                        and "using ForkExt;" not in new):
+                        and not new.startswith("using System;\\nusing System.Collections.Generic;\\nusing System.IO;\\n")):
                     bcl = (
                         "using System;\\n"
                         "using System.Collections.Generic;\\n"
