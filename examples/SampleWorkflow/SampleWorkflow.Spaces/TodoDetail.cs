@@ -1,4 +1,4 @@
-using VSlices.Arrows;
+using LanguageExt;
 using VSlices.Spaces;
 using VSlices.Spaces.Traits;
 
@@ -16,9 +16,8 @@ public sealed record TodoDetail :
 
     public string Value { get; }
 
-    public static Req<string, TodoDetail>.Full Transformation =>
-        Req<string, TodoDetail>.Transform<string, TodoDetail>(
-            value => new TodoDetail(value));
+    public static Fin<TodoDetail> Transform(string value) =>
+        new TodoDetail(value);
 
     public override string ToString() =>
         Value;
