@@ -1,0 +1,662 @@
+{
+  "scannedProjectFiles": 32,
+  "loadedProjects": 32,
+  "analyzedDocuments": 295,
+  "attributedReferences": 2231,
+  "assemblies": {
+    "LanguageExt.Core": 2231
+  },
+  "topSymbols": [
+    {
+      "symbol": "global::LanguageExt.Traits.K\u003CF, A\u003E",
+      "locations": 191
+    },
+    {
+      "symbol": "global::LanguageExt.Traits.K\u003CF, A, B\u003E",
+      "locations": 154
+    },
+    {
+      "symbol": "RunAsync",
+      "locations": 137
+    },
+    {
+      "symbol": "Map\u003CB\u003E",
+      "locations": 122
+    },
+    {
+      "symbol": "Match\u003CB\u003E",
+      "locations": 118
+    },
+    {
+      "symbol": "Bind\u003CB\u003E",
+      "locations": 95
+    },
+    {
+      "symbol": "global::LanguageExt.Fin\u003CA\u003E",
+      "locations": 78
+    },
+    {
+      "symbol": "pure\u003CA\u003E",
+      "locations": 75
+    },
+    {
+      "symbol": "global::LanguageExt.Traits.Const\u003CTYPE\u003E",
+      "locations": 64
+    },
+    {
+      "symbol": "global::LanguageExt.IO",
+      "locations": 62
+    },
+    {
+      "symbol": "global::LanguageExt.Common.Error",
+      "locations": 52
+    },
+    {
+      "symbol": "global::LanguageExt.Eff\u003CA\u003E",
+      "locations": 52
+    },
+    {
+      "symbol": "lift\u003CA\u003E",
+      "locations": 48
+    },
+    {
+      "symbol": "global::LanguageExt.IO\u003CA\u003E",
+      "locations": 45
+    },
+    {
+      "symbol": "As",
+      "locations": 44
+    },
+    {
+      "symbol": "Run",
+      "locations": 42
+    },
+    {
+      "symbol": "global::LanguageExt.Option\u003CA\u003E",
+      "locations": 39
+    },
+    {
+      "symbol": "New",
+      "locations": 33
+    },
+    {
+      "symbol": "Value",
+      "locations": 32
+    },
+    {
+      "symbol": "global::LanguageExt.Eff\u003CRT, A\u003E",
+      "locations": 31
+    },
+    {
+      "symbol": "Right\u003CL, R\u003E",
+      "locations": 30
+    },
+    {
+      "symbol": "None",
+      "locations": 27
+    },
+    {
+      "symbol": "global::LanguageExt.Fin",
+      "locations": 25
+    },
+    {
+      "symbol": "ThrowIfFail",
+      "locations": 24
+    },
+    {
+      "symbol": "global::LanguageExt.Common",
+      "locations": 23
+    },
+    {
+      "symbol": "global::LanguageExt.Unit",
+      "locations": 23
+    },
+    {
+      "symbol": "Fail",
+      "locations": 21
+    },
+    {
+      "symbol": "Succ",
+      "locations": 19
+    },
+    {
+      "symbol": "Left\u003CL, R\u003E",
+      "locations": 18
+    },
+    {
+      "symbol": "IfNone",
+      "locations": 18
+    },
+    {
+      "symbol": "Some\u003CA\u003E",
+      "locations": 18
+    },
+    {
+      "symbol": "implicit operator global::LanguageExt.Fin\u003CA\u003E",
+      "locations": 17
+    },
+    {
+      "symbol": "global::LanguageExt.Either",
+      "locations": 16
+    },
+    {
+      "symbol": "Message",
+      "locations": 16
+    },
+    {
+      "symbol": "IsFail",
+      "locations": 16
+    },
+    {
+      "symbol": "global::LanguageExt.FinT\u003CM\u003E",
+      "locations": 15
+    },
+    {
+      "symbol": "global::LanguageExt.Prelude",
+      "locations": 14
+    },
+    {
+      "symbol": "operator \u002B",
+      "locations": 13
+    },
+    {
+      "symbol": "ToException",
+      "locations": 12
+    },
+    {
+      "symbol": "lift\u003CM, A\u003E",
+      "locations": 12
+    },
+    {
+      "symbol": "fail\u003CA\u003E",
+      "locations": 12
+    },
+    {
+      "symbol": "RunIO",
+      "locations": 12
+    },
+    {
+      "symbol": "Run\u003CM, A\u003E",
+      "locations": 11
+    },
+    {
+      "symbol": "IsNone",
+      "locations": 10
+    },
+    {
+      "symbol": "global::LanguageExt.Traits.Monad\u003CM\u003E",
+      "locations": 10
+    },
+    {
+      "symbol": "Ctor\u003CA, R\u003E",
+      "locations": 9
+    },
+    {
+      "symbol": "Left",
+      "locations": 8
+    },
+    {
+      "symbol": "Right",
+      "locations": 8
+    },
+    {
+      "symbol": "@catch\u003CM, A\u003E",
+      "locations": 8
+    },
+    {
+      "symbol": "global::LanguageExt.OptionT\u003CM, A\u003E",
+      "locations": 7
+    },
+    {
+      "symbol": "Some",
+      "locations": 7
+    },
+    {
+      "symbol": "global::LanguageExt.Eff",
+      "locations": 7
+    },
+    {
+      "symbol": "global::LanguageExt.FinT\u003CM, A\u003E",
+      "locations": 7
+    },
+    {
+      "symbol": "map\u003CF, A, B\u003E",
+      "locations": 6
+    },
+    {
+      "symbol": "Apply\u003CA, B\u003E",
+      "locations": 6
+    },
+    {
+      "symbol": "flatten\u003CM, A\u003E",
+      "locations": 6
+    },
+    {
+      "symbol": "ToString",
+      "locations": 6
+    },
+    {
+      "symbol": "FailSpan",
+      "locations": 6
+    },
+    {
+      "symbol": "global::LanguageExt.Either\u003CL, R\u003E",
+      "locations": 5
+    },
+    {
+      "symbol": "unit",
+      "locations": 5
+    },
+    {
+      "symbol": "global::LanguageExt.Pure\u003CA\u003E",
+      "locations": 5
+    },
+    {
+      "symbol": "global::LanguageExt.EnvIO",
+      "locations": 4
+    },
+    {
+      "symbol": "operator |",
+      "locations": 4
+    },
+    {
+      "symbol": "Empty",
+      "locations": 4
+    },
+    {
+      "symbol": "global::LanguageExt.Next\u003CA, B\u003E",
+      "locations": 4
+    },
+    {
+      "symbol": "unitIO",
+      "locations": 4
+    },
+    {
+      "symbol": "global::LanguageExt.OptionT",
+      "locations": 3
+    },
+    {
+      "symbol": "ToEff",
+      "locations": 3
+    },
+    {
+      "symbol": "As\u003CA\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "LiftIO",
+      "locations": 3
+    },
+    {
+      "symbol": "global::LanguageExt.Fail\u003CE\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "RunSafe",
+      "locations": 3
+    },
+    {
+      "symbol": "RunSafeAsync",
+      "locations": 3
+    },
+    {
+      "symbol": "RunIO\u003CA\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "choose\u003CF, A\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "empty\u003CF, A\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "global::LanguageExt.Traits.Fallible\u003CE, F\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "Catch\u003CF, A\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "error\u003CF, A\u003E",
+      "locations": 3
+    },
+    {
+      "symbol": "Catch\u003CE, F, A\u003E",
+      "locations": 3
+    }
+  ],
+  "projects": {
+    "SampleBFF": 35,
+    "SampleBFF.Tests": 58,
+    "SampleFileRepo": 46,
+    "SampleWorkflow.Api": 68,
+    "SampleWorkflow.Grounding": 50,
+    "SampleWorkflow.Process": 35,
+    "SampleWorkflow.Process.Tests": 17,
+    "SampleWorkflow.Spaces": 10,
+    "SampleWorkflow.Work": 226,
+    "VSlices": 1051,
+    "VSlices.Grounding": 21,
+    "VSlices.Grounding.EntityFrameworkCore": 36,
+    "VSlices.Grounding.EntityFrameworkCore.Tests": 71,
+    "VSlices.Grounding.Tests": 9,
+    "VSlices.Spaces": 62,
+    "VSlices.Spaces.Modeling": 30,
+    "VSlices.Spaces.Modeling.Tests": 22,
+    "VSlices.Spaces.Products": 5,
+    "VSlices.Spaces.Tests": 43,
+    "VSlices.TransformAdapter.AotProbe": 30,
+    "VSlices.Views.Abstract": 12,
+    "VSlices.Views.Abstract.Tests": 38,
+    "VSlices.Views.Razor.AdapterProbe": 9,
+    "VSlices.Work": 29,
+    "VSlices.Work.Algebra.Tests": 217,
+    "VSlices.Work.Services": 1
+  },
+  "loadErrors": [
+    "[Warning] Duplicate source file \u0027/home/runner/work/framework/framework/src/VSlices.Spaces.Analyzers/AnalyzerReleases.Shipped.md\u0027 in project \u0027/home/runner/work/framework/framework/src/VSlices.Spaces.Analyzers/VSlices.Spaces.Analyzers.csproj\u0027",
+    "[Warning] Duplicate source file \u0027/home/runner/work/framework/framework/src/VSlices.Spaces.Analyzers/AnalyzerReleases.Unshipped.md\u0027 in project \u0027/home/runner/work/framework/framework/src/VSlices.Spaces.Analyzers/VSlices.Spaces.Analyzers.csproj\u0027"
+  ],
+  "projectFailures": [],
+  "compilationErrors": [],
+  "analyzedDocumentsList": [
+    "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/CrossServiceProcessTests.cs",
+    "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/obj/Debug/net10.0/SampleBFF.Tests.GlobalUsings.g.cs",
+    "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/obj/Debug/net10.0/SelfRegisteredExtensions.cs",
+    "SampleBFF.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultRunnerReporters.cs",
+    "SampleBFF.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultResultWriters.cs",
+    "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/obj/Debug/net10.0/XunitAutoGeneratedEntryPoint.cs",
+    "SampleBFF.Tests:examples/SampleBFF/SampleBFF.Tests/obj/Debug/net10.0/SampleBFF.Tests.AssemblyInfo.cs",
+    "SampleBFF:examples/SampleBFF/SampleBFF/AttachFileToTodo.cs",
+    "SampleBFF:examples/SampleBFF/SampleBFF/obj/Debug/net10.0/SampleBFF.GlobalUsings.g.cs",
+    "SampleBFF:examples/SampleBFF/SampleBFF/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleBFF:examples/SampleBFF/SampleBFF/obj/Debug/net10.0/SampleBFF.AssemblyInfo.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/AddFile.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/FileAlgebra.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/GetFile.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/InMemoryFileWork.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/SampleFile.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/obj/Debug/net10.0/SampleFileRepo.GlobalUsings.g.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleFileRepo:examples/SampleFileRepo/SampleFileRepo/obj/Debug/net10.0/SampleFileRepo.AssemblyInfo.cs",
+    "SampleWorkflow.Api:examples/SampleWorkflow/SampleWorkflow.Api/Program.cs",
+    "SampleWorkflow.Api:examples/SampleWorkflow/SampleWorkflow.Api/obj/Debug/net10.0/SampleWorkflow.Api.GlobalUsings.g.cs",
+    "SampleWorkflow.Api:examples/SampleWorkflow/SampleWorkflow.Api/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleWorkflow.Api:examples/SampleWorkflow/SampleWorkflow.Api/obj/Debug/net10.0/SampleWorkflow.Api.AssemblyInfo.cs",
+    "SampleWorkflow.Grounding:examples/SampleWorkflow/SampleWorkflow.Grounding/InMemoryTodoWork.cs",
+    "SampleWorkflow.Grounding:examples/SampleWorkflow/SampleWorkflow.Grounding/obj/Debug/net10.0/SampleWorkflow.Grounding.GlobalUsings.g.cs",
+    "SampleWorkflow.Grounding:examples/SampleWorkflow/SampleWorkflow.Grounding/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleWorkflow.Grounding:examples/SampleWorkflow/SampleWorkflow.Grounding/obj/Debug/net10.0/SampleWorkflow.Grounding.AssemblyInfo.cs",
+    "SampleWorkflow.Process.Tests:examples/SampleWorkflow/SampleWorkflow.Process.Tests/ProcessHoistTests.cs",
+    "SampleWorkflow.Process.Tests:examples/SampleWorkflow/SampleWorkflow.Process.Tests/obj/Debug/net10.0/SampleWorkflow.Process.Tests.GlobalUsings.g.cs",
+    "SampleWorkflow.Process.Tests:examples/SampleWorkflow/SampleWorkflow.Process.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleWorkflow.Process.Tests:examples/SampleWorkflow/SampleWorkflow.Process.Tests/obj/Debug/net10.0/SelfRegisteredExtensions.cs",
+    "SampleWorkflow.Process.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultRunnerReporters.cs",
+    "SampleWorkflow.Process.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultResultWriters.cs",
+    "SampleWorkflow.Process.Tests:examples/SampleWorkflow/SampleWorkflow.Process.Tests/obj/Debug/net10.0/XunitAutoGeneratedEntryPoint.cs",
+    "SampleWorkflow.Process.Tests:examples/SampleWorkflow/SampleWorkflow.Process.Tests/obj/Debug/net10.0/SampleWorkflow.Process.Tests.AssemblyInfo.cs",
+    "SampleWorkflow.Process:examples/SampleWorkflow/SampleWorkflow.Process/CreateAndGetTodo.cs",
+    "SampleWorkflow.Process:examples/SampleWorkflow/SampleWorkflow.Process/obj/Debug/net10.0/SampleWorkflow.Process.GlobalUsings.g.cs",
+    "SampleWorkflow.Process:examples/SampleWorkflow/SampleWorkflow.Process/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleWorkflow.Process:examples/SampleWorkflow/SampleWorkflow.Process/obj/Debug/net10.0/SampleWorkflow.Process.AssemblyInfo.cs",
+    "SampleWorkflow.Spaces:examples/SampleWorkflow/SampleWorkflow.Spaces/ResourceReference.cs",
+    "SampleWorkflow.Spaces:examples/SampleWorkflow/SampleWorkflow.Spaces/Todo.cs",
+    "SampleWorkflow.Spaces:examples/SampleWorkflow/SampleWorkflow.Spaces/TodoDetail.cs",
+    "SampleWorkflow.Spaces:examples/SampleWorkflow/SampleWorkflow.Spaces/TodoId.cs",
+    "SampleWorkflow.Spaces:examples/SampleWorkflow/SampleWorkflow.Spaces/obj/Debug/net10.0/SampleWorkflow.Spaces.GlobalUsings.g.cs",
+    "SampleWorkflow.Spaces:examples/SampleWorkflow/SampleWorkflow.Spaces/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleWorkflow.Spaces:examples/SampleWorkflow/SampleWorkflow.Spaces/obj/Debug/net10.0/SampleWorkflow.Spaces.AssemblyInfo.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/AddAttachmentReference.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/CreateTodo.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/DeleteTodo.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/GetTodo.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/TodoAlgebra.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/UpdateTodo.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/obj/Debug/net10.0/SampleWorkflow.Work.GlobalUsings.g.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "SampleWorkflow.Work:examples/SampleWorkflow/SampleWorkflow.Work/obj/Debug/net10.0/SampleWorkflow.Work.AssemblyInfo.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/AlgebraicSymbolAreaVolumeProbe.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/CoordinateProductProbe.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/InvalidUsage.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/Location.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/ProductShapeComparisonProbe.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/Quantities/Mass.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/Quantities/Quantity.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/QuantityFamilies/QuantityFamily.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/QuantityFamilies/SelfMass.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/QuantityFamilies/StaticSelfMass.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/Usage.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/obj/Debug/net10.0/VSlices.Spaces.Modeling.GlobalUsings.g.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Spaces.Modeling:examples/VSlices.Spaces.Modeling/obj/Debug/net10.0/VSlices.Spaces.Modeling.AssemblyInfo.cs",
+    "VSlices.Grounding.EntityFrameworkCore:src/VSlices.Grounding.EntityFrameworkCore/EntityFrameworkPointIO.cs",
+    "VSlices.Grounding.EntityFrameworkCore:src/VSlices.Grounding.EntityFrameworkCore/obj/Debug/net10.0/VSlices.Grounding.EntityFrameworkCore.GlobalUsings.g.cs",
+    "VSlices.Grounding.EntityFrameworkCore:src/VSlices.Grounding.EntityFrameworkCore/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Grounding.EntityFrameworkCore:src/VSlices.Grounding.EntityFrameworkCore/obj/Debug/net10.0/VSlices.Grounding.EntityFrameworkCore.AssemblyInfo.cs",
+    "VSlices.Grounding:src/VSlices.Grounding/SystemTimeIO.cs",
+    "VSlices.Grounding:src/VSlices.Grounding/obj/Debug/net10.0/VSlices.Grounding.GlobalUsings.g.cs",
+    "VSlices.Grounding:src/VSlices.Grounding/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Grounding:src/VSlices.Grounding/obj/Debug/net10.0/VSlices.Grounding.AssemblyInfo.cs",
+    "VSlices.Spaces.Analyzers:src/VSlices.Spaces.Analyzers/TransformAdapterAnalyzer.cs",
+    "VSlices.Spaces.Analyzers:src/VSlices.Spaces.Analyzers/obj/Debug/netstandard2.0/VSlices.Spaces.Analyzers.GlobalUsings.g.cs",
+    "VSlices.Spaces.Analyzers:src/VSlices.Spaces.Analyzers/obj/Debug/netstandard2.0/.NETStandard,Version=v2.0.AssemblyAttributes.cs",
+    "VSlices.Spaces.Analyzers:src/VSlices.Spaces.Analyzers/obj/Debug/netstandard2.0/VSlices.Spaces.Analyzers.AssemblyInfo.cs",
+    "VSlices.Spaces.Products:src/VSlices.Spaces.Products/Role.cs",
+    "VSlices.Spaces.Products:src/VSlices.Spaces.Products/obj/Debug/net10.0/VSlices.Spaces.Products.GlobalUsings.g.cs",
+    "VSlices.Spaces.Products:src/VSlices.Spaces.Products/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Spaces.Products:src/VSlices.Spaces.Products/obj/Debug/net10.0/VSlices.Spaces.Products.AssemblyInfo.cs",
+    "VSlices.Spaces.Services:src/VSlices.Spaces.Services/Claims/Claim.cs",
+    "VSlices.Spaces.Services:src/VSlices.Spaces.Services/obj/Debug/net10.0/VSlices.Spaces.Services.GlobalUsings.g.cs",
+    "VSlices.Spaces.Services:src/VSlices.Spaces.Services/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Spaces.Services:src/VSlices.Spaces.Services/obj/Debug/net10.0/VSlices.Spaces.Services.AssemblyInfo.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/AffineSpace.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/DerivedSpace.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/DiscreteSpace.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Finance/Currency.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Finance/ExchangeRate.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Finance/Money.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Laws/DerivedSpaceLaws.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/MaintainedSpace.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Abstract/Coordinate.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Abstract/Exponent.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Abstract/M.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Abstract/Quantity.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Algebra/AlgebraicSymbolAttribute.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Algebra/Power.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Algebra/Product.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Algebra/Quotient.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Conversions.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Derived/Acceleration.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Derived/Area.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Derived/Speed.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Derived/Volume.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Duration.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Length.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Mass.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Quantities/Temperature.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/QuantitySpace.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Temporal/Moment.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Traits/Evolvable.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Traits/Transformable.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Traits/TransformableM.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Traits/TransformAdapter.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Traits/Validatable.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/Traits/ValidatableM.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/VectorSpace.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/obj/Debug/net10.0/VSlices.Spaces.GlobalUsings.g.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Spaces:src/VSlices.Spaces/obj/Debug/net10.0/VSlices.Spaces.AssemblyInfo.cs",
+    "VSlices.Views.Abstract:src/VSlices.Views.Abstract/Forms/vTextInput.cs",
+    "VSlices.Views.Abstract:src/VSlices.Views.Abstract/Forms/vTransformMetadata.cs",
+    "VSlices.Views.Abstract:src/VSlices.Views.Abstract/obj/Debug/net10.0/VSlices.Views.Abstract.GlobalUsings.g.cs",
+    "VSlices.Views.Abstract:src/VSlices.Views.Abstract/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Views.Abstract:src/VSlices.Views.Abstract/obj/Debug/net10.0/VSlices.Views.Abstract.AssemblyInfo.cs",
+    "VSlices.Work.Products:src/VSlices.Work.Products/Traits/ProductFeature.cs",
+    "VSlices.Work.Products:src/VSlices.Work.Products/obj/Debug/net10.0/VSlices.Work.Products.GlobalUsings.g.cs",
+    "VSlices.Work.Products:src/VSlices.Work.Products/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Work.Products:src/VSlices.Work.Products/obj/Debug/net10.0/VSlices.Work.Products.AssemblyInfo.cs",
+    "VSlices.Work.Services:src/VSlices.Work.Services/Traits/ServiceFeature.cs",
+    "VSlices.Work.Services:src/VSlices.Work.Services/obj/Debug/net10.0/VSlices.Work.Services.GlobalUsings.g.cs",
+    "VSlices.Work.Services:src/VSlices.Work.Services/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Work.Services:src/VSlices.Work.Services/obj/Debug/net10.0/VSlices.Work.Services.AssemblyInfo.cs",
+    "VSlices.Work:src/VSlices.Work/Algebra/AlgebraMix.cs",
+    "VSlices.Work:src/VSlices.Work/Algebra/PointReader.cs",
+    "VSlices.Work:src/VSlices.Work/Algebra/PointRemover.cs",
+    "VSlices.Work:src/VSlices.Work/Algebra/PointWriter.cs",
+    "VSlices.Work:src/VSlices.Work/Feature.cs",
+    "VSlices.Work:src/VSlices.Work/TemporalIO.cs",
+    "VSlices.Work:src/VSlices.Work/obj/Debug/net10.0/VSlices.Work.GlobalUsings.g.cs",
+    "VSlices.Work:src/VSlices.Work/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Work:src/VSlices.Work/obj/Debug/net10.0/VSlices.Work.AssemblyInfo.cs",
+    "VSlices:src/VSlices/Arrows/Req/Req.Prelude.cs",
+    "VSlices:src/VSlices/Errors/ConflictStateIssue.cs",
+    "VSlices:src/VSlices/Errors/ValidationIssue.cs",
+    "VSlices:src/VSlices/GlobalUsings.cs",
+    "VSlices:src/VSlices/Literals/Boolean.cs",
+    "VSlices:src/VSlices/Literals/Charsets.cs",
+    "VSlices:src/VSlices/Literals/Number/Decimal/Decimal.Abstracts.cs",
+    "VSlices:src/VSlices/Literals/Number/Decimal/Typed/Decimal.Typed.Hundredths.cs",
+    "VSlices:src/VSlices/Literals/Number/Decimal/Typed/Decimal.Typed.Tenths.cs",
+    "VSlices:src/VSlices/Literals/Number/Decimal/Typed/Decimal.Typed.Thousandths.cs",
+    "VSlices:src/VSlices/Literals/Number/Whole/Typed/Whole.Typed.Huns.cs",
+    "VSlices:src/VSlices/Literals/Number/Whole/Typed/Whole.Typed.Tens.cs",
+    "VSlices:src/VSlices/Literals/Number/Whole/Typed/Whole.Typed.Thous.cs",
+    "VSlices:src/VSlices/Literals/Number/Whole/Typed/Whole.Typed.Units.cs",
+    "VSlices:src/VSlices/Literals/Number/Whole/Whole.Abstracts.cs",
+    "VSlices:src/VSlices/Monads/Eff/Syntax/Monad/Eff2.Monad.Fin.cs",
+    "VSlices:src/VSlices/Monads/Eff/Syntax/Monad/Eff2.Monad.Flow.cs",
+    "VSlices:src/VSlices/Monads/Fin/Syntax/Monad/Fin.Monad.Eff2.cs",
+    "VSlices:src/VSlices/Monads/Flow/Flow.Definition.cs",
+    "VSlices:src/VSlices/Monads/Flow/Flow.Dependencies.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Flow.Dependencies.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Flow.DependencyPrelude.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Flow.Final.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Flow.Functor.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Flow.Kind.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Flow.Transform.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Monad/Flow.Monad.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Monad/Flow.Monad.Eff.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Monad/Flow.Monad.Eff2.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Monad/Flow.Monad.Fin.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Monad/Flow.Monad.FinT\u002BEff.cs",
+    "VSlices:src/VSlices/Monads/Flow/Syntax/Monad/Flow.Monad.IO.cs",
+    "VSlices:src/VSlices/Monads/Flow/Trait/Flow.Alternative\u002BChoice.cs",
+    "VSlices:src/VSlices/Monads/Flow/Trait/Flow.Fallible\u002BFinal\u002BReadable.cs",
+    "VSlices:src/VSlices/Monads/Flow/Trait/Flow.Functor\u002BApplicative.cs",
+    "VSlices:src/VSlices/Monads/Flow/Trait/Flow.Monad\u002BMonadIO\u002BMonadUnliftIO.cs",
+    "VSlices:src/VSlices/Monads/Flow/Trait/Flow.MonoidK\u002BSemigroupK.cs",
+    "VSlices:src/VSlices/Monads/Flow/Trait/Flow.Traits.cs",
+    "VSlices:src/VSlices/Prelude.cs",
+    "VSlices:src/VSlices/Traits/Arrow/Arrow.Laws.cs",
+    "VSlices:src/VSlices/Traits/Arrow/Arrow.Module.cs",
+    "VSlices:src/VSlices/Traits/Arrow/Arrow.Trait.cs",
+    "VSlices:src/VSlices/Traits/ArrowApply/ArrowApply.Module.cs",
+    "VSlices:src/VSlices/Traits/ArrowApply/ArrowApply.Trait.cs",
+    "VSlices:src/VSlices/Traits/Category/Category.Laws.cs",
+    "VSlices:src/VSlices/Traits/Category/Category.Module.cs",
+    "VSlices:src/VSlices/Traits/Category/Category.Trait.cs",
+    "VSlices:src/VSlices/Traits/FloatingPoint.cs",
+    "VSlices:src/VSlices/Traits/Kleisli/Kleisli.Module.cs",
+    "VSlices:src/VSlices/Traits/Kleisli/Kleisli.Trait.cs",
+    "VSlices:src/VSlices/obj/Debug/net10.0/VSlices.GlobalUsings.g.cs",
+    "VSlices:src/VSlices/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices:src/VSlices/obj/Debug/net10.0/VSlices.AssemblyInfo.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/EntityFrameworkPointIOTests.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/PostgreSqlFixture.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/TestDbContext.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/obj/Debug/net10.0/VSlices.Grounding.EntityFrameworkCore.Tests.GlobalUsings.g.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/obj/Debug/net10.0/SelfRegisteredExtensions.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultRunnerReporters.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultResultWriters.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/obj/Debug/net10.0/XunitAutoGeneratedEntryPoint.cs",
+    "VSlices.Grounding.EntityFrameworkCore.Tests:tests/VSlices.Grounding.EntityFrameworkCore.Tests/obj/Debug/net10.0/VSlices.Grounding.EntityFrameworkCore.Tests.AssemblyInfo.cs",
+    "VSlices.Grounding.Tests:tests/VSlices.Grounding.Tests/SystemTimeIOTests.cs",
+    "VSlices.Grounding.Tests:tests/VSlices.Grounding.Tests/obj/Debug/net10.0/VSlices.Grounding.Tests.GlobalUsings.g.cs",
+    "VSlices.Grounding.Tests:tests/VSlices.Grounding.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Grounding.Tests:tests/VSlices.Grounding.Tests/obj/Debug/net10.0/SelfRegisteredExtensions.cs",
+    "VSlices.Grounding.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultRunnerReporters.cs",
+    "VSlices.Grounding.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultResultWriters.cs",
+    "VSlices.Grounding.Tests:tests/VSlices.Grounding.Tests/obj/Debug/net10.0/XunitAutoGeneratedEntryPoint.cs",
+    "VSlices.Grounding.Tests:tests/VSlices.Grounding.Tests/obj/Debug/net10.0/VSlices.Grounding.Tests.AssemblyInfo.cs",
+    "VSlices.Spaces.Analyzers.Tests:tests/VSlices.Spaces.Analyzers.Tests/TransformAdapterAnalyzerTests.cs",
+    "VSlices.Spaces.Analyzers.Tests:tests/VSlices.Spaces.Analyzers.Tests/obj/Debug/net10.0/VSlices.Spaces.Analyzers.Tests.GlobalUsings.g.cs",
+    "VSlices.Spaces.Analyzers.Tests:tests/VSlices.Spaces.Analyzers.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Spaces.Analyzers.Tests:tests/VSlices.Spaces.Analyzers.Tests/obj/Debug/net10.0/SelfRegisteredExtensions.cs",
+    "VSlices.Spaces.Analyzers.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultRunnerReporters.cs",
+    "VSlices.Spaces.Analyzers.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultResultWriters.cs",
+    "VSlices.Spaces.Analyzers.Tests:tests/VSlices.Spaces.Analyzers.Tests/obj/Debug/net10.0/XunitAutoGeneratedEntryPoint.cs",
+    "VSlices.Spaces.Analyzers.Tests:tests/VSlices.Spaces.Analyzers.Tests/obj/Debug/net10.0/VSlices.Spaces.Analyzers.Tests.AssemblyInfo.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/AlgebraicSymbolAreaVolumeProbeTests.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/CoordinateProductProbeTests.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/ProductShapeComparisonProbeTests.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/QuantityFamilyModelingTests.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/QuantityModelingTests.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/SelfMassModelingTests.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/SpaceModelingTests.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/StaticSelfMassModelingTests.cs",
+    "VSlices.Spaces.Modeling.Tests:../../../.nuget/packages/microsoft.net.test.sdk/17.14.1/build/net8.0/Microsoft.NET.Test.Sdk.Program.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/obj/Debug/net10.0/VSlices.Spaces.Modeling.Tests.GlobalUsings.g.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Spaces.Modeling.Tests:tests/VSlices.Spaces.Modeling.Tests/obj/Debug/net10.0/VSlices.Spaces.Modeling.Tests.AssemblyInfo.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/AccelerationTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/LengthDurationTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/MomentTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/MoneyTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/PowerTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/ProductTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/QuotientTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/TemperatureTests.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/vMassTests.cs",
+    "VSlices.Spaces.Tests:../../../.nuget/packages/microsoft.net.test.sdk/17.14.1/build/net8.0/Microsoft.NET.Test.Sdk.Program.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/obj/Debug/net10.0/VSlices.Spaces.Tests.GlobalUsings.g.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Spaces.Tests:tests/VSlices.Spaces.Tests/obj/Debug/net10.0/VSlices.Spaces.Tests.AssemblyInfo.cs",
+    "VSlices.TransformAdapter.AotProbe:tests/VSlices.TransformAdapter.AotProbe/Program.cs",
+    "VSlices.TransformAdapter.AotProbe:tests/VSlices.TransformAdapter.AotProbe/obj/Debug/net10.0/VSlices.TransformAdapter.AotProbe.GlobalUsings.g.cs",
+    "VSlices.TransformAdapter.AotProbe:tests/VSlices.TransformAdapter.AotProbe/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.TransformAdapter.AotProbe:tests/VSlices.TransformAdapter.AotProbe/obj/Debug/net10.0/VSlices.TransformAdapter.AotProbe.AssemblyInfo.cs",
+    "VSlices.Views.Abstract.Tests:tests/VSlices.Views.Abstract.Tests/TransformAdapterUiTests.cs",
+    "VSlices.Views.Abstract.Tests:tests/VSlices.Views.Abstract.Tests/obj/Debug/net10.0/VSlices.Views.Abstract.Tests.GlobalUsings.g.cs",
+    "VSlices.Views.Abstract.Tests:tests/VSlices.Views.Abstract.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Views.Abstract.Tests:tests/VSlices.Views.Abstract.Tests/obj/Debug/net10.0/SelfRegisteredExtensions.cs",
+    "VSlices.Views.Abstract.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultRunnerReporters.cs",
+    "VSlices.Views.Abstract.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultResultWriters.cs",
+    "VSlices.Views.Abstract.Tests:tests/VSlices.Views.Abstract.Tests/obj/Debug/net10.0/XunitAutoGeneratedEntryPoint.cs",
+    "VSlices.Views.Abstract.Tests:tests/VSlices.Views.Abstract.Tests/obj/Debug/net10.0/VSlices.Views.Abstract.Tests.AssemblyInfo.cs",
+    "VSlices.Views.PackageConsumer.InvalidProbe:tests/VSlices.Views.PackageConsumer.InvalidProbe/BrokenEmailAddress.cs",
+    "VSlices.Views.PackageConsumer.InvalidProbe:tests/VSlices.Views.PackageConsumer.InvalidProbe/obj/Debug/net10.0/EmbeddedAttribute.cs",
+    "VSlices.Views.PackageConsumer.InvalidProbe:tests/VSlices.Views.PackageConsumer.InvalidProbe/obj/Debug/net10.0/ValidatableTypeAttribute.cs",
+    "VSlices.Views.PackageConsumer.InvalidProbe:tests/VSlices.Views.PackageConsumer.InvalidProbe/obj/Debug/net10.0/VSlices.Views.PackageConsumer.InvalidProbe.GlobalUsings.g.cs",
+    "VSlices.Views.PackageConsumer.InvalidProbe:tests/VSlices.Views.PackageConsumer.InvalidProbe/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Views.PackageConsumer.InvalidProbe:tests/VSlices.Views.PackageConsumer.InvalidProbe/obj/Debug/net10.0/VSlices.Views.PackageConsumer.InvalidProbe.AssemblyInfo.cs",
+    "VSlices.Views.Razor.AdapterProbe:tests/VSlices.Views.Razor.AdapterProbe/EmailAddress.cs",
+    "VSlices.Views.Razor.AdapterProbe:tests/VSlices.Views.Razor.AdapterProbe/obj/Debug/net10.0/EmbeddedAttribute.cs",
+    "VSlices.Views.Razor.AdapterProbe:tests/VSlices.Views.Razor.AdapterProbe/obj/Debug/net10.0/ValidatableTypeAttribute.cs",
+    "VSlices.Views.Razor.AdapterProbe:tests/VSlices.Views.Razor.AdapterProbe/obj/Debug/net10.0/VSlices.Views.Razor.AdapterProbe.GlobalUsings.g.cs",
+    "VSlices.Views.Razor.AdapterProbe:tests/VSlices.Views.Razor.AdapterProbe/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Views.Razor.AdapterProbe:tests/VSlices.Views.Razor.AdapterProbe/obj/Debug/net10.0/VSlices.Views.Razor.AdapterProbe.AssemblyInfo.cs",
+    "VSlices.Views.Razor.InvalidAdapterProbe:tests/VSlices.Views.Razor.InvalidAdapterProbe/BrokenEmailAddress.cs",
+    "VSlices.Views.Razor.InvalidAdapterProbe:tests/VSlices.Views.Razor.InvalidAdapterProbe/obj/Debug/net10.0/EmbeddedAttribute.cs",
+    "VSlices.Views.Razor.InvalidAdapterProbe:tests/VSlices.Views.Razor.InvalidAdapterProbe/obj/Debug/net10.0/ValidatableTypeAttribute.cs",
+    "VSlices.Views.Razor.InvalidAdapterProbe:tests/VSlices.Views.Razor.InvalidAdapterProbe/obj/Debug/net10.0/VSlices.Views.Razor.InvalidAdapterProbe.GlobalUsings.g.cs",
+    "VSlices.Views.Razor.InvalidAdapterProbe:tests/VSlices.Views.Razor.InvalidAdapterProbe/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Views.Razor.InvalidAdapterProbe:tests/VSlices.Views.Razor.InvalidAdapterProbe/obj/Debug/net10.0/VSlices.Views.Razor.InvalidAdapterProbe.AssemblyInfo.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/AlgebraMixArityTests.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/FlowDependencyCompositionTests.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/FlowTransformTests.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/PointAlgebraTests.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/TemporalAlgebraTests.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/obj/Debug/net10.0/VSlices.Work.Algebra.Tests.GlobalUsings.g.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/obj/Debug/net10.0/.NETCoreApp,Version=v10.0.AssemblyAttributes.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/obj/Debug/net10.0/SelfRegisteredExtensions.cs",
+    "VSlices.Work.Algebra.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultRunnerReporters.cs",
+    "VSlices.Work.Algebra.Tests:../../../.nuget/packages/xunit.v3.core.mtp-v2/4.0.1/_content/DefaultResultWriters.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/obj/Debug/net10.0/XunitAutoGeneratedEntryPoint.cs",
+    "VSlices.Work.Algebra.Tests:tests/VSlices.Work.Algebra.Tests/obj/Debug/net10.0/VSlices.Work.Algebra.Tests.AssemblyInfo.cs"
+  ]
+}

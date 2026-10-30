@@ -1,0 +1,21 @@
+{
+  "root_commit": "PINNED_BY_GITHUB_ACTION_CHECKOUT",
+  "source_files": 212,
+  "location_rows": 1645,
+  "files_with_candidates": 110,
+  "explicit_files": 60,
+  "counts": {
+    "explicit_namespace": 98,
+    "candidate_type": 944,
+    "candidate_extension": 356,
+    "candidate_prelude": 228,
+    "package": 1,
+    "implicit_import": 18
+  },
+  "local_declarations_colliding_with_candidates": [
+    "ArrowApply",
+    "Kleisli",
+    "State",
+    "Unit"
+  ]
+}

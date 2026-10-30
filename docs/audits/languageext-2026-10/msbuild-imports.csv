@@ -1,0 +1,29 @@
+project,line,namespace,attributes
+src/VSlices/VSlices.csproj,14,LanguageExt,/
+src/VSlices/VSlices.csproj,15,LanguageExt.Common,/
+src/VSlices/VSlices.csproj,16,LanguageExt.Traits,/
+src/VSlices/VSlices.csproj,17,LanguageExt.Effects,/
+src/VSlices/VSlices.csproj,18,LanguageExt.Pretty,/
+src/VSlices/VSlices.csproj,19,LanguageExt.Traits.Domain,/
+src/VSlices/VSlices.csproj,21,LanguageExt.Prelude,"Static=""true"" /"
+src/VSlices/VSlices.csproj,23,VSlices,/
+src/VSlices/VSlices.csproj,24,VSlices.Monads,/
+src/VSlices/VSlices.csproj,25,VSlices.VSlicesPrelude,"Static=""true"" /"
+src/VSlices.Spaces/VSlices.Spaces.csproj,18,LanguageExt.Common,/
+src/VSlices.Spaces/VSlices.Spaces.csproj,19,LanguageExt.Traits,/
+src/VSlices.Spaces/VSlices.Spaces.csproj,20,LanguageExt.Effects,/
+src/VSlices.Spaces/VSlices.Spaces.csproj,22,LanguageExt.Prelude,"Static=""true"" /"
+src/VSlices.Spaces/VSlices.Spaces.csproj,24,VSlices.Monads,/
+src/VSlices.Spaces/VSlices.Spaces.csproj,26,VSlices.VSlicesPrelude,"Static=""true"" /"
+src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj,22,LanguageExt,/
+src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj,23,LanguageExt.Prelude,"Static=""true"" /"
+src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj,24,VSlices,/
+src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj,25,VSlices.Monads,/
+src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj,26,VSlices.Spaces.Traits,/
+src/VSlices.Work/VSlices.Work.csproj,8,LanguageExt,/
+src/VSlices.Work/VSlices.Work.csproj,9,LanguageExt.Common,/
+src/VSlices.Work/VSlices.Work.csproj,10,LanguageExt.Traits,/
+src/VSlices.Work/VSlices.Work.csproj,11,LanguageExt.Effects,/
+src/VSlices.Work/VSlices.Work.csproj,12,LanguageExt.Prelude,"Static=""true"" /"
+tests/VSlices.Spaces.Modeling.Tests/VSlices.Spaces.Modeling.Tests.csproj,22,Xunit,/
+tests/VSlices.Spaces.Tests/VSlices.Spaces.Tests.csproj,22,Xunit,/

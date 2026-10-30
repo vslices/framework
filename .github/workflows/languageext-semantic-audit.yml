@@ -1,0 +1,59 @@
+name: LanguageExt semantic audit
+on:
+  push:
+    branches: [docs/audit-languageext-usage-2026-10]
+    paths:
+      - 'tools/languageext-audit/semantic/**'
+      - '.github/workflows/languageext-semantic-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  semantic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: true
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore workspace
+        run: dotnet restore VSlices.slnx
+      - name: Restore AOT probe outside the solution
+        run: dotnet restore tests/VSlices.TransformAdapter.AotProbe/VSlices.TransformAdapter.AotProbe.csproj
+      - name: Run Roslyn audit
+        shell: bash
+        run: |
+          set +e
+          dotnet run --project tools/languageext-audit/semantic/LanguageExt.SemanticAudit.csproj -- --root . --out docs/audits/languageext-2026-10/semantic
+          status=$?
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('docs/audits/languageext-2026-10/semantic/summary.json')
+          if p.exists():
+              s = json.loads(p.read_text())
+              print('AUDIT: ' + json.dumps({k:s.get(k) for k in ('scannedProjectFiles','loadedProjects','analyzedDocuments','attributedReferences','assemblies')},indent=2))
+              print('COMPILATION ERRORS: ' + json.dumps(s.get('compilationErrors',[]),indent=2))
+              print('PROJECT FAILURES: ' + json.dumps(s.get('projectFailures',[]),indent=2))
+          PY
+          exit "$status"
+      - name: Persist semantic evidence
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/audits/languageext-2026-10/semantic/ || true
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: record compiler-bound LanguageExt references"
+            git pull --rebase origin docs/audit-languageext-usage-2026-10
+            git push
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: languageext-semantic-audit
+          path: docs/audits/languageext-2026-10/semantic/
