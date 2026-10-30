@@ -82,7 +82,7 @@ public sealed record EmailAddress :
 {
     public readonly record struct Input(string Value);
 
-    public static Req<Input, EmailAddress>.Full Transformation => ...;
+    public static Fin<EmailAddress> Transform(Input input) => ...;
 }
 ```
 
