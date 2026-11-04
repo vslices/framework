@@ -1,9 +1,6 @@
 name: Flow Algebra Runtime Experiment CI
 
 on:
-  pull_request:
-    branches:
-      - fix/restore-feature-flow-boundary
   workflow_dispatch:
 
 permissions:

@@ -1,14 +1,6 @@
 name: Simple Workflow CRUD
 
 on:
-  push:
-    branches:
-      - master
-      - experiment/simple-workflow-point-crud
-      - experiment/cross-service-workprocess
-  pull_request:
-    branches:
-      - master
   workflow_dispatch:
 
 permissions:
