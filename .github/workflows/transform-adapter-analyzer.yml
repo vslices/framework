@@ -1,6 +1,9 @@
 name: TransformAdapter Analyzer Experiment CI
 
 on:
+  pull_request:
+    branches:
+      - experiment/flow-algebra-runtime
   workflow_dispatch:
 
 permissions:
