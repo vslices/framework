@@ -1,4 +1,4 @@
-using LanguageExt;
+using ForkExt;
 using System.Runtime.CompilerServices;
 using VSlices.Spaces.Traits;
 
@@ -18,9 +18,9 @@ public sealed record LocationName :
 
     public static Fin<LocationName> Transform(string value) =>
         string.IsNullOrWhiteSpace(value)
-            ? LanguageExt.Common.Error.New("A location name cannot be empty.")
+            ? ForkExt.Common.Error.New("A location name cannot be empty.")
             : value.Trim().Length > 100
-                ? LanguageExt.Common.Error.New("A location name cannot exceed 100 characters.")
+                ? ForkExt.Common.Error.New("A location name cannot exceed 100 characters.")
                 : new LocationName(value.Trim());
 
     public override string ToString() =>

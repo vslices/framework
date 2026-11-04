@@ -1,0 +1,34 @@
+using System.Diagnostics.Contracts;
+using static ForkExt.Prelude;
+
+namespace ForkExt.ClassInstances;
+
+/// <summary>
+/// Array hash
+/// </summary>
+public struct HashableArray<HashA, A> : Hashable<A[]> where HashA : Hashable<A>
+{
+    /// <summary>
+    /// Get hash code of the value
+    /// </summary>
+    /// <param name="x">Value to get the hash code of</param>
+    /// <returns>The hash code of x</returns>
+    [Pure]
+    public static int GetHashCode(A[] x) =>
+        hash<HashA, A>(x);
+}
+
+/// <summary>
+/// Array hash
+/// </summary>
+public struct HashableArray<A> : Hashable<A[]>
+{
+    /// <summary>
+    /// Get hash code of the value
+    /// </summary>
+    /// <param name="x">Value to get the hash code of</param>
+    /// <returns>The hash code of x</returns>
+    [Pure]
+    public static int GetHashCode(A[] x) =>
+        HashableArray<HashableDefault<A>, A>.GetHashCode(x);
+}

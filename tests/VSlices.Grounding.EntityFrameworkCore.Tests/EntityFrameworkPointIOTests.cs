@@ -1,4 +1,4 @@
-using LanguageExt;
+using ForkExt;
 using VSlices.Monads;
 using VSlices.Work;
 using Xunit;

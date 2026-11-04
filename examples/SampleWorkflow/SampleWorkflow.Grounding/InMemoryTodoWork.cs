@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
-using LanguageExt;
+using ForkExt;
 using SampleWorkflow.Spaces;
 using SampleWorkflow.Work;
 using VSlices.Work;
-using static LanguageExt.Prelude;
+using static ForkExt.Prelude;
 
 namespace SampleWorkflow.Grounding;
 

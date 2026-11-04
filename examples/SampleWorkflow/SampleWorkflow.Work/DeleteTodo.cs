@@ -1,8 +1,8 @@
-using LanguageExt;
+using ForkExt;
 using SampleWorkflow.Spaces;
 using VSlices.Monads;
 using VSlices.Work;
-using static LanguageExt.Prelude;
+using static ForkExt.Prelude;
 
 namespace SampleWorkflow.Work;
 

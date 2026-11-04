@@ -1,3 +1,7 @@
 [submodule "language-ext"]
 	path = language-ext
 	url = https://github.com/HernanFAR/language-ext.git
+
+[submodule "functional-ef-core"]
+	path = functional-ef-core
+	url = https://github.com/vslices/functional-ef-core.git

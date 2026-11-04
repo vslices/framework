@@ -1,5 +1,5 @@
 using System.Numerics;
-using LanguageExt;
+using ForkExt;
 
 namespace VSlices.Spaces.Finance;
 
