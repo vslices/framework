@@ -1,0 +1,48 @@
+name: Verify VSlices NuGet preview bundle
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'scripts/verify-nuget-packages.py'
+      - '.github/workflows/nuget-preview-bundle.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pack-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Pack all ten public libraries (no push)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          for project in \
+            VSlices \
+            VSlices.Spaces \
+            VSlices.Spaces.Services \
+            VSlices.Spaces.Products \
+            VSlices.Work \
+            VSlices.Work.Services \
+            VSlices.Work.Products \
+            VSlices.Grounding \
+            VSlices.Grounding.EntityFrameworkCore \
+            VSlices.Views.Abstract
+          do
+            dotnet pack "src/${project}/${project}.csproj" -c Release -o artifacts/nuget
+          done
+      - name: Verify package IDs, dependencies, and excluded analyzers
+        run: python3 scripts/verify-nuget-packages.py artifacts/nuget
+      - name: Upload package bundle for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: vslices-nuget-preview-0.1.0-preview.1
+          path: artifacts/nuget/*.nupkg
+          if-no-files-found: error

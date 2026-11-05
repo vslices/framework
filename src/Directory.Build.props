@@ -1,42 +1,35 @@
-  <Project>
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Authors>Enryu20</Authors>
-		<Product>VSlices</Product>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Copyright>Hernán Fernando Álvarez Rubio</Copyright>
-		<PackageProjectUrl>https://vslice-framework.readthedocs.io/es/latest/</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/HernanFAR/vslices-framework</RepositoryUrl>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<PackageIcon>icon lq.png</PackageIcon>
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
 
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+    <!-- One coordinated prerelease for every packable project in src/. -->
+    <Version>0.1.0-preview.1</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Authors>Enryu20</Authors>
+    <Product>VSlices</Product>
+    <Description>Modular functional and domain-oriented building blocks for .NET.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/vslices/framework</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vslices/framework</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<None Include="..\..\LICENSE">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-		<None Include="..\..\README.md">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-		<None Include="..\..\icons\icon lq.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
+  <ItemGroup Condition="'$(IsPackable)' != 'false'">
+    <None Include="../README.nuget.md" Pack="true" PackagePath="README.md" />
+    <None Include="../../icons/icon lq.png" Pack="true" PackagePath="icon.png" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-			<_Parameter1>$(MsBuildProjectName).UnitTests</_Parameter1>
-		</AssemblyAttribute>
-		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-			<_Parameter1>$(MsBuildProjectName).IntegTests</_Parameter1>
-		</AssemblyAttribute>
-	</ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(MSBuildProjectName).UnitTests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>$(MSBuildProjectName).IntegTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
