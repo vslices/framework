@@ -1,0 +1,85 @@
+name: Publish VSlices NuGet
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vslices-nuget-publish
+  cancel-in-progress: false
+
+jobs:
+  build-test-pack:
+    if: github.event.release.tag_name == '0.1.0-preview.1' || github.event.release.tag_name == 'v0.1.0-preview.1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require release commit to be on master
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin master
+          git merge-base --is-ancestor HEAD origin/master
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore solution
+        run: dotnet restore VSlices.slnx
+      - name: Build solution
+        run: dotnet build VSlices.slnx -c Release --no-restore
+      - name: Test solution
+        run: dotnet test VSlices.slnx -c Release --no-build
+      - name: Pack all ten libraries
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          for project in VSlices VSlices.Spaces VSlices.Spaces.Services VSlices.Spaces.Products VSlices.Work VSlices.Work.Services VSlices.Work.Products VSlices.Grounding VSlices.Grounding.EntityFrameworkCore VSlices.Views.Abstract; do
+            dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore --no-build -p:Version=0.1.0-preview.1 -o artifacts/nuget
+          done
+      - name: Verify package manifests and analyzer exclusion
+        run: python3 scripts/verify-nuget-packages.py artifacts/nuget
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vslices-nuget-0.1.0-preview.1
+          path: artifacts/nuget/*.nupkg
+          if-no-files-found: error
+
+  publish:
+    needs: build-test-pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: nuget-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: vslices-nuget-0.1.0-preview.1
+          path: artifacts/nuget
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Acquire NuGet.org key using GitHub OIDC
+        uses: NuGet/login@v1
+        id: nuget
+        with:
+          user: ${{ vars.NUGET_USERNAME }}
+      - name: Publish packages
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$NUGET_API_KEY"
+          for package in artifacts/nuget/*.nupkg; do
+            dotnet nuget push "$package" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done
