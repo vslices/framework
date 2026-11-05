@@ -1,8 +1,9 @@
 name: Publish VSlices NuGet
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - recovery/publish-v0.1.0-preview.1
 
 permissions:
   contents: read
@@ -13,12 +14,13 @@ concurrency:
 
 jobs:
   build-test-pack:
-    if: github.event.release.tag_name == '0.1.0-preview.1' || github.event.release.tag_name == 'v0.1.0-preview.1'
+    if: github.ref == 'refs/heads/recovery/publish-v0.1.0-preview.1'
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: v0.1.0-preview.1
           fetch-depth: 0
           persist-credentials: false
       - name: Require release commit to be on master
@@ -30,12 +32,35 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+      - name: Verify exact release source
+        run: |
+          test "$(git rev-parse HEAD)" = "d76be8c5cd94b3b2bc64a45bf67668bd5684a32d"
+          grep -q '<Version>0.1.0-preview.1</Version>' src/Directory.Build.props
       - name: Restore solution
         run: dotnet restore VSlices.slnx
       - name: Build solution
         run: dotnet build VSlices.slnx -c Release --no-restore
-      - name: Test solution
-        run: dotnet test VSlices.slnx -c Release --no-build
+      - name: Test solution (VSTest and xUnit v3)
+        shell: bash
+        run: |
+          set -euo pipefail
+          for project in \
+            tests/VSlices.Spaces.Tests/VSlices.Spaces.Tests.csproj \
+            tests/VSlices.Spaces.Modeling.Tests/VSlices.Spaces.Modeling.Tests.csproj
+          do
+            dotnet test "$project" -c Release --no-build --no-restore
+          done
+          for project in \
+            examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj \
+            examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj \
+            tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj \
+            tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj \
+            tests/VSlices.Spaces.Analyzers.Tests/VSlices.Spaces.Analyzers.Tests.csproj \
+            tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj \
+            tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj
+          do
+            dotnet run --project "$project" -c Release --no-build --no-restore
+          done
       - name: Pack all ten libraries
         shell: bash
         run: |
