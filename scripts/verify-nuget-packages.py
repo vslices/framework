@@ -46,7 +46,7 @@ for path in files:
             fail(f"Unexpected or duplicate package ID: {package_id}")
         if version != VERSION:
             fail(f"{package_id}: unexpected version {version}")
-        if authors != "Enryu20;Limen":
+        if [author.strip() for author in (authors or "").replace(";", ",").split(",")] != ["Enryu20", "Limen"]:
             fail(f"{package_id}: unexpected authors metadata {authors!r}")
         if "README.md" not in names or "icon.png" not in names:
             fail(f"{package_id}: missing package README or icon")
