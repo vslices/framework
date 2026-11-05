@@ -1,30 +1,29 @@
-# VSlices Trusted Publishing (GitHub Actions → NuGet.org)
+# Trusted Publishing for VSlices releases
 
-VSlices publishes the **ten** .NET 10 libraries as version `0.1.0-preview.1`. The experimental analyzer is not distributed. Publishing uses **NuGet/login@v1** and an ephemeral GitHub Actions OIDC credential instead of a stored `NUGET_API_KEY`.
+Restored the historical GitHub Release workflow from vslices/framework@cf3aba0
+(.github/workflows/master-deploy.yml). Its sequence remains restore, build,
+test, pack, push; NuGet/login@v1 uses short-lived GitHub OIDC rather than
+the previous long-lived NUGET_AUTH_TOKEN secret.
 
-## Required policy on NuGet.org (manual account action)
+## Configure NuGet.org trusted publisher
 
-Sign in to the **NuGet.org account or organization that will own the ten IDs**. From the account menu select **Trusted Publishing** and add a GitHub Actions policy with exactly:
+- GitHub owner: vslices
+- GitHub repository: framework
+- Workflow filename: master-deploy.yml
+- GitHub environment: nuget-release
 
-| Field | Value |
-| --- | --- |
-| Repository owner | `vslices` |
-| Repository | `framework` |
-| Workflow file | `publish-nuget.yml` (filename only) |
-| Environment | `nuget-release` |
+Create the policy from the NuGet.org owner account. Confirm the owner controls
+all ten package IDs (in particular VSlices). OIDC cannot claim third-party IDs.
+Set repository Actions variable NUGET_USERNAME to that NuGet.org username.
+Configure a GitHub environment named nuget-release, ideally with reviewers.
 
-Choose the correct **policy owner** and scopes for all ten VSlices packages (or scope to `VSlices*` when that policy scope is supported and appropriate). An existing package ID owned by a different NuGet account **cannot** be claimed merely by OIDC. The root package ID remains **VSlices**, not `VSlices.Core`; verify ownership/availability with NuGet.org before running the publish workflow.
+## Release behavior
 
-In GitHub **Settings → Environments**, configure `nuget-release`. A reviewer approval gate is recommended if your GitHub plan/repository supports it. The policy must use exactly the same environment name; no API key secret is required.
-
-## Publish
-
-1. Review and merge the packaging configuration to `master`.
-2. Confirm NuGet.org policy ownership and all ten IDs.
-3. Open **Actions → Publish VSlices NuGet (Trusted Publishing) → Run workflow**, choose `master`.
-4. Enter your **NuGet.org username** (not email) and the confirmation `PUBLISH_VSLICES_0_1_0_PREVIEW_1`.
-5. The `pack` job produces and verifies the bundle; `publish` requires the `nuget-release` environment, exchanges GitHub OIDC for a short-lived NuGet key and uploads the ten packages.
-
-The workflow does **not** run on push or pull requests. NuGet packages are immutable by `ID + version`; partial publishes can require recovery. Do **not** re-use the same version to change package contents. After a partial failure, examine NuGet.org state and rerun only when the missing package IDs can be published safely.
-
-To prepare the bundle without publication, run **Verify VSlices NuGet preview bundle**. Do not store legacy long-lived NuGet keys in GitHub or the repository; rotate/revoke a previous compromised key via the NuGet.org API Keys page.
+Publish a GitHub Release tagged 0.1.0-preview.1 (or v0.1.0-preview.1)
+on a commit reachable from master. Build and verification run first;
+the publish job authenticates with OIDC and uploads all ten packages.
+Only those two tags are accepted by this initial-preview workflow.
+Packages are immutable per ID/version. --skip-duplicate does not replace
+existing packages; verify IDs and ownership before first release.
+nuget-preview-bundle.yml remains available for checks without publication.
+The experimental analyzer is deliberately not distributed.
