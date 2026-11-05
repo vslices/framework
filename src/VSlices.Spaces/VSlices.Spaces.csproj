@@ -8,13 +8,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\VSlices.Spaces.Analyzers\bin\$(Configuration)\netstandard2.0\VSlices.Spaces.Analyzers.dll"
-		      Pack="true"
-		      PackagePath="analyzers/dotnet/cs"
-		      Visible="false" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Using Include="LanguageExt.Common" />
 		<Using Include="LanguageExt.Traits" />
 		<Using Include="LanguageExt.Effects" />
