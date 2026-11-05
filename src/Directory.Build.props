@@ -7,7 +7,7 @@
     <!-- One coordinated prerelease for every packable project in src/. -->
     <Version>0.1.0-preview.1</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Authors>Enryu20</Authors>
+    <Authors>Enryu20;Limen</Authors>
     <Product>VSlices</Product>
     <Description>Modular functional and domain-oriented building blocks for .NET.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
