@@ -1,0 +1,33 @@
+name: LanguageExt usage audit
+on:
+  push:
+    branches: [docs/audit-languageext-usage-2026-10]
+    paths: ['tools/languageext-audit/**', '.github/workflows/languageext-usage-audit.yml']
+permissions:
+  contents: write
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate line-level report
+        run: python tools/languageext-audit/inventory.py
+      - name: Commit report into audit branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/audits/languageext-2026-10/
+          if ! git diff --cached --quiet; then
+            git commit -m "docs: generate LanguageExt inventory from audit script"
+            git push
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: languageext-usage-inventory
+          path: docs/audits/languageext-2026-10/
