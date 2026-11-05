@@ -5,7 +5,7 @@ import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-VERSION = "0.1.0-preview.1"
+VERSION = "0.1.0-preview.2"
 PACKAGES = {
     "VSlices",
     "VSlices.Spaces",
@@ -41,10 +41,13 @@ for path in files:
             return entry.text if entry is not None else None
         package_id = val("id")
         version = val("version")
+        authors = val("authors")
         if package_id not in PACKAGES or package_id in seen:
             fail(f"Unexpected or duplicate package ID: {package_id}")
         if version != VERSION:
             fail(f"{package_id}: unexpected version {version}")
+        if [author.strip() for author in (authors or "").replace(";", ",").split(",")] != ["Enryu20", "Limen"]:
+            fail(f"{package_id}: unexpected authors metadata {authors!r}")
         if "README.md" not in names or "icon.png" not in names:
             fail(f"{package_id}: missing package README or icon")
         if any(x.startswith("analyzers/") for x in names):

@@ -43,6 +43,6 @@ jobs:
       - name: Upload package bundle for review
         uses: actions/upload-artifact@v4
         with:
-          name: vslices-nuget-preview-0.1.0-preview.1
+          name: vslices-nuget-preview-0.1.0-preview.2
           path: artifacts/nuget/*.nupkg
           if-no-files-found: error
