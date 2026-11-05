@@ -1,0 +1,96 @@
+name: Publish VSlices NuGet (Trusted Publishing)
+
+on:
+  workflow_dispatch:
+    inputs:
+      nuget_username:
+        description: 'NuGet.org username that owns the VSlices package IDs (not email)'
+        required: true
+        type: string
+      confirmation:
+        description: 'Type PUBLISH_VSLICES_0_1_0_PREVIEW_1 to publish ten immutable packages'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vslices-nuget-preview-release
+  cancel-in-progress: false
+
+jobs:
+  pack:
+    if: github.ref == 'refs/heads/master' && inputs.confirmation == 'PUBLISH_VSLICES_0_1_0_PREVIEW_1'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Pack ten prerelease libraries (no push)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/nuget
+          for project in \
+            VSlices \
+            VSlices.Spaces \
+            VSlices.Spaces.Services \
+            VSlices.Spaces.Products \
+            VSlices.Work \
+            VSlices.Work.Services \
+            VSlices.Work.Products \
+            VSlices.Grounding \
+            VSlices.Grounding.EntityFrameworkCore \
+            VSlices.Views.Abstract
+          do
+            dotnet pack "src/${project}/${project}.csproj" -c Release -o artifacts/nuget
+          done
+      - name: Verify package contents, IDs, and excluded analyzers
+        run: python3 scripts/verify-nuget-packages.py artifacts/nuget
+      - name: Save verified package bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: vslices-nuget-0.1.0-preview.1
+          path: artifacts/nuget/*.nupkg
+          if-no-files-found: error
+
+  publish:
+    needs: pack
+    runs-on: ubuntu-latest
+    environment: nuget-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download exactly the verified package bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: vslices-nuget-0.1.0-preview.1
+          path: artifacts/nuget
+      - name: Prepare .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Exchange GitHub OIDC token for short-lived NuGet.org API key
+        id: nuget
+        uses: NuGet/login@v1
+        with:
+          user: ${{ inputs.nuget_username }}
+      - name: Push verified packages
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$NUGET_API_KEY"
+          for package in artifacts/nuget/*.nupkg; do
+            dotnet nuget push "$package" \
+              --source https://api.nuget.org/v3/index.json \
+              --api-key "$NUGET_API_KEY"
+          done
