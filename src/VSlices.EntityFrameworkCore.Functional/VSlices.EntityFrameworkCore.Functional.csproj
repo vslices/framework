@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>VSlices.EntityFrameworkCore.Functional</PackageId>
+    <Authors>Hernán Alvarez; VSlices Development</Authors>
+    <Company>VSlices</Company>
+    <Description>Functional, effectful Entity Framework Core extensions built on LanguageExt.</Description>
+    <PackageTags>entity-framework-core;efcore;functional;language-ext;effects;vslices</PackageTags>
+    <PackageProjectUrl>https://github.com/vslices/framework</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vslices/framework</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LanguageExt.Core" Version="5.0.0-beta-77" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.11" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="LanguageExt" />
+    <Using Include="LanguageExt.Prelude" Static="true" />
+  </ItemGroup>
+</Project>
