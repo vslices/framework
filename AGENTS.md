@@ -329,8 +329,6 @@ For the current miniature, the branch should remain green for:
 
 ```text
 VSlices.Work build
-VSlices.Work.Services build
-VSlices.Work.Products build
 Work algebra tests
 SampleWorkflow API build
 composed Feature hoist/composition tests

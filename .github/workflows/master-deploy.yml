@@ -79,14 +79,14 @@ jobs:
           do
             dotnet run --project "$project" -c Release --no-build --no-restore
           done
-      - name: Pack all ten libraries
+      - name: Pack all six libraries
         env:
           VERSION: ${{ needs.validate-tag.outputs.version }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts/nuget
-          for project in VSlices VSlices.Spaces VSlices.Spaces.Services VSlices.Spaces.Products VSlices.Work VSlices.Work.Services VSlices.Work.Products VSlices.Grounding VSlices.Grounding.EntityFrameworkCore VSlices.Views.Abstract; do
+          for project in VSlices VSlices.Spaces VSlices.Work VSlices.Grounding VSlices.Grounding.EntityFrameworkCore VSlices.Views.Abstract; do
             dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore --no-build -p:Version="$VERSION" -o artifacts/nuget
           done
       - name: Verify package manifests and analyzer exclusion

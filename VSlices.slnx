@@ -31,13 +31,9 @@
     <File Path="src/Directory.Build.props" />
     <Project Path="src/VSlices.Grounding.EntityFrameworkCore/VSlices.Grounding.EntityFrameworkCore.csproj" />
     <Project Path="src/VSlices.Grounding/VSlices.Grounding.csproj" />
-    <Project Path="src/VSlices.Spaces.Products/VSlices.Spaces.Products.csproj" />
-    <Project Path="src/VSlices.Spaces.Services/VSlices.Spaces.Services.csproj" />
     <Project Path="src/VSlices.Spaces/VSlices.Spaces.csproj" />
     <Project Path="src/VSlices.Spaces.Analyzers/VSlices.Spaces.Analyzers.csproj" />
     <Project Path="src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj" />
-    <Project Path="src/VSlices.Work.Products/VSlices.Work.Products.csproj" />
-    <Project Path="src/VSlices.Work.Services/VSlices.Work.Services.csproj" />
     <Project Path="src/VSlices.Work/VSlices.Work.csproj" />
     <Project Path="src/VSlices/VSlices.csproj" />
   </Folder>

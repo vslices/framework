@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Pack all ten public libraries (no push)
+      - name: Pack all six public libraries (no push)
         shell: bash
         run: |
           set -euo pipefail
@@ -27,11 +27,7 @@ jobs:
           for project in \
             VSlices \
             VSlices.Spaces \
-            VSlices.Spaces.Services \
-            VSlices.Spaces.Products \
             VSlices.Work \
-            VSlices.Work.Services \
-            VSlices.Work.Products \
             VSlices.Grounding \
             VSlices.Grounding.EntityFrameworkCore \
             VSlices.Views.Abstract
