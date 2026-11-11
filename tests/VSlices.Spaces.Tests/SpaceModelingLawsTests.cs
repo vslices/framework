@@ -10,6 +10,17 @@ namespace VSlices.Spaces.Tests.Fixtures.Definitions
         public UncheckedPoint() { }
     }
 
+    // The construction input is external rather than owned by its target.
+    public readonly record struct ExternalInput(string Name);
+
+    public sealed class ExternalInputPoint : Transformable<ExternalInput, ExternalInputPoint>
+    {
+        private ExternalInputPoint(string name) => Name = name;
+        public string Name { get; }
+        public static LanguageExt.Fin<ExternalInputPoint> Transform(ExternalInput input) =>
+            new ExternalInputPoint(input.Name);
+    }
+
     // Deliberately invalid fixture: State constructor is internal, not private.
     public sealed class LeakyPoint :
         Transformable<string, LeakyPoint>,
@@ -29,12 +40,13 @@ namespace VSlices.Spaces.Tests.Fixtures.Definitions
             new LeakyPoint(@new);
     }
 
-    public sealed class ValidPoint : Transformable<string, ValidPoint>
+    public sealed class ValidPoint : Transformable<ValidPoint.Input, ValidPoint>
     {
+        public readonly record struct Input(string Name);
         private ValidPoint(string name) => Name = name;
         public string Name { get; }
-        public static LanguageExt.Fin<ValidPoint> Transform(string name) =>
-            new ValidPoint(name);
+        public static LanguageExt.Fin<ValidPoint> Transform(Input input) =>
+            new ValidPoint(input.Name);
     }
 }
 
@@ -52,6 +64,8 @@ namespace VSlices.Spaces.Tests
             Assert.Contains(violations, v => v.RuleId == "SM001" && v.Definition.EndsWith("UncheckedPoint"));
             Assert.Contains(violations, v => v.RuleId == "SM002" && v.Definition.EndsWith("UncheckedPoint"));
             Assert.Contains(violations, v => v.RuleId == "SM004" && v.Definition.EndsWith("LeakyPoint"));
+            Assert.Contains(violations, v => v.RuleId == "SM006" && v.Definition.EndsWith("ExternalInputPoint"));
+            Assert.DoesNotContain(violations, v => v.RuleId == "SM006" && v.Definition.EndsWith("ValidPoint"));
             Assert.All(violations, v =>
             {
                 Assert.Contains("docs/spaces/modeling.md#sm00", v.GuidanceUrl);

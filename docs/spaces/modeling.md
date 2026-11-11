@@ -19,9 +19,7 @@ implement a target-owned `Transformable<FROM, SELF>` (or an explicit
 fallible construction rule. Otherwise consumers cannot tell where admissibility
 is decided.
 
-**Preferred realization:** Give the type `Input` where useful, implement
-`Transformable<Input, Self>`, and return `Fin<Self>` from `Transform`.
-Use specific input types rather than mandatory boilerplate when it adds no meaning.
+**Preferred realization:** Declare `SELF.Input` and implement `Transformable<SELF.Input, SELF>`. Input ownership is checked independently by SM006.
 
 **Alternative and limit:** Direct public constructors are common and valid
 for ordinary CLR data carriers, DTOs and infrastructure entities. They are not
@@ -93,6 +91,28 @@ Grounding record, but is not equivalent to this immutable semantic point.
 Reflection does not establish deep immutability, preservation of identity or
 whether `Evolve` validates the actual transition; test those behaviors
 separately with real domain examples.
+
+## SM006 — Input ownership
+
+**Error:** The definition does not declare a nested `Input`, or its
+`Transformable` uses a different source type instead of `SELF.Input`.
+
+**Why:** The information needed to establish a semantic Space belongs to the
+Space that interprets and validates it. A nested Input makes that ownership
+explicit and prevents unrelated or transport-level contracts from becoming
+the accidental authority for construction.
+
+**Preferred realization:** Declare `Input` as a nested subtype of the
+definition and implement `Transformable<SELF.Input, SELF>`. For example,
+`Item.Input` belongs inside `Item`. Input may be a record, record struct,
+or class, depending on its semantics.
+
+**Alternative and limit:** Accepting `string`, `Guid` or an external DTO
+directly can be convenient, but does not encode this ownership convention.
+The law is scoped to explicit consumer Definitions namespaces; it does not
+retroactively redefine all historic Framework examples or other transformation
+contexts. Reflection verifies the type relationship, not whether Input
+contains the correct evidence or Transform enforces all semantic invariants.
 
 ## What these Laws do not establish
 

@@ -52,6 +52,23 @@ public static class SpaceModelingLaws
             issues.Add(Violation(type, "SM001", "The definition does not own a Transformable rule.",
                 "sm001-semantic-construction"));
 
+
+        // A definition owns its own construction input contract.
+        var input = type.GetNestedType("Input", BindingFlags.Public | BindingFlags.NonPublic);
+        var usesOwnInput = input is not null && interfaces.Any(i =>
+            i.IsGenericType
+            && ((i.GetGenericTypeDefinition() == typeof(Transformable<,>)
+                    && i.GenericTypeArguments[0] == input
+                    && i.GenericTypeArguments[1] == type)
+                || (i.GetGenericTypeDefinition() == typeof(Transformable<,,>)
+                    && i.GenericTypeArguments[0] == type
+                    && i.GenericTypeArguments[1] == input
+                    && i.GenericTypeArguments[2] == type)));
+        if (!usesOwnInput)
+            issues.Add(Violation(type, "SM006",
+                "Define nested Input and use it as the source of Transformable<Input, SELF>.",
+                "sm006-input-ownership"));
+
         // A public constructor can bypass Transform and materialize an unchecked point.
         if (type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).Length != 0)
             issues.Add(Violation(type, "SM002", "A public instance constructor bypasses semantic construction.",
