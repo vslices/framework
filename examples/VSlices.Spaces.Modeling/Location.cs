@@ -67,6 +67,6 @@ public sealed class Location :
     public static Fin<Location> Transform(Input input) =>
         new Location(NewState(input.Name, input.X, input.Y));
 
-    public static Fin<Location> Evolve(State state) =>
-        new Location(state);
+    public static Fin<Location> Evolve(State old, State @new) =>
+        new Location(@new);
 }
