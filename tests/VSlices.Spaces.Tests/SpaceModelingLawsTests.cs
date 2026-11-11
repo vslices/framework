@@ -169,8 +169,6 @@ namespace VSlices.Spaces.Tests
         [InlineData(typeof(Fixtures.Definitions.LeakyStateConstructorPoint), "SM004", "sm004-state-constructor-encapsulation")]
         [InlineData(typeof(Fixtures.Definitions.SettableCurrentStatePoint), "SM005", "sm005-accepted-state-exposure")]
         [InlineData(typeof(Fixtures.Definitions.ExternalInputPoint), "SM006", "sm006-input-ownership")]
-        [InlineData(typeof(Fixtures.Definitions.NullableInputPoint), "SM007", "sm007-explicit-optionality")]
-        [InlineData(typeof(Fixtures.Definitions.NullableStatePoint), "SM007", "sm007-explicit-optionality")]
         public void Invalid_definition_explains_its_specific_law(
             Type definition, string ruleId, string documentAnchor)
         {
@@ -222,6 +220,11 @@ namespace VSlices.Spaces.Tests
 
             var state = SpaceModelingLaws.Inspect(typeof(Fixtures.Definitions.NullableStatePoint));
             Assert.Contains(state, v => v.RuleId == "SM007" && v.Error.Contains("State.Name"));
+            foreach (var violation in input.Concat(state).Where(v => v.RuleId == "SM007"))
+            {
+                Assert.Equal(SpaceModelingLaws.Guide + "#sm007-explicit-optionality", violation.GuidanceUrl);
+                Assert.Contains(violation.GuidanceUrl, violation.ToString());
+            }
         }
 
         [Fact]
