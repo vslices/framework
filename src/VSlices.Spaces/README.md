@@ -8,6 +8,8 @@ Its current working principle is:
 
 The abstractions in this project are pressure-tested from real cases. They should not gain operations merely because their CLR representation supports them.
 
+For the current .NET conventions for defining/evolving points, and structural integrity diagnostics with precise rationale, see [Space modeling Laws](../../docs/spaces/modeling.md). They are scoped conventions, not a complete definition of Space semantics.
+
 ## Core spaces
 
 - `DiscreteSpace<SELF>` expresses semantic equality without introducing ordering or algebra.
