@@ -26,8 +26,11 @@ public interface Evolvable<SELF, STATE>
     /// Proposes a transformation over the current state. Both the previous
     /// state and the candidate state are passed to the semantic transition rule.
     /// </summary>
-    Fin<SELF> Update(Func<STATE, STATE> update) =>
-        SELF.Evolve(CurrentState, update(CurrentState));
+    Fin<SELF> Update(Func<STATE, STATE> update)
+    {
+        var old = CurrentState;
+        return SELF.Evolve(old, update(old));
+    }
 }
 
 public static class Evolvable
