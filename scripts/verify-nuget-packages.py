@@ -5,7 +5,6 @@ import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-VERSION = "0.1.0-preview.1"
 PACKAGES = {
     "VSlices",
     "VSlices.Spaces",
@@ -23,7 +22,12 @@ NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
 def fail(message):
     raise SystemExit(message)
 
-folder = Path(sys.argv[1] if len(sys.argv) > 1 else "artifacts/nuget")
+if len(sys.argv) != 3:
+    fail("Usage: verify-nuget-packages.py <artifacts-folder> <expected-version>")
+folder = Path(sys.argv[1])
+VERSION = sys.argv[2]
+if not VERSION:
+    fail("Expected package version cannot be empty")
 files = sorted(folder.glob("*.nupkg"))
 if len(files) != len(PACKAGES):
     fail(f"Expected {len(PACKAGES)} packages; found {len(files)}: {[x.name for x in files]}")
