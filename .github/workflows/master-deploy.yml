@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build-test-pack:
-    if: github.event.release.tag_name == '0.1.0-preview.1' || github.event.release.tag_name == 'v0.1.0-preview.1'
+    if: github.event.release.tag_name == 'v0.2.0-preview.1' || github.event.release.tag_name == 'v0.2.0-preview.2'
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
