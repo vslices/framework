@@ -69,6 +69,10 @@ public static class SpaceModelingLaws
                 "Define nested Input and use it as the source of Transformable<Input, SELF>.",
                 "sm006-input-ownership"));
 
+        // Nullable members in owned Input and State contracts obscure required information.
+        if (input is not null)
+            InspectNullableMembers(type, input, "Input", issues);
+
         // A public constructor can bypass Transform and materialize an unchecked point.
         if (type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).Length != 0)
             issues.Add(Violation(type, "SM002", "A public instance constructor bypasses semantic construction.",
@@ -81,6 +85,8 @@ public static class SpaceModelingLaws
         if (evolvable is not null)
         {
             var stateType = evolvable.GenericTypeArguments[1];
+            if (stateType.IsNested && stateType.DeclaringType == type)
+                InspectNullableMembers(type, stateType, "State", issues);
             if (!stateType.IsNested || stateType.DeclaringType != type)
                 issues.Add(Violation(type, "SM003", "Evolvable State must be nested in its semantic owner.",
                     "sm003-evolution-state-ownership"));
@@ -98,6 +104,58 @@ public static class SpaceModelingLaws
 
         return issues;
     }
+
+
+    private static void InspectNullableMembers(
+        Type owner, Type contract, string contractName, List<SpaceLawViolation> issues)
+    {
+        var context = new NullabilityInfoContext();
+        const BindingFlags declared = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+        foreach (var property in contract.GetProperties(declared))
+        {
+            if (property.GetIndexParameters().Length != 0)
+                continue;
+
+            var info = context.Create(property);
+            if (IsNullable(property.PropertyType, info.ReadState)
+                || IsNullable(property.PropertyType, info.WriteState))
+                issues.Add(NullableViolation(owner, contractName, property.Name));
+        }
+
+        foreach (var field in contract.GetFields(declared))
+        {
+            var info = context.Create(field);
+            if (IsNullable(field.FieldType, info.ReadState)
+                || IsNullable(field.FieldType, info.WriteState))
+                issues.Add(NullableViolation(owner, contractName, field.Name));
+        }
+
+        // Check constructor parameters too: positional records and privately
+        // constructed State types can declare nullable input at this boundary.
+        // Duplicate findings from a generated property are intentionally avoided.
+        foreach (var ctor in contract.GetConstructors(
+                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+        foreach (var parameter in ctor.GetParameters())
+        {
+            var name = parameter.Name ?? "unnamed";
+            if (contract.GetProperty(name, BindingFlags.IgnoreCase | declared) is not null)
+                continue;
+
+            var info = context.Create(parameter);
+            if (IsNullable(parameter.ParameterType, info.ReadState))
+                issues.Add(NullableViolation(owner, contractName, name));
+        }
+    }
+
+    private static bool IsNullable(Type memberType, NullabilityState state) =>
+        Nullable.GetUnderlyingType(memberType) is not null ||
+        (!memberType.IsValueType && state == NullabilityState.Nullable);
+
+    private static SpaceLawViolation NullableViolation(Type owner, string contract, string member) =>
+        Violation(owner, "SM007",
+            $"{contract}.{member} is nullable; model absence with ForkExt Option<A>, not C# nullable types.",
+            "sm007-explicit-optionality");
 
     private static SpaceLawViolation Violation(Type type, string id, string message, string anchor) =>
         new(id, type.FullName ?? type.Name, message, Guide + "#" + anchor);

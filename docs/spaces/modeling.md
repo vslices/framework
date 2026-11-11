@@ -114,6 +114,32 @@ retroactively redefine all historic Framework examples or other transformation
 contexts. Reflection verifies the type relationship, not whether Input
 contains the correct evidence or Transform enforces all semantic invariants.
 
+## SM007 — Explicit optionality in owned Input and State
+
+**Error:** A member of a definition's nested `Input` or `State` uses
+C# nullable syntax (`string?`, `ItemId?`, `int?`, etc.). The Law inspects
+compiled public instance properties and fields, plus constructor parameters.
+
+**Why:** Semantic absence must be represented by an explicit algebraic type,
+not an implicit nullable escape hatch. If a value is required, its type should
+be non-nullable and construction should not invent an absent case just to
+reject it later at runtime. If absence is meaningful, it belongs in the model.
+
+**Preferred realization:** Use the required type directly (`ItemId`,
+`ItemName`) when the information must exist. When the concept is genuinely
+optional, use `Option<A>` from Language-Ext, exposed under `ForkExt`,
+rather than `A?`. Keep the handling of `None` explicit.
+
+**Alternative and limit:** Nullable C# types are useful in ordinary DTO,
+interop and infrastructure boundaries, but these scoped semantic contracts
+follow the explicit optionality convention. This reflection Law reads nullable
+metadata and catches `Nullable<T>` and annotated reference types; it does
+not establish that every non-nullable reference actually contains a value at
+runtime. Null-forgiving operators, oblivious annotations and generic nested
+nullability require source analysis and compile-time warnings-as-errors for
+stronger enforcement. This Law does not prohibit nullable types outside
+owned `Input` and `State` contracts.
+
 ## What these Laws do not establish
 
 - **File layout:** one definition per file and the `Definitions/` folder are
