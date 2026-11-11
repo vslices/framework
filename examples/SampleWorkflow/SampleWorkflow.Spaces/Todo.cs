@@ -1,4 +1,5 @@
 using LanguageExt;
+using LanguageExt.Common;
 using System.Runtime.CompilerServices;
 using VSlices.Spaces;
 using VSlices.Spaces.Traits;
@@ -63,6 +64,8 @@ public sealed class Todo :
     public IReadOnlyList<ResourceReference> Attachments =>
         CurrentState.Attachments;
 
+    // Keep State's constructor private to its definition. Todo is the
+    // semantic authority that can create a new accepted State.
     [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
     private static extern State NewState(
         TodoId id,
@@ -72,14 +75,16 @@ public sealed class Todo :
 
     public static Fin<Todo> Transform(Input input) =>
         new Todo(
-                NewState(
-                    input.Id,
-                    input.Detail,
-                    input.Completed,
-                    input.Attachments));
+            NewState(
+                input.Id,
+                input.Detail,
+                input.Completed,
+                input.Attachments));
 
-    public static Fin<Todo> Evolve(State state) =>
-        new Todo(state);
+    public static Fin<Todo> Evolve(State old, State @new) =>
+        !Equals(old.Id, @new.Id)
+            ? Fin.Fail<Todo>(Error.New("Todo identity cannot change during evolution."))
+            : Fin.Succ(new Todo(@new));
 
     public bool Equals(Todo? other) =>
         Id.Equals(other?.Id);
