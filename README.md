@@ -50,3 +50,8 @@ First of all, thanks so much :) you can support the development of the framework
 - To Alvaro Osorio, for beign a good influence in my early years in development.
 - To Antonio Riquelme, for help me in the documentation of the framework.
 
+
+
+## Functional EF Core extensions
+
+The `VSlices.EntityFrameworkCore.Functional` NuGet package is built and published from this repository alongside the other VSlices packages. Its implementation and PostgreSQL/Testcontainers tests originate from [vslices/functional-ef-core](https://github.com/vslices/functional-ef-core) (imported from `89d7d57b7c28de39960c633045e9465ba7d45eb7`). See [usage documentation](docs/functional-ef-core.md). This package adds effectful EF Core extensions and is distinct from the Point-oriented `VSlices.Grounding.EntityFrameworkCore` adapter.

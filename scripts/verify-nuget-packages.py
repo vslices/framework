@@ -9,6 +9,7 @@ PACKAGES = {
     "VSlices",
     "VSlices.Spaces",
     "VSlices.Work",
+    "VSlices.EntityFrameworkCore.Functional",
     "VSlices.Grounding",
     "VSlices.Grounding.EntityFrameworkCore",
     "VSlices.Views.Abstract",
@@ -55,4 +56,4 @@ for path in files:
         print(f"Verified {package_id} {version}")
 if seen != PACKAGES:
     fail(f"Missing package IDs: {PACKAGES - seen}")
-print("All six packages verified. This does NOT establish NuGet.org ID ownership or publish them.")
+print("All seven packages verified. This does NOT establish NuGet.org ID ownership or publish them.")

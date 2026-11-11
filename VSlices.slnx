@@ -29,6 +29,7 @@
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
+    <Project Path="src/VSlices.EntityFrameworkCore.Functional/VSlices.EntityFrameworkCore.Functional.csproj" />
     <Project Path="src/VSlices.Grounding.EntityFrameworkCore/VSlices.Grounding.EntityFrameworkCore.csproj" />
     <Project Path="src/VSlices.Grounding/VSlices.Grounding.csproj" />
     <Project Path="src/VSlices.Spaces/VSlices.Spaces.csproj" />
@@ -38,6 +39,7 @@
     <Project Path="src/VSlices/VSlices.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/VSlices.EntityFrameworkCore.Functional.Tests/VSlices.EntityFrameworkCore.Functional.Tests.csproj" />
     <Project Path="tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj" />
     <Project Path="tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj" />
     <Project Path="tests/VSlices.Spaces.Modeling.Tests/VSlices.Spaces.Modeling.Tests.csproj" />
