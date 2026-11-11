@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Spaces;
 using VSlices.Spaces.Laws;
@@ -93,6 +94,8 @@ namespace VSlices.Spaces.Tests.Fixtures.Definitions
     public sealed class ExternalInputPoint :
         Transformable<ExternalInput, ExternalInputPoint>
     {
+        // Declared but deliberately NOT used by Transformable.
+        public readonly record struct Input(string Value);
         private ExternalInputPoint(string value) => Value = value;
         public string Value { get; }
         public static Fin<ExternalInputPoint> Transform(ExternalInput input) =>
@@ -109,13 +112,15 @@ namespace VSlices.Spaces.Tests.Fixtures.Definitions
         {
             private State(string value) => Value = value;
             public string Value { get; init; }
-            public static State Create(string value) => new(value);
         }
+
+        [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+        private static extern State NewState(string value);
 
         private ValidPoint(State state) => CurrentState = state;
         public State CurrentState { get; }
         public static Fin<ValidPoint> Transform(Input input) =>
-            new ValidPoint(State.Create(input.Value));
+            new ValidPoint(NewState(input.Value));
         public static Fin<ValidPoint> Evolve(State old, State @new) =>
             new ValidPoint(@new);
     }
