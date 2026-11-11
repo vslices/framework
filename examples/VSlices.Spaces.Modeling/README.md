@@ -4,6 +4,8 @@ This project is a modeling probe for the emerging `VSlices.Spaces` API. It is in
 
 Its job is to make semantic decisions executable enough that their C# consequences can be inspected before those decisions become stable framework contracts.
 
+For executable, consumer-facing structural checks and rationale, see [Space modeling Laws](../../docs/spaces/modeling.md). Laws do not replace the behavioral and negative-compilation probes below.
+
 ## Location probe
 
 `Location` composes independently established semantic values and persistent evolution. `LocationName` is established through `Transformable<string, LocationName>`; `Location.Input` and `Location.State` reuse that semantic type rather than duplicating its invariants. `Location.State` keeps `Name` creation-fixed while `X/Y` are proposal-updatable. The private State constructor is bridged only by a private .NET `UnsafeAccessor`, which is treated as a realization mechanism rather than semantic authority.
