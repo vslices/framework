@@ -140,6 +140,43 @@ nullability require source analysis and compile-time warnings-as-errors for
 stronger enforcement. This Law does not prohibit nullable types outside
 owned `Input` and `State` contracts.
 
+## Modeling practice — Optionality follows construction semantics
+
+An `Input` member should be optional **only when its absence is a valid and
+meaningful possibility at the moment the Space is constructed**. The mere fact
+that `Option<A>` can represent `None` does not justify admitting `None` in
+a particular construction contract.
+
+- **Required at construction:** use `A` directly. For example, if an `Item`
+  cannot be established without an `ItemId` and an `ItemName`, its contract
+  is `Input(ItemId Id, ItemName Name)`, not `Input(Option<ItemId> Id,
+  Option<ItemName> Name)`. Do not invent a `None` branch merely to reject it
+  in `Transform`. Preserve the constraint in the type signature.
+- **Genuinely optional at construction:** use `Option<A>` (Language-Ext,
+  exposed through `ForkExt`) when both `Some` and `None` are admissible
+  and have distinct, defined semantics. Document what `None` means and how
+  construction interprets it.
+- **Unknown, pending, or supplied later:** do not automatically equate these
+  situations with optionality. First determine whether the Space can validly
+  exist without that information. If the answer depends on a lifecycle or
+  state transition, model that distinction explicitly instead of making
+  every field optional.
+
+**Why it matters:** Unnecessary `Option<A>` adds representable states,
+branches for `Some`/`None`, validation work, and cognitive overhead without
+providing domain meaning. Avoiding those branches may also reduce runtime
+work, but the primary concern is **semantic accuracy and compile-time
+guidance**, not an unmeasured performance claim.
+
+**Review question:** *Can this Space legitimately be constructed when this
+value is absent?* If not, require `A`. If yes, explain the significance of
+`None` and use `Option<A>`.
+
+This is a **modeling practice, not another executable Law**: SM007 can detect
+C# nullable annotations, but reflection cannot decide whether a particular
+`Option<A>` is semantically justified. That decision belongs to the Space
+model and its owner.
+
 ## What these Laws do not establish
 
 - **File layout:** one definition per file and the `Definitions/` folder are
