@@ -6,7 +6,7 @@
 
 [![Release: preview](https://img.shields.io/badge/release-0.3.0--preview.1-orange)](https://github.com/vslices/framework/releases/tag/v0.3.0-preview.1)
 [![Target: .NET 10](https://img.shields.io/badge/.NET-10-512bd4)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
-[![NuGet bundle CI](https://github.com/vslices/framework/actions/workflows/nuget-preview-bundle.yml/badge.svg?branch=feat%2Fwork-feature-modeling-eff)](https://github.com/vslices/framework/actions/workflows/nuget-preview-bundle.yml?query=branch%3Afeat%2Fwork-feature-modeling-eff)
+[![NuGet bundle CI](https://github.com/vslices/framework/actions/workflows/nuget-preview-bundle.yml/badge.svg)](https://github.com/vslices/framework/actions/workflows/nuget-preview-bundle.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 **Feel the semantics.**
