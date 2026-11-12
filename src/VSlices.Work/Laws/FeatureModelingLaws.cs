@@ -85,16 +85,6 @@ public static class FeatureModelingLaws
             InspectNullable(type, response, "Response", violations);
         }
 
-        var get = type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-            .Where(method => method.Name == "Get" && method.GetParameters().Length == 1
-                && method.GetParameters()[0].ParameterType == parameters[2]
-                && method.ReturnType.IsGenericType
-                && method.ReturnType.GetGenericTypeDefinition() == typeof(LanguageExt.Eff<,>)
-                && method.ReturnType.GenericTypeArguments.SequenceEqual(new[] { algebra, parameters[3] }))
-            .ToArray();
-        if (get.Length != 1)
-            violations.Add(Violation(type, "FM007", "Expose public static Eff<ALG, Response> Get(Request).", "fm007-execution-contract"));
-
         return violations;
     }
 

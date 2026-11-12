@@ -100,22 +100,6 @@ other code in the assembly, so they do not satisfy this convention.
 Private constructors are **not** proof of execution, authorization, or deep
 immutability. FM008 checks the current construction mechanism separately.
 
-## FM007 — Execution contract
-
-**Error:** There is no matching public static
-`Eff<ALG, Response> Get(Request request)` method.
-
-**Why:** Applying Request when obtaining an effect keeps the proposed input
-separate from the executable module algebra; the effect still runs only when
-the runtime is supplied and executed.
-
-**Preferred realization:** Implement the exact static method required by
-`Feature<F, ALG, REQ, RES>`, using the module's executable capability algebra.
-
-**Alternative and limit:** A standalone `Flow` is still available elsewhere
-in Framework. This Law checks the signature, not effect laziness, cancellation,
-or the handling of expected errors.
-
 ## FM008 — Response factory
 
 **Error:** The Feature does not expose exactly one private static
