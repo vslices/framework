@@ -17,10 +17,7 @@ public sealed class PointAlgebraTests
             [new Account(id, "before")]);
 
         var response = await RenameAccount
-            .Get()
-            .RunFlow(
-                grounding.Algebra,
-                new RenameAccount.Request(id, "after"))
+            .Get(new RenameAccount.Request(id, "after")).RunIO(grounding.Algebra)
             .RunAsync();
 
         Assert.True(response.Account.IsSome);

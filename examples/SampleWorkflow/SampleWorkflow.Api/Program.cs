@@ -18,12 +18,9 @@ app.MapPost("/todos", async (CreateTodoBody body, InMemoryTodoWork grounding) =>
         Succ: async semanticDetail =>
         {
             var response = await CreateTodo
-                .Get()
-                .RunFlow(
-                    grounding.Algebra,
-                    new CreateTodo.Request(
+                .Get(new CreateTodo.Request(
                         semanticDetail,
-                        body.Completed))
+                        body.Completed)).RunIO(grounding.Algebra)
                 .RunAsync();
 
             return response.Todo.Match<IResult>(
@@ -49,10 +46,7 @@ app.MapGet("/todos/{id:guid}", async (Guid id, InMemoryTodoWork grounding) =>
         Succ: async todoId =>
         {
             var response = await GetTodo
-                .Get()
-                .RunFlow(
-                    grounding.Algebra,
-                    new GetTodo.Request(todoId))
+                .Get(new GetTodo.Request(todoId)).RunIO(grounding.Algebra)
                 .RunAsync();
 
             return response.Todo.Match<IResult>(
@@ -78,13 +72,10 @@ app.MapPut("/todos/{id:guid}", async (
         Succ: async semantic =>
         {
             var response = await UpdateTodo
-                .Get()
-                .RunFlow(
-                    grounding.Algebra,
-                    new UpdateTodo.Request(
+                .Get(new UpdateTodo.Request(
                         semantic.semanticId,
                         semantic.detail,
-                        body.Completed))
+                        body.Completed)).RunIO(grounding.Algebra)
                 .RunAsync();
 
             return response.Todo.Match<IResult>(
@@ -108,10 +99,7 @@ app.MapDelete("/todos/{id:guid}", async (Guid id, InMemoryTodoWork grounding) =>
         Succ: async todoId =>
         {
             var response = await DeleteTodo
-                .Get()
-                .RunFlow(
-                    grounding.Algebra,
-                    new DeleteTodo.Request(todoId))
+                .Get(new DeleteTodo.Request(todoId)).RunIO(grounding.Algebra)
                 .RunAsync();
 
             return response.Todo.Match<IResult>(

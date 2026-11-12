@@ -16,12 +16,9 @@ public sealed class ComposedFeatureFlowTests
         var grounding = new InMemoryTodoWork();
 
         var response = await CreateAndGetTodo
-            .Get()
-            .RunFlow(
-                grounding.Algebra,
-                new CreateAndGetTodo.Request(
+            .Get(new CreateAndGetTodo.Request(
                     detail,
-                    Completed: false))
+                    Completed: false)).RunIO(grounding.Algebra)
             .RunAsync();
 
         var todo = response.Todo.Match(

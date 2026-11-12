@@ -19,12 +19,9 @@ public sealed class CrossServiceFeatureCompositionTests
             .ThrowIfFail();
 
         var created = await CreateTodo
-            .Get()
-            .RunFlow(
-                todo.Algebra,
-                new CreateTodo.Request(
+            .Get(new CreateTodo.Request(
                     detail,
-                    Completed: false))
+                    Completed: false)).RunIO(todo.Algebra)
             .RunAsync();
 
         var createdTodo = created.Todo.Match(
@@ -38,13 +35,10 @@ public sealed class CrossServiceFeatureCompositionTests
             todo.Algebra);
 
         var response = await AttachFileToTodo
-            .Get()
-            .RunFlow(
-                algebra,
-                new AttachFileToTodo.Request(
+            .Get(new AttachFileToTodo.Request(
                     createdTodo.Id,
                     "evidence.txt",
-                    [1, 2, 3, 4]))
+                    [1, 2, 3, 4])).RunIO(algebra)
             .RunAsync();
 
         var attached = response.Attachment.Match(
@@ -60,10 +54,7 @@ public sealed class CrossServiceFeatureCompositionTests
             attached.Todo.Attachments[0].Value);
 
         var rereadTodo = await GetTodo
-            .Get()
-            .RunFlow(
-                todo.Algebra,
-                new GetTodo.Request(createdTodo.Id))
+            .Get(new GetTodo.Request(createdTodo.Id)).RunIO(todo.Algebra)
             .RunAsync();
 
         Assert.Single(
@@ -71,10 +62,7 @@ public sealed class CrossServiceFeatureCompositionTests
                 () => throw new InvalidOperationException()).Attachments);
 
         var rereadFile = await GetFile
-            .Get()
-            .RunFlow(
-                files.Algebra,
-                new GetFile.Request(attached.File.Id))
+            .Get(new GetFile.Request(attached.File.Id)).RunIO(files.Algebra)
             .RunAsync();
 
         Assert.Equal(
@@ -97,13 +85,10 @@ public sealed class CrossServiceFeatureCompositionTests
             todo.Algebra);
 
         var response = await AttachFileToTodo
-            .Get()
-            .RunFlow(
-                algebra,
-                new AttachFileToTodo.Request(
+            .Get(new AttachFileToTodo.Request(
                     missingTodoId,
                     "orphan.txt",
-                    [9, 8, 7]))
+                    [9, 8, 7])).RunIO(algebra)
             .RunAsync();
 
         var attachment = response.Attachment.Match(
