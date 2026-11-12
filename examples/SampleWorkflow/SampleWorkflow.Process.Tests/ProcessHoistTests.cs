@@ -20,7 +20,7 @@ public sealed class ComposedFeatureFlowTests
             .Get(new CreateAndGetTodo.Request(
                     detail,
                     Completed: false)).RunIO(grounding.Algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         var todo = response.Todo.Match(
             Left: error => throw error.ToException(),

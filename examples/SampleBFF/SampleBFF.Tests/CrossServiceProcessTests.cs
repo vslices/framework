@@ -23,7 +23,7 @@ public sealed class CrossServiceFeatureCompositionTests
             .Get(new CreateTodo.Request(
                     detail,
                     Completed: false)).RunIO(todo.Algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         var createdTodo = created.Todo.Match(
             Left: error => throw error.ToException(),
@@ -40,7 +40,7 @@ public sealed class CrossServiceFeatureCompositionTests
                     createdTodo.Id,
                     "evidence.txt",
                     [1, 2, 3, 4])).RunIO(algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         var attached = response.Attachment.Match(
             Left: error => throw error.ToException(),
@@ -56,7 +56,7 @@ public sealed class CrossServiceFeatureCompositionTests
 
         var rereadTodo = await GetTodo
             .Get(new GetTodo.Request(createdTodo.Id)).RunIO(todo.Algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Single(
             rereadTodo.Todo.IfNone(
@@ -64,7 +64,7 @@ public sealed class CrossServiceFeatureCompositionTests
 
         var rereadFile = await GetFile
             .Get(new GetFile.Request(attached.File.Id)).RunIO(files.Algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(
             "evidence.txt",
@@ -90,7 +90,7 @@ public sealed class CrossServiceFeatureCompositionTests
                     missingTodoId,
                     "orphan.txt",
                     [9, 8, 7])).RunIO(algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         var attachment = response.Attachment.Match(
             Left: error => throw error.ToException(),

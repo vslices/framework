@@ -27,38 +27,38 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
             .ReadOrDefault(id)
             .Run()
             .As()
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.True(missing.IsNone);
 
         await points
             .Write(new DirectRecord { Id = id, Name = "created" })
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
-        var created = await points.Read(id).RunAsync();
+        var created = await points.Read(id).RunAsync(TestContext.Current.CancellationToken);
         Assert.Equal("created", created.Name);
 
         await points
             .Write(new DirectRecord { Id = id, Name = "updated" })
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
-        var updated = await points.Read(id).RunAsync();
+        var updated = await points.Read(id).RunAsync(TestContext.Current.CancellationToken);
         Assert.Equal("updated", updated.Name);
 
-        await points.Remove(id).RunAsync();
+        await points.Remove(id).RunAsync(TestContext.Current.CancellationToken);
 
         var removed = await points
             .ReadOrDefault(id)
             .Run()
             .As()
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.True(removed.IsNone);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () =>
             {
-                _ = await points.Read(id).RunAsync();
+                _ = await points.Read(id).RunAsync(TestContext.Current.CancellationToken);
             });
     }
 
@@ -91,7 +91,7 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
 
         var evidence = await ExerciseRecord
             .Get(new ExerciseRecord.Request(id)).RunIO(algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(
             new Record(id, "created"),

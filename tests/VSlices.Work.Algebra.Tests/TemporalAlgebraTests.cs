@@ -23,7 +23,7 @@ public sealed class TemporalAlgebraTests
             .Get(new TemporalProbe.Request(
                     new Duration<double>(2),
                     new Duration<double>(5))).RunIO(algebra)
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(origin, response.Observed);
         Assert.Equal(
