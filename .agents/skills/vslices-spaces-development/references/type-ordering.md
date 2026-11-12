@@ -1,97 +1,106 @@
-# Orden de composición: Space y constructores de LanguageExt
+# Composición semántica de Spaces y tipos funcionales
 
-La elección entre `F<Space>` y `Space<F<A>>` depende de **qué expresa la condición** y **quién establece su admisibilidad**. No inferir la forma por la redacción superficial de una frase: comprobar su significado.
+## Regla principal
 
-## Regla de decisión
+**Modelar distinciones de significado antes de elegir el orden de los tipos.** `Option<Space>`, `Seq<Space>`, `Space` que encapsula `Seq<A>` y `Option<Space<Seq<A>>>` no son intercambiables. Tampoco debe decidirse su forma solo por palabras como «puede», «tiene» o «nunca».
 
-1. Identificar el concepto (`A` o un Space nominal) y las condiciones que definen que un ejemplar suyo es válido.
-2. Distinguir condiciones **sobre presencia o multiplicidad del concepto ya válido** de condiciones **sobre los valores admitidos de una estructura completa**.
-3. Si una forma estándar de LanguageExt expresa íntegramente la condición, componerla alrededor del concepto: `Option<Description>`, `Seq<OrderItem>`, `Arr<Part>`. Evitar crear un Space sin significado adicional.
-4. Si la estructura completa está sometida a una regla semántica adicional (cardinalidad, unicidad, orden significativo, correlación entre elementos, etc.), crear un Space propietario de esa regla alrededor de la estructura: `NonEmptyOrderItems` que encapsula `Seq<OrderItem>`.
-5. Aplicar las dos capas cuando coexistan condiciones distintas. Por ejemplo, `Option<NonEmptyOrderItems>` significa que **puede no existir** la colección, pero **si existe** no es vacía. No colapsar ambas condiciones en una sola.
-6. Verificar la construcción y todas las operaciones que podrían exponer un estado inválido. El wrapper no basta: debe establecer y conservar efectivamente su invariante.
+1. **Identificar el concepto** y sus reglas de admisibilidad propias.
+2. **Identificar qué condiciona la regla**: la existencia del concepto, cada elemento, la cardinalidad o la relación entre elementos de una colección.
+3. **Para valores individuales**, preguntar si la ausencia del valor es válida; si lo es, considerar `Option<Description>`. La ausencia y un valor construido no deben significar lo mismo. Si una descripción vacía carece de significado, `Description.Transform(string.Empty)` debe rechazarse; `None` ya expresa ausencia.
+4. **Solo para estructuras con estado vacío**, preguntar si «colección inexistente» y «colección existente pero vacía» son situaciones semánticamente diferentes. Si ambas significan «aún no hay elementos», preferir `Seq<A>` vacío; no inventar `Option<Seq<A>>`. Esta pregunta no es universal para todo `A`.
+5. **Si la estructura satisface el contrato sin reglas nuevas**, usar el tipo de LanguageExt directamente: `Seq<OrderItem>` (o `Arr`, `Lst` u otro cuando corresponda). Si una regla propia de la colección necesita autoridad y construcción, definir un Space que la envuelva: `OrderItems` sobre `Seq<OrderItem>` para prohibir identificadores duplicados, o `NonEmptyOrderItems` para exigir al menos uno.
+6. **Solo si coexisten distinciones independientes**, componer capas: `Option<NonEmptyOrderItems>` es justificable únicamente cuando «el grupo no existe» significa algo diferente de «el grupo existe y contiene cero elementos». No deducirlo de «puede tener órdenes».
+7. **Revisar los estados representables**. Dos representaciones distintas con exactamente el mismo significado son evidencia de redundancia; no prohibir estados distintos que sí tengan significado propio.
+8. **Verificar garantías reales**: el envoltorio nominal no prueba una invariante por sí solo. Validar en la construcción y preservar en la evolución; tener cuidado con colecciones evaluadas de forma diferida.
 
 ## Ejemplos y contraejemplos
 
-### Descripción opcional — `Option<Description>`
+### Descripción que puede faltar
 
-Enunciado: «Puede tener una descripción». `Description` es un Space válido por derecho propio; el condicionante afecta **si está presente**.
-
-```csharp
-public readonly record struct Input(
-    ItemName Name,
-    Option<Description> Description);
-```
-
-**Contraejemplo:** crear `OptionalDescription` que encapsula `Option<Description>` **solo para reiterar** que puede estar presente o ausente. Sería estructura redundante. Podría justificarse un Space nominal si aporta significado o reglas propios y verificables (no por la mera opcionalidad).
-
-### Órdenes sin restricción adicional — `Seq<OrderItem>`
-
-Enunciado: «Tiene órdenes»; la colección puede ser vacía, respeta el orden y admite repeticiones si el dominio no dispone otra cosa.
+Regla: «Puede tener una descripción; cuando la tiene, debe haber contenido significativo».
 
 ```csharp
-public readonly record struct Input(Seq<OrderItem> Items);
+Option<Description> Description
 ```
 
-**Contraejemplo:** introducir `OrderItems` con un `Transform` que simplemente acepta cualquier `Seq<OrderItem>`, sin identidad, distinción, invariante o comportamiento adicional. No requiere wrapper nominal por defecto. Si «tiene órdenes» realmente implica al menos una, **sí** existe una condición adicional: confirmarla, no inferirla en silencio.
+`Description` establece sus invariantes (`string.Empty` no es una descripción admisible **en este dominio**). `None` significa ausencia de descripción.
 
-### Órdenes obligatoriamente no vacías — `NonEmptyOrderItems` sobre `Seq<OrderItem>`
+**Incorrecto:** aceptar `Some(Description(""))` como equivalente de `None`, o crear `OptionalDescription` sin otro significado. Tampoco universalizar «ningún Space de texto acepta vacío»: otros conceptos pueden admitirlo con un significado diferente.
 
-Enunciado: «Tiene órdenes y nunca menos de una». La restricción afecta **a la colección completa**, no a cada `OrderItem` ni a la presencia de una colección opcional.
+### Elementos que pueden ser cero o más
+
+Regla: «La orden tiene elementos; ninguno ha sido agregado todavía» significa colección existente vacía.
 
 ```csharp
-// Esquema semántico, no implementación completa ni código compilado.
-Space NonEmptyOrderItems
-    owns Seq<OrderItem> Items
-    Transform(seq) = Fail if seq is empty; otherwise accepted Space
+Seq<OrderItem> Items
 ```
 
-**Contraejemplos:**
-- `Seq<OrderItem>` directamente **no** garantiza no-vacío.
-- `Option<Seq<OrderItem>>` admite `None` y `Some(empty)`; no garantiza no-vacío y añade ausencia.
-- `Seq<Option<OrderItem>>` condiciona **cada elemento**, admite una secuencia vacía e incluso elementos `None`. No expresa la regla de cardinalidad.
-- `NonEmptyOrderItem` aplicado a cada elemento restringe los elementos individualmente, no asegura que exista alguno.
+**Incorrecto:** `Option<Seq<OrderItem>>` solo para representar que aún no hay elementos, porque `None` y `Some(Empty)` duplican el mismo estado.
 
-### Dos condiciones independientes — `Option<NonEmptyOrderItems>`
+### Colección que prohíbe duplicados
 
-Enunciado: «Puede existir un grupo de órdenes, y, cuando existe, debe contener una o más».
+Regla: «Los elementos de la orden pueden ser cero o más, pero no puede haber dos con el mismo identificador».
+
+```text
+OrderItems
+  owns Seq<OrderItem>
+  Transform: aceptar vacío; rechazar IDs duplicados
+```
+
+**Incorrecto:** `NonEmptyOrderItems` (agrega una restricción no solicitada), o `Seq<OrderItem>` sin validación de unicidad. Considerar `Set<A>` solo si expresa fielmente la igualdad y el orden del dominio; no asumir que elimina duplicados por ID automáticamente.
+
+### Colección obligatoriamente no vacía
+
+Regla: «Una orden confirmada debe tener al menos un elemento».
+
+```text
+NonEmptyOrderItems
+  owns Seq<OrderItem>
+  Transform: rechazar vacío
+```
+
+**Incorrecto:** `Seq<OrderItem>` sin garantía adicional; `Seq<Option<OrderItem>>` modifica la presencia **de cada elemento**, no la cardinalidad de la colección.
+
+### Colección opcional: caso excepcional justificado
+
+Regla: «Un catálogo todavía no está configurado» es distinto de «ya fue configurado explícitamente con cero elementos».
 
 ```csharp
-public readonly record struct Input(
-    Option<NonEmptyOrderItems> Items);
+Option<Seq<CatalogItem>> Catalog
 ```
 
-**Contraejemplo:** `NonEmptyOrderItems` sin `Option` haría la presencia obligatoria; `Option<Seq<OrderItem>>` admitiría `Some(empty)`. Ambas perderían una condición.
+`None` = sin configuración; `Some(Empty)` = configuración completada y vacía. Ambas situaciones existen y provocan decisiones diferentes.
 
-### Opcionalidad de cada elemento — `Seq<Option<A>>`
+**Incorrecto:** reemplazarlo automáticamente por `Seq<CatalogItem>`, que perdería esa distinción. También sería incorrecto aplicar este patrón por analogía a cualquier colección.
 
-Enunciado: «Hay posiciones ordenadas; cada una puede estar ocupada o vacía». Las posiciones existen y su contenido es opcional.
+### Opcionalidad por posición
+
+Regla: «Hay posiciones numeradas; cada una puede encontrarse libre u ocupada».
 
 ```csharp
 Seq<Option<SeatAssignment>> Seats
 ```
 
-**Contraejemplo:** `Option<Seq<SeatAssignment>>` haría opcional **la secuencia completa**; no representaría vacíos por posición.
+**Incorrecto:** `Option<Seq<SeatAssignment>>`, que modifica la existencia de toda la secuencia y pierde las posiciones vacantes.
 
-### Restricción sobre el elemento versus restricción sobre la colección
+### Condiciones combinadas
 
-- `Seq<PositiveQuantity>`: **cada cantidad** debe ser positiva; la secuencia puede estar vacía.
-- `NonEmptyQuantities` sobre `Seq<PositiveQuantity>`: cada cantidad es positiva **y** la colección no está vacía.
-- `Option<NonEmptyQuantities>`: toda esa colección puede estar ausente.
+- `Seq<PositiveQuantity>`: cada elemento es positivo; colección vacía permitida.
+- `NonEmptyQuantities` sobre `Seq<PositiveQuantity>`: elementos positivos y al menos uno.
+- `Option<NonEmptyQuantities>`: además, el **grupo mismo puede no existir**, cuando esa distinción tenga significado comprobable.
 
-Si el dominio exige unicidad, orden sin repeticiones u otra propiedad, considerar si `Set<A>` u otro tipo ya expresa la regla antes de escribir un wrapper sobre `Seq<A>`. No agregar tipos solo porque puedan ser imaginados.
+## Colecciones y evaluación diferida
 
-## Atención a la evaluación diferida
+`Seq<A>` puede construirse desde una fuente diferida; `Iterable<A>` también puede diferir evaluación y admitir asincronía. No asumir que guardar el productor equivale a validar la invariante. Si el Space promete no-vacío, unicidad u otra regla global, comprobarla al construir, o disponer de garantías suficientes explícitas; no esconder I/O en una transformación pura.
 
-`Seq<A>` puede construirse desde una fuente diferida; `Iterable<A>` puede ser diferido o asíncrono. Un Space que promete `NonEmpty`, unicidad u otras invariantes de contenido debe **establecer la garantía durante su construcción**, no limitarse a guardar el productor. Materializar o disponer de evidencia explícita y suficiente según el caso; no esconder I/O en una transformación pura. La comprobación de `IsEmpty` por sí sola no demuestra automáticamente todas las propiedades de una secuencia diferida.
+## Lista de comprobación del agente
 
-## Comprobación del agente
+- ¿Qué concepto existe y qué significa?
+- ¿La condición se refiere a la existencia del concepto, a cada elemento, o a la colección completa?
+- Si hay colección vacía: ¿qué diferencia observable hay entre «vacía» e «inexistente»? **No preguntar esto para cada valor individual.**
+- ¿Qué estados distintos admite el tipo propuesto? ¿Alguno representa exactamente lo mismo que otro?
+- ¿Qué invariantes aporta el Space por encima del constructor funcional?
+- ¿Qué ejemplo refuta la alternativa descartada?
+- ¿Qué evidencia verifica admisibilidad y preservación de invariantes?
 
-Para cada tipo propuesto, explicitar:
-- **Objeto**: ¿qué concepto se está modelando?
-- **Condición**: ¿afecta al elemento, a su presencia, a cada posición o a la estructura completa?
-- **Precedencia**: ¿por qué `Option<Space>`, `Seq<Space>` o `Space<Seq<A>>`?
-- **Garantía**: ¿dónde se establece y quién conserva la invariante?
-- **Contraejemplo**: ¿qué alternativa aparentemente similar admite valores que la regla prohíbe?
-
-Este documento aporta criterios de modelado, no redefine las APIs reales de LanguageExt ni sustituye las `SpaceModelingLaws`.
+Esta referencia describe decisiones de modelado; no sustituye las firmas reales de LanguageExt ni `SpaceModelingLaws`.
