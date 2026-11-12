@@ -231,7 +231,7 @@ For `TransformAdapter<FROM, TO>`:
 - `TO.Input -> TO` remains owned by `TO.Transformation`;
 - do not infer missing values for multi-field Inputs;
 - do not make a semantic target implement a presentation-specific direct transform merely to satisfy a UI control;
-- keep the analyzer enabled so invalid adapter conventions fail during compilation when the closed target is visible.
+- for published consumers, explicitly invoke `TransformAdapterModelingLaws` on closed source/target pairs in tests; the experimental analyzer remains source-only and is not distributed with NuGet. Do not claim compilation diagnostics or automatic discovery for consumers.
 
 Reflection is a .NET realization detail and is cached per closed adapter pair. It is not semantic authority.
 
