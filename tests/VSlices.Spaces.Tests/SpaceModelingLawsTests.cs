@@ -102,7 +102,39 @@ namespace VSlices.Spaces.Tests.Fixtures.Definitions
             new ExternalInputPoint(input.Value);
     }
 
-    // Positive control: a complete definition obeys all six structural rules.
+    // SM007: a nested Input has nullable reference and nullable value members.
+    public sealed class NullableInputPoint :
+        Transformable<NullableInputPoint.Input, NullableInputPoint>
+    {
+        public readonly record struct Input(string? Name, int? Rank);
+        private NullableInputPoint() { }
+        public static Fin<NullableInputPoint> Transform(Input input) => new NullableInputPoint();
+    }
+
+    // SM007: State nullability is forbidden even when construction stays private.
+    public sealed class NullableStatePoint :
+        Transformable<NullableStatePoint.Input, NullableStatePoint>,
+        Evolvable<NullableStatePoint, NullableStatePoint.State>
+    {
+        public readonly record struct Input(string Name);
+        public sealed record State
+        {
+            private State(string? name) => Name = name;
+            public string? Name { get; init; }
+        }
+
+        [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+        private static extern State NewState(string? name);
+
+        private NullableStatePoint(State state) => CurrentState = state;
+        public State CurrentState { get; }
+        public static Fin<NullableStatePoint> Transform(Input input) =>
+            new NullableStatePoint(NewState(input.Name));
+        public static Fin<NullableStatePoint> Evolve(State old, State @new) =>
+            new NullableStatePoint(@new);
+    }
+
+    // Positive control: a complete definition obeys all seven structural rules.
     public sealed class ValidPoint :
         Transformable<ValidPoint.Input, ValidPoint>,
         Evolvable<ValidPoint, ValidPoint.State>
@@ -154,7 +186,7 @@ namespace VSlices.Spaces.Tests
         }
 
         [Fact]
-        public void Consumer_scan_discovers_all_six_laws_and_reports_their_owners()
+        public void Consumer_scan_discovers_all_seven_laws_and_reports_their_owners()
         {
             var violations = SpaceModelingLaws.InspectDefinitions(
                 typeof(Fixtures.Definitions.ValidPoint).Assembly,
@@ -162,7 +194,7 @@ namespace VSlices.Spaces.Tests
 
             var expected = new[]
             {
-                "SM001", "SM002", "SM003", "SM004", "SM005", "SM006"
+                "SM001", "SM002", "SM003", "SM004", "SM005", "SM006", "SM007"
             };
 
             foreach (var rule in expected)
@@ -177,6 +209,22 @@ namespace VSlices.Spaces.Tests
         {
             Assert.Empty(SpaceModelingLaws.Inspect(
                 typeof(Fixtures.Definitions.ValidPoint)));
+        }
+
+        [Fact]
+        public void SM007_identifies_nullable_members_in_both_owned_contracts()
+        {
+            var input = SpaceModelingLaws.Inspect(typeof(Fixtures.Definitions.NullableInputPoint));
+            Assert.Contains(input, v => v.RuleId == "SM007" && v.Error.Contains("Input.Name"));
+            Assert.Contains(input, v => v.RuleId == "SM007" && v.Error.Contains("Input.Rank"));
+
+            var state = SpaceModelingLaws.Inspect(typeof(Fixtures.Definitions.NullableStatePoint));
+            Assert.Contains(state, v => v.RuleId == "SM007" && v.Error.Contains("State.Name"));
+            foreach (var violation in input.Concat(state).Where(v => v.RuleId == "SM007"))
+            {
+                Assert.Equal(SpaceModelingLaws.Guide + "#sm007-explicit-optionality", violation.GuidanceUrl);
+                Assert.Contains(violation.GuidanceUrl, violation.ToString());
+            }
         }
 
         [Fact]
