@@ -100,6 +100,8 @@ other code in the assembly, so they do not satisfy this convention.
 Private constructors are **not** proof of execution, authorization, or deep
 immutability. FM008 checks the current construction mechanism separately.
 
+FM007 is intentionally retired: the C# `Feature<F, ALG, REQ, RES>` interface already enforces `Get(REQ)` returning `Eff<ALG, RES>` at compile time. The numbering remains stable to preserve existing diagnostic identifiers.
+
 ## FM008 — Response factory
 
 **Error:** The Feature does not expose exactly one private static
