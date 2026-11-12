@@ -162,6 +162,20 @@ construction, and choose immutable values for their contents.
 referencing a mutable object or collection can still expose mutable state.
 Review and test the owned result shape separately.
 
+## Modeling practice — Response is not Evolvable State
+
+The construction policies are intentionally related but not identical.
+`Evolvable.State` represents candidate and accepted semantic states, and may
+need explicit mechanisms for proposing an evolution. A `Feature.Response`
+represents the result owned by an executable operation; after construction it
+must not expose public setters or init-only setters that allow callers to
+replace the outcome. FM010 checks this **shallow** exposure boundary; it does
+not claim that Response is deeply immutable or that successful construction
+proves effects were completed.
+
+This difference is a documented modeling decision, **not** an additional
+executable Law.
+
 ## Modeling practice — Explicit outcomes are not exception control flow
 
 Expected rejection, missing data, or validation failure belongs in explicit
