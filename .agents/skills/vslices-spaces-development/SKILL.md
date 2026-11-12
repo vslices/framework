@@ -20,10 +20,21 @@ Los tipos funcionales de LanguageExt son parte de la base conceptual escogida po
 
 1. **Localizar la autoridad.** Identificar el repositorio y la versión efectiva de `VSlices.Spaces`; leer el código y los contratos instalados, no confiar en ejemplos desactualizados. Consultar [Modeling semantic Spaces](https://github.com/vslices/framework/blob/master/docs/spaces/modeling.md) y los traits concretos.
 2. **Delimitar el significado.** Determinar qué representa la definición, qué identidad o igualdad le corresponde, qué evidencia necesita para existir y cuáles son sus invariantes. Distinguir datos externos de valores semánticos aceptados. No crear un tipo por cada primitivo sin justificación.
-3. **Decidir construcción y opcionalidad.** Para definiciones en un namespace `Definitions` sujeto a las Laws, declarar `SELF.Input` y realizar `Transformable<SELF.Input, SELF>` con `Fin<SELF> Transform(Input)`. Encapsular constructores. Aplicar la selección de tipos funcionales de la sección siguiente: requerir `A` cuando sea obligatorio; usar `Option<A>` solo cuando `None` sea un estado de información admisible en la construcción. No utilizar nullabilidad C# en `Input`/`State` sujetos a SM007.
+3. **Determinar precedencia y construcción.** Consultar la regla de precedencia y sus contraejemplos: decidir primero si la condición modifica el concepto, su presencia, cada elemento o la colección completa. Luego, para definiciones en un namespace `Definitions` sujeto a las Laws, declarar `SELF.Input` y realizar `Transformable<SELF.Input, SELF>` con `Fin<SELF> Transform(Input)`. Encapsular constructores. Aplicar la selección de tipos funcionales de la sección siguiente: requerir `A` cuando sea obligatorio; usar `Option<A>` solo cuando `None` sea un estado de información admisible en la construcción. No utilizar nullabilidad C# en `Input`/`State` sujetos a SM007.
 4. **Decidir si hay evolución.** No aplicar `Evolvable` a toda definición. Si hay estado aceptado que puede cambiar, considerar `Evolvable<SELF, SELF.State>`, `CurrentState` de solo lectura y `Evolve(old, proposed)` validando la transición sin mutar la instancia original. Proteger la identidad si no debe cambiar. Seguir la convención actual de `State` anidado y constructor privado cuando corresponda.
 5. **Realizar lo mínimo.** Escribir la transformación pura con la evidencia explícita disponible. No introducir `IO`, consultas, servicios o adaptadores en `Transform` para obtener hechos faltantes. No confundir `UnsafeAccessor` (mecanismo de .NET para acceder a un constructor privado) con una garantía semántica.
 6. **Probar y revisar.** Compilar. Ejecutar `SpaceModelingLaws.InspectDefinitions(assembly, definitionsNamespace)` o `Inspect(type)` en pruebas del consumidor y revisar los diagnósticos SM001–SM007. Agregar pruebas de comportamiento para aceptación/rechazo, igualdad, preservación de invariantes y transiciones admitidas/rechazadas. Las Laws son estructurales: **no prueban corrección semántica**. Declarar explícitamente lo no ejecutado o no demostrado.
+
+## Precedencia entre constructores y Spaces
+
+**Determinar sobre qué recae la condición antes de elegir la forma del tipo**:
+
+- **Condición de presencia del concepto**: `Option<Description>` cuando una descripción válida puede o no estar presente. No introducir `OptionalDescription` sin significado adicional.
+- **Multiplicidad sin restricciones nuevas**: `Seq<OrderItem>` (o `Arr`, `Lst`, `Iterable` cuando sus garantías sean apropiadas). No envolverlo por mera costumbre.
+- **Restricción de la colección como valor semántico**: `NonEmptyOrderItems` que encapsula `Seq<OrderItem>` y establece que hay al menos un elemento.
+- **Condiciones combinadas**: `Option<NonEmptyOrderItems>` significa «puede faltar el grupo; si existe, no es vacío». `Seq<Option<OrderItem>>` significa algo distinto: cada posición puede estar vacía.
+
+No confundir `F<Space>` (el constructor condiciona al Space) con un Space que encapsula `F<A>` (el Space establece una condición adicional sobre la estructura). Son heurísticas de modelado, no una regla sintáctica universal; una condición puede justificar ambas capas. **Leer [ejemplos y contraejemplos de precedencia](references/type-ordering.md)** antes de introducir wrappers nuevos o transformar uno existente.
 
 ## Tipos de LanguageExt dentro de Spaces
 
