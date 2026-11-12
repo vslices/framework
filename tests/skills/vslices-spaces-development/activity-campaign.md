@@ -28,7 +28,11 @@ Después de conversar con quienes organizan las actividades, se recogieron las s
 
 «Cuando se completan los cupos, no se reciben más participantes. En esta etapa del proyecto tampoco se contempla retirar personas ya inscritas ni cambiarles el lugar que ocuparon en el orden de llegada: solo se incorporan nuevas inscripciones al final».
 
-«Tenemos datos para distinguir a los participantes, incluso cuando dos comparten nombre. También se les asigna un identificador interno, pero todavía no decidimos su representación o formato. El nombre de cada participante se registra tal como lo conocemos; no levantamos otras restricciones para ese campo. Si alguien ya está inscrito, una edición no debería convertir su inscripción en la de otra persona».
+«Tenemos datos para distinguir a los participantes, incluso cuando dos comparten nombre. También se les asigna un identificador interno, pero todavía no decidimos su representación o formato. Si alguien ya está inscrito, una edición no debería convertir su inscripción en la de otra persona».
+
+«No todas las inscripciones son hechas por personas individuales. También participan organizaciones de la comunidad. Cuando se trata de una persona, registramos su **nombre de pila**; cuando se trata de una organización, lo que registramos es su **razón social**. Son maneras distintas de identificar cómo presentar al participante, no queremos tratarlas como el mismo dato ni obligar a completar las dos».
+
+«En los formularios actuales, el equipo sabe si está registrando a una persona o a una organización antes de ingresar el nombre correspondiente. No hemos definido límites de longitud, reglas de normalización o qué hacer con apellidos, nombres comerciales u otras variantes. Tampoco se conversó si una inscripción podría pasar de persona a organización después de registrarse».
 
 **Sobre cuentas de otra plataforma**
 
