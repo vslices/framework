@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Monads;
 using VSlices.Work;
@@ -89,10 +90,7 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
         var id = Guid.NewGuid();
 
         var evidence = await ExerciseRecord
-            .Get()
-            .RunFlow(
-                algebra,
-                new ExerciseRecord.Request(id))
+            .Get(new ExerciseRecord.Request(id)).RunIO(algebra)
             .RunAsync();
 
         Assert.Equal(
@@ -117,13 +115,28 @@ public sealed class ExerciseRecord :
 {
     public sealed record Request(Guid Id);
 
-    public sealed record Response(
-        Record Created,
-        Record Updated,
-        Option<Record> Removed);
+    public sealed record Response
+    {
+        private Response(Record created, Record updated, Option<Record> removed)
+        {
+            Created = created;
+            Updated = updated;
+            Removed = removed;
+        }
 
-    public static Flow<RecordAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
+        public Record Created { get; }
+        public Record Updated { get; }
+        public Option<Record> Removed { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(
+        Record created,
+        Record updated,
+        Option<Record> removed);
+
+    public static Eff<RecordAlgebra, Response> Get(Request request) =>
+        Eff<RecordAlgebra, Response>.LiftIO(algebra =>
             algebra.Writer.Write(new Record(request.Id, "created"))
                 .Bind(_ => algebra.Reader.Read(request.Id))
                 .Bind(created =>
@@ -137,7 +150,7 @@ public sealed class ExerciseRecord :
                                         .Run()
                                         .As())
                                 .Map(removed =>
-                                    new Response(
+                                    NewResponse(
                                         created,
                                         updated,
                                         removed)))));
