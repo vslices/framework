@@ -9,7 +9,7 @@ The Framework is being defined and validated through real implementation. Do not
 The current direction is semantic-first and is actively validating distinctions such as:
 
 - `Space`: semantic values, structure, admissibility, and pure transformations;
-- `Work`: executable behavior, coordination, WorkFlows, Feature composition, effects, and expected errors;
+- `Work`: executable behavior, coordination, Feature composition, effects, and expected errors;
 - `Grounding`: acquisition or realization of facts and effects that are not derivable from pure semantics alone.
 
 These names and boundaries remain provisional. Prefer current repository evidence over remembered architecture.
@@ -61,7 +61,7 @@ Do not force this factorization when current evidence contradicts it, but do not
 
 ## Current Work Model
 
-The current validated direction uses `Flow` directly over executable Work algebras.
+The current Feature contract uses `Eff<ALG, Response> Get(Request)` over executable Work algebras. `Flow` remains available as an independent core abstraction, but it is not the current Feature execution contract.
 
 ```text
 Feature
@@ -78,7 +78,7 @@ Grounding
 
 There is no Free-monad/interpreter layer in the current Work model.
 
-### Feature / WorkFlow
+### Feature
 
 A Feature owns public nested Request/Response contracts and exposes execution through Eff; Request is publicly constructible, while Response is privately constructed through the owning Feature's `NewResponse` accessor:
 
@@ -131,7 +131,7 @@ AlgebraMix<A, B>
 AlgebraMix<A, B, C, D, E, F, G>
 ```
 
-`AlgebraMix` is intentionally modest vocabulary: it means that independently owned executable algebras are available together to a composing Flow. It does not claim categorical product/coproduct semantics, ordering, priority, transactionality, or shared ownership.
+`AlgebraMix` is intentionally modest vocabulary: it means that independently owned executable algebras are available together to a composing Feature's effect. It does not claim categorical product/coproduct semantics, ordering, priority, transactionality, or shared ownership.
 
 A parent constructs explicit child requests and projects the required child algebra at execution:
 
@@ -176,7 +176,7 @@ Observation, delay, scheduling and invocation remain distinct concerns. Do not i
 
 ## Guarantees
 
-The current executable-algebra / Flow model does not settle the guarantee model.
+The current executable-algebra / Eff-based Feature model does not settle the guarantee model.
 
 Still treat the following as separate, unresolved work unless current repository evidence says otherwise:
 
@@ -201,8 +201,8 @@ Failures expected by the modeled Work must remain explicit.
 
 - do not throw exceptions for expected flows;
 - use explicit error values or typed alternatives;
-- preserve error information through composed Feature WorkFlows;
-- distinguish semantic rejection from interpreter/runtime failure;
+- preserve error information through composed Feature effects (use `Error.New` for expected failures; reserve .NET exceptions for exceptional conditions);
+- distinguish semantic rejection from effect execution or Grounding failure;
 - do not collapse missing authority or unsupported semantics into a plausible default.
 
 ---
@@ -244,11 +244,11 @@ Architecture should emerge from semantic ownership and real coordination boundar
 Rules:
 
 - keep Features understandable in isolation;
-- keep WorkFlow instruction vocabulary local to its owner;
-- avoid shared service/program layers that steal WorkFlow ownership;
+- keep each Feature's executable vocabulary and nominal Request/Response contracts under their proper Work ownership;
+- avoid shared service/program layers that steal Feature ownership;
 - keep concrete realization behind explicit Grounding boundaries;
 - keep presentation adapters thin;
-- let a composing Feature reuse existing WorkFlows without rewriting them;
+- let a composing Feature reuse existing child Features without rewriting their behavior;
 - do not assign semantic policy to persistence or transport components merely because they can execute an operation.
 
 Vertical slices, DDD patterns, functional programming, and other established approaches may be used where they fit; do not treat them as mandatory top-level taxonomy.
@@ -279,7 +279,7 @@ real case
     -> observe the next boundary
 ```
 
-`SampleBFF.AttachFileToTodo` now validates composition across two independently owned WorkFlows and two distinct Groundings. The next observable pressure is partial-failure semantics across those WorkFlows: compensation, retry, reconciliation, or stronger guarantees when a product actually requires them. Ticket Support BFF `AttachFile` / `RemoveAttachment` remains the real-world pressure case after the isolated sample.
+`SampleBFF.AttachFileToTodo` validates composition across two independently owned Work modules and two distinct Groundings. The next observable pressure is partial-failure semantics across those effects: compensation, retry, reconciliation, or stronger guarantees when a product actually requires them. Ticket Support BFF `AttachFile` / `RemoveAttachment` remains the real-world pressure case after the isolated sample.
 
 ---
 
@@ -290,13 +290,13 @@ Do NOT:
 - introduce null where an explicit alternative belongs;
 - throw exceptions for expected control flow;
 - inject concrete service implementations into Feature definitions;
-- hide WorkParts behind vague helper/manager/service abstractions;
-- recreate a shared `TodoPrograms`-style layer that owns the real WorkFlow;
-- make a lower WorkFlow know the Feature/BFF that may compose it later;
-- treat one concrete interpreter as the semantic owner of several WorkFlows;
+- hide executable capability atoms or Feature ownership behind vague helper/manager/service abstractions;
+- recreate a shared `TodoPrograms`-style layer that takes ownership from the Feature;
+- make a child Feature know the parent Feature/BFF that may compose it later;
+- treat one concrete Grounding adapter as the semantic owner of several Features;
 - infer transactions or stronger persistence guarantees from point read/write/remove;
 - replace the explicit module algebra runtime with an arbitrary dependency carrier without new evidence;
-- force every pure semantic transformation into a WorkPart;
+- force every pure semantic transformation into an effectful Work capability;
 - extend `AlgebraMix` beyond the supported A..G arities without pressure;
 - use current implementation convenience as proof of universal Framework semantics.
 
@@ -315,7 +315,7 @@ Current evidence should include, where relevant:
 - presentation/API smoke behavior;
 - preservation of semantic state transitions.
 
-Prefer fake or in-memory interpreters over mocking vague service layers.
+Prefer fake or in-memory Grounding implementations of capability atoms over mocking vague service layers.
 
 For the current miniature, the branch should remain green for:
 
@@ -323,7 +323,7 @@ For the current miniature, the branch should remain green for:
 VSlices.Work build
 Work algebra tests
 SampleWorkflow API build
-composed Feature hoist/composition tests
+composed Feature execution/composition tests
 AlgebraMix A..G tests
 SampleFileRepo build
 cross-service SampleBFF composition tests
@@ -369,4 +369,6 @@ The implementation is evidence about the design. If a real case contradicts this
 
 ## Structural modeling Laws
 
-When defining or evolving semantic Spaces, consult [Space modeling rules](docs/spaces/modeling.md). The stable SM001-SM005 rule IDs explain errors, rationale, and rejected/limited alternatives. Consumers can call `SpaceModelingLaws.InspectDefinitions` from their test suite; it is a structural integrity check, not a semantic proof or a source-layout analyzer.
+When defining or evolving semantic Spaces, consult [Space modeling rules](docs/spaces/modeling.md). The stable SM001–SM007 identifiers explain errors, rationale, and rejected/limited alternatives. Consumers can call `SpaceModelingLaws.InspectDefinitions` from their test suite; the check is structural, not a semantic proof or source-layout analyzer.
+
+When defining or evolving Work Features, consult [Feature modeling rules](docs/work/feature-modeling.md) and [the current Feature contract](docs/feature-model.md). `FeatureModelingLaws.InspectDefinitions` checks the compiled, selected Feature definitions. The current active IDs are FM001–FM006 and FM008–FM010; FM007 is intentionally retired because the C# interface already enforces `Get(Request) -> Eff<ALG, Response>` at compile time. The reflection Laws do not prove correct outcomes, completed effects, authorization, or cancellation.
