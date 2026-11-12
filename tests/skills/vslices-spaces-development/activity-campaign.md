@@ -1,4 +1,4 @@
-# Caso de estudio — campaña de actividades comunitarias (iteración 2)
+# Caso de estudio — campaña de actividades comunitarias (iteración 4)
 
 > **Material para el agente evaluado.** Este documento reproduce un levantamiento funcional resumido, no un diseño técnico. No consultar otros archivos dentro de `tests/skills/vslices-spaces-development/`: ese directorio contiene material reservado de evaluación.
 
@@ -34,6 +34,14 @@ Después de conversar con quienes organizan las actividades, se recogieron las s
 
 «En los formularios actuales, el equipo sabe si está registrando a una persona o a una organización antes de ingresar el nombre correspondiente. No hemos definido límites de longitud, reglas de normalización o qué hacer con apellidos, nombres comerciales u otras variantes. Tampoco se conversó si una inscripción podría pasar de persona a organización después de registrarse».
 
+**Sobre un campo condicional del registro**
+
+«Además del nombre, el formulario de inscripción tiene un campo de **indicaciones de coordinación** para las organizaciones. Si se registra una persona individual, ese campo ni siquiera aparece. Si se registra una organización, aparece siempre, pero pueden dejarlo en blanco: no hay ninguna obligación de escribir algo».
+
+«Nos interesa conservar lo que realmente pasó al enviar el registro: que el campo nunca estuvo disponible no es lo mismo que haberlo mostrado y recibido en blanco. Tampoco es lo mismo que haber recibido un texto. Cuando el campo se muestra, su contenido puede tener desde cero hasta quinientos caracteres».
+
+«Esta distinción importa al interpretar la solicitud de registro, antes de decidir qué datos persistiremos. No hemos hablado de reglas adicionales sobre espacios, caracteres o cambios posteriores en ese campo».
+
 **Sobre cuentas de otra plataforma**
 
 «Algunas personas tienen una cuenta en una plataforma administrada por otra organización y quieren dejarla asociada a su inscripción. Otras no tienen ninguna, y eso está bien».
@@ -52,7 +60,7 @@ Después de conversar con quienes organizan las actividades, se recogieron las s
 
 A partir de este levantamiento, preparar el **modelo semántico de Spaces** para el módulo. Utilizar la Skill `vslices-spaces-development` disponible en el repositorio [vslices/framework](https://github.com/vslices/framework), consultando sus referencias y los contratos efectivos del Framework.
 
-Implementar los Spaces pertinentes con construcción y, cuando el dominio lo necesite, evolución. Preparar pruebas que permitan verificar tanto casos admitidos como rechazos relevantes. Limitar esta iteración al modelo semántico; no se solicita construir interfaces, Features completas, persistencia ni integración con la plataforma externa.
+Implementar los Spaces pertinentes con construcción y, cuando el dominio lo necesite, evolución. Preparar pruebas que permitan verificar tanto casos admitidos como rechazos relevantes. Limitar esta iteración al modelo semántico, incluyendo las distinciones que la solicitud de inscripción necesita conservar; no se solicita construir interfaces, Features completas, persistencia ni integración con la plataforma externa.
 
 Entregar los archivos o el código completo que se produzca, distinguir las verificaciones realmente ejecutadas de las pendientes y cerrar con el informe de modelado que solicita la Skill.
 
