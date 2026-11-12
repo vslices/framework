@@ -23,9 +23,33 @@ public sealed class FeatureModelingLawsTests
     [InlineData(typeof(NullableRequest), "FM009")]
     [InlineData(typeof(NullableResponse), "FM009")]
     [InlineData(typeof(NonPublicRequestConstruction), "FM005")]
+    [InlineData(typeof(MissingNestedResponse), "FM003")]
+    [InlineData(typeof(MissingNestedResponse), "FM004")]
+    [InlineData(typeof(WrongResponseFactory), "FM008")]
+    [InlineData(typeof(PublicInitResponse), "FM010")]
     public void Reports_exact_structural_failure(Type feature, string id)
     {
-        Assert.Contains(FeatureModelingLaws.Inspect(feature), issue => issue.RuleId == id);
+        var violation = Assert.Single(
+            FeatureModelingLaws.Inspect(feature), issue => issue.RuleId == id);
+
+        Assert.Equal(feature.FullName, violation.Definition);
+        Assert.False(string.IsNullOrWhiteSpace(violation.Error));
+        Assert.StartsWith(FeatureModelingLaws.Guide + "#" + id.ToLowerInvariant() + "-", violation.GuidanceUrl);
+        Assert.Contains("[" + id + "]", violation.ToString());
+        Assert.Contains(violation.Error, violation.ToString());
+        Assert.Contains(violation.GuidanceUrl, violation.ToString());
+    }
+
+    [Fact]
+    public void Consumer_scan_is_scoped_and_reports_owners()
+    {
+        var violations = FeatureModelingLaws.InspectDefinitions(
+            typeof(FeatureModelingLawsTests).Assembly, typeof(ValidTopLevelFeature).Namespace!);
+
+        Assert.Contains(violations, v => v.RuleId == "FM006"
+            && v.Definition == typeof(InvalidTopLevelFeature).FullName);
+        Assert.DoesNotContain(violations, v => v.Definition == typeof(ValidTopLevelFeature).FullName);
+        Assert.DoesNotContain(violations, v => v.Definition == typeof(FeatureModelingLawsTests).FullName);
     }
 
     [Fact]
@@ -118,6 +142,48 @@ public sealed class FeatureModelingLawsTests
         }
         [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
         private static extern Response NewResponse(string? value);
+        public static Eff<string, Response> Get(Request request) =>
+            Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+    }
+
+    public sealed record ExternalResponse(string Value);
+
+    public sealed class MissingNestedResponse :
+        Feature<MissingNestedResponse, string, MissingNestedResponse.Request, ExternalResponse>
+    {
+        public sealed record Request(string Value);
+        public static Eff<string, ExternalResponse> Get(Request request) =>
+            Eff<string, ExternalResponse>.LiftIO(_ => IO.pure(new ExternalResponse(request.Value)));
+    }
+
+    public sealed class WrongResponseFactory :
+        Feature<WrongResponseFactory, string, WrongResponseFactory.Request, WrongResponseFactory.Response>
+    {
+        public sealed record Request(string Value);
+        public sealed record Response
+        {
+            private Response(string value) => Value = value;
+            public string Value { get; }
+        }
+
+        [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+        private static extern Response NewResponse(int value);
+
+        public static Eff<string, Response> Get(Request request) =>
+            Eff<string, Response>.LiftIO(_ => IO.pure(default(Response)!));
+    }
+
+    public sealed class PublicInitResponse :
+        Feature<PublicInitResponse, string, PublicInitResponse.Request, PublicInitResponse.Response>
+    {
+        public sealed record Request(string Value);
+        public sealed record Response
+        {
+            private Response(string value) => Value = value;
+            public string Value { get; init; }
+        }
+        [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+        private static extern Response NewResponse(string value);
         public static Eff<string, Response> Get(Request request) =>
             Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
     }
