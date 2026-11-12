@@ -61,7 +61,7 @@ Do not force this factorization when current evidence contradicts it, but do not
 
 ## Current Work Model
 
-The current Feature contract uses `Eff<ALG, Response> Get(Request)` over executable Work algebras. `Flow` remains available as an independent core abstraction, but it is not the current Feature execution contract.
+The current Feature contract uses `Eff<ALG, RES> Get(REQ request)` over executable Work algebras. `Flow` remains available as an independent core abstraction, but it is not the current Feature execution contract.
 
 ```text
 Feature
@@ -191,7 +191,7 @@ Still treat the following as separate, unresolved work unless current repository
 - analyzers;
 - guarantee-oriented VSIR.
 
-Do not smuggle those guarantees into capability names, WorkPart names, interpreter classes, or Process composition.
+Do not smuggle those guarantees into capability names, Feature names, Grounding implementations, or Process composition. Historical WorkPart/interpreter designs do not establish guarantees for the current model.
 
 ---
 
@@ -200,7 +200,7 @@ Do not smuggle those guarantees into capability names, WorkPart names, interpret
 Failures expected by the modeled Work must remain explicit.
 
 - do not throw exceptions for expected flows;
-- use explicit error values or typed alternatives;
+- use `Error.New` for expected failures carried by effects, or explicit typed alternatives where absence/rejection is a modeled result;
 - preserve error information through composed Feature effects (use `Error.New` for expected failures; reserve .NET exceptions for exceptional conditions);
 - distinguish semantic rejection from effect execution or Grounding failure;
 - do not collapse missing authority or unsupported semantics into a plausible default.
