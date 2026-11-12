@@ -208,6 +208,8 @@ public sealed class FeatureModelingLawsTests
     public sealed class WrongSelfFeature :
         Feature<ValidFeature, string, ValidFeature.Request, ValidFeature.Response>
     {
+        public static Eff<string, ValidFeature.Response> Get(ValidFeature.Request request) =>
+            ValidFeature.Get(request);
     }
 
     public sealed class NonPublicRequestConstruction :
