@@ -27,14 +27,14 @@ public sealed class FeatureModelingLawsTests
     [InlineData(typeof(MissingNestedResponse), "FM004")]
     [InlineData(typeof(WrongResponseFactory), "FM008")]
     [InlineData(typeof(PublicInitResponse), "FM010")]
-    public void Reports_exact_structural_failure(Type feature, string id)
+    public void Reports_exact_structural_failure(Type feature, string id, string documentAnchor)
     {
         var violation = Assert.Single(
             FeatureModelingLaws.Inspect(feature), issue => issue.RuleId == id);
 
         Assert.Equal(feature.FullName, violation.Definition);
         Assert.False(string.IsNullOrWhiteSpace(violation.Error));
-        Assert.StartsWith(FeatureModelingLaws.Guide + "#" + id.ToLowerInvariant() + "-", violation.GuidanceUrl);
+        Assert.Equal(FeatureModelingLaws.Guide + "#" + documentAnchor, violation.GuidanceUrl);
         Assert.Contains("[" + id + "]", violation.ToString());
         Assert.Contains(violation.Error, violation.ToString());
         Assert.Contains(violation.GuidanceUrl, violation.ToString());
