@@ -2,7 +2,7 @@
 
 ## Status
 
-Point operations are currently modeled as executable algebraic capability atoms and composed into Work-module algebras used directly as `Flow` runtimes.
+Point operations are currently modeled as executable algebraic capability atoms and composed into Work-module algebras used directly as `Eff` runtimes.
 
 The validated point atoms are:
 
@@ -65,7 +65,7 @@ public interface PointRemover<POINT, ID>
 
 `ReadOrDefault` is the primitive a Grounding must realize. It keeps absence explicit as `OptionT<IO, POINT>` and carries an at-most-one law: if the realization can observe more than one point for the same identity, it should fail the effect rather than choose one. This completes the intended `SingleOrDefault`-like semantics.
 
-`Read` is a default required-value view over that primitive. If the point is absent it fails exceptionally, matching the distinction between LINQ `Single` and `SingleOrDefault`. An implementation may declare its own `Read` when required lookup needs more specific failure or retrieval semantics, but the override should preserve the meaning that the point is required to exist.
+`Read` is a default required-value view over that primitive. If the point is absent it fails exceptionally, matching the required-presence contract and the LINQ `Single` versus `SingleOrDefault` distinction. This is intentional; a new catchable error category or `@catch` is not required solely to represent that absence. An implementation may declare its own `Read` when required lookup needs more specific failure or retrieval semantics, but the override should preserve the meaning that the point is required to exist.
 
 Because default interface members are not exposed as ordinary instance members on a concrete implementing type, `PointReaderExtensions.Read` forwards concrete readers to the trait member. This lets a Grounding implement only `ReadOrDefault` and still call `grounding.Read(id)`. If the concrete reader declares its own `Read`, normal C# member resolution gives that specialized method precedence while interface dispatch preserves the override.
 
@@ -89,20 +89,27 @@ Features then use that algebra directly:
 public sealed class GetTodo :
     Feature<GetTodo, TodoAlgebra, GetTodo.Request, GetTodo.Response>
 {
-    public static Flow<TodoAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
-            algebra.Reader
-                .ReadOrDefault(request.Id)
-                .Run()
-                .As()
-                .Map(todo => new Response(todo)));
+    public sealed record Request(TodoId Id);
+    public sealed record Response
+    {
+        private Response(Option<Todo> todo) => Todo = todo;
+        public Option<Todo> Todo { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(Option<Todo> todo);
+
+    public static Eff<TodoAlgebra, Response> Get(Request request) =>
+        Eff<TodoAlgebra, Response>.LiftIO(algebra =>
+            algebra.Reader.ReadOrDefault(request.Id).Run().As()
+                .Map(NewResponse));
 }
 ```
 
 The algebra is both:
 
 - an explicit description of the executable operations available to the module;
-- the runtime required by the module's Flows.
+- the runtime required by the module's Effects.
 
 ## Grounding
 
@@ -148,25 +155,21 @@ AlgebraMix<FileAlgebra, TodoAlgebra>
 
 `AlgebraMix` deliberately states only that the child algebras are available together for projection. It does not import the coproduct semantics of the earlier Free instruction model or claim a stronger mathematical construction than current evidence requires.
 
-The child Flow is lifted into that larger runtime by runtime projection:
+Child Features receive their requests explicitly, and the parent projects the appropriate algebra when executing their effects:
 
 ```csharp
-AddFile.Get()
-    .MapRuntime(
-        (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
+AddFile.Get(new AddFile.Request(name, content)).RunIO(mix.A)
 ```
 
-This is a contravariant adaptation of the Flow runtime: the parent runtime knows how to provide the smaller runtime required by the child.
-
-Requests are adapted separately with `MapRequest`.
+No Flow `MapRuntime` or `MapRequest` operation is required in the Feature path.
 
 ## Current executable evidence
 
 The experiment currently exercises:
 
-1. point atoms directly through a Feature Flow;
+1. point atoms directly through a Feature Eff;
 2. a seven-way `AlgebraMix`;
-3. temporal capability atoms as a Flow runtime;
+3. temporal capability atoms as a Feature Eff runtime;
 4. a CRUD SampleWorkflow using one module algebra;
 5. same-module Feature composition;
 6. cross-service BFF composition using `AlgebraMix<FileAlgebra, TodoAlgebra>`;

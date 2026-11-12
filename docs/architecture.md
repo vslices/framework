@@ -8,7 +8,7 @@ Core language and reusable mechanisms shared by the rest of the Framework.
 
 Current examples include:
 
-- `Req` / `ReqK`;
+- LanguageExt effects and explicit failures;
 - `Flow`;
 - category/arrow traits;
 - literals and small cross-cutting primitives.
@@ -29,7 +29,7 @@ The current Feature contract is:
 
 ```text
 Feature
-    -> Flow<ALG, Request, Response>
+    -> Eff<ALG, Response> Get(Request)
 ```
 
 For capability-backed Work, `ALG` is an executable algebra: a simple value that composes the smallest executable capability atoms the module exposes.
@@ -44,7 +44,7 @@ public sealed record TodoAlgebra(
     TodoIdSource Ids);
 ```
 
-The algebra is the runtime required by the Flow. It is not a Free program, interpreter vocabulary, DI service bag, Repository, or Infrastructure layer.
+The algebra is the runtime required by the Feature's Eff. It is not a Free program, interpreter vocabulary, DI service bag, Repository, or Infrastructure layer.
 
 ## VSlices.Grounding
 
@@ -68,16 +68,15 @@ AlgebraMix<A, B, C>
 ...
 ```
 
-`AlgebraMix` means only that independently owned executable algebras are available together to a composing Flow. The name deliberately avoids claiming product/coproduct semantics beyond the projections actually used.
+`AlgebraMix` means only that independently owned executable algebras are available together to a composing Feature. The name deliberately avoids claiming product/coproduct semantics beyond the projections actually used.
 
-A child Flow is adapted to a composed runtime by projecting the algebra it requires:
+A composing Feature constructs the child's public Request and passes the projected child algebra when running the returned Eff:
 
 ```csharp
-child.MapRuntime(
-    (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
+Child.Get(new Child.Request(...)).RunIO(mix.A)
 ```
 
-Requests can be adapted independently with `MapRequest`, or runtime and request together with `ContraMap`.
+The `Flow` abstraction continues to exist independently, but is no longer the Feature execution contract.
 
 This preserves the distinction:
 
@@ -97,7 +96,7 @@ Space
     semantic meaning
 
 Work
-    Feature -> Flow<Algebra, Request, Response>
+    Feature -> Eff<Algebra, Response> Get(Request)
     Algebra -> executable capability atoms
 
 Grounding

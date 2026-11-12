@@ -15,6 +15,20 @@ PACKAGES = {
     "VSlices.Views.Abstract",
 }
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
+# Direct package references that must remain visible to NuGet consumers.
+# Keep this graph aligned with the seven packable .csproj files.
+INTERNAL_DEPENDENCIES = {
+    "VSlices": set(),
+    "VSlices.Spaces": {"VSlices"},
+    "VSlices.Work": {"VSlices", "VSlices.Spaces"},
+    "VSlices.Grounding": {"VSlices.Work"},
+    "VSlices.Grounding.EntityFrameworkCore.Functional": {"VSlices"},
+    "VSlices.Grounding.EntityFrameworkCore": {
+        "VSlices.Work", "VSlices.Grounding.EntityFrameworkCore.Functional",
+    },
+    "VSlices.Views.Abstract": {"VSlices.Spaces"},
+}
+
 
 def fail(message):
     raise SystemExit(message)
@@ -55,6 +69,23 @@ for path in files:
         actual_authors = [a.strip() for a in (authors or "").replace(";", ",").split(",")]
         if actual_authors != expected_authors:
             fail(f"{package_id}: unexpected authors metadata {authors!r}")
+        dependencies = {
+            element.attrib["id"]: element.attrib.get("version", "")
+            for element in root.iter()
+            if element.tag.split("}")[-1] == "dependency" and "id" in element.attrib
+        }
+        actual_internal = set(dependencies) & PACKAGES
+        expected_internal = INTERNAL_DEPENDENCIES[package_id]
+        if actual_internal != expected_internal:
+            fail(f"{package_id}: internal dependencies {actual_internal} != {expected_internal}")
+        for dependency_id in expected_internal:
+            declared = dependencies[dependency_id]
+            # NuGet renders ProjectReference versions as ranges, usually [x, ).
+            minimum = declared.lstrip("[(").split(",", 1)[0].rstrip("])")
+            if minimum != VERSION:
+                fail(f"{package_id}: {dependency_id} version {declared!r} != {VERSION}")
+        if "VSlices.EntityFrameworkCore.Functional" in dependencies:
+            fail(f"{package_id}: reference to retired functional EF Core package ID")
         if "README.md" not in names or "icon.png" not in names:
             fail(f"{package_id}: missing package README or icon")
         if any(x.startswith("analyzers/") for x in names):

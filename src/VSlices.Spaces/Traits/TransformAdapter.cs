@@ -19,9 +19,9 @@ namespace VSlices.Spaces.Traits;
 /// constructor with exactly one parameter of type <typeparamref name="FROM"/>, and
 /// the target to implement <c>Transformable&lt;TO.Input, TO&gt;</c>.
 ///
-/// These conditions are verified statically by the VSlices analyzer when the
-/// closed adapter is visible to Roslyn. Runtime validation remains as a safety
-/// boundary for open generic consumers such as UI components.
+/// Consumer-invoked TransformAdapterModelingLaws can check closed adapter pairs.
+/// The experimental analyzer is source-only and not distributed with NuGet.
+/// Runtime validation remains the safety boundary for open generic consumers.
 /// </remarks>
 public sealed class TransformAdapter<FROM, TO> :
     Transformable<TransformAdapter<FROM, TO>, FROM, TO>

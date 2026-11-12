@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This sample pressures executable-algebra Flow composition across two independently owned Work modules.
+This sample pressures executable-algebra Eff composition across two independently owned Work modules.
 
 The scenario is:
 
@@ -36,7 +36,7 @@ SampleWorkflow
 SampleBFF
     owns cross-service coordination
     owns FileAlgebra + TodoAlgebra composition
-    owns request/runtime adaptation between child Flows
+    owns explicit child Requests and algebra projection for child Effects
 
 Grounding
     owns realization of each algebraic capability atom
@@ -56,44 +56,17 @@ Feature<
     Response>
 ```
 
-Each child Flow keeps its smaller runtime:
-
-```text
-AddFile
-    Flow<FileAlgebra, AddFile.Request, AddFile.Response>
-
-AddAttachmentReference
-    Flow<TodoAlgebra, AddAttachmentReference.Request, ...>
-```
-
-The parent adapts each child to the larger runtime by projection:
+Each child Feature receives its nominal public Request and returns an `Eff` that requires its own module algebra. The BFF projects the corresponding runtime explicitly:
 
 ```csharp
-AddFile.Get()
-    .MapRuntime(
-        (AlgebraMix<FileAlgebra, TodoAlgebra> sum) => sum.A)
+AddFile.Get(new AddFile.Request(name, content))
+    .RunIO(mix.A);
 
-AddAttachmentReference.Get()
-    .MapRuntime(
-        (AlgebraMix<FileAlgebra, TodoAlgebra> sum) => sum.B)
+AddAttachmentReference.Get(new AddAttachmentReference.Request(todoId, resource))
+    .RunIO(mix.B);
 ```
 
-Requests are adapted independently with `MapRequest`.
-
-This gives the composition geometry:
-
-```text
-parent runtime
-    AlgebraMix<FileAlgebra, TodoAlgebra>
-        |                       |
-        v                       v
-    FileAlgebra             TodoAlgebra
-        |                       |
-        v                       v
-    AddFile Flow     AddAttachmentReference Flow
-```
-
-The runtime mapping is contravariant: the parent provides enough structure to satisfy the smaller runtime required by the child.
+The parent owns composition, and neither child needs to know about the BFF. This does not require `MapRuntime`, `MapRequest` or `ContraMap`.
 
 ## Grounding
 
@@ -138,8 +111,8 @@ The tests demonstrate that:
 
 1. each child Feature runs against its independently owned module algebra;
 2. the BFF can compose those algebras structurally;
-3. `MapRuntime` projects the larger runtime into each child runtime;
-4. `MapRequest` adapts the parent request independently;
+3. the parent projects the child runtime explicitly at `RunIO`;
+4. the parent constructs each child Request explicitly;
 5. both Groundings remain independently readable after the composed Feature completes;
 6. no Free/interpreter layer is required for this composition.
 

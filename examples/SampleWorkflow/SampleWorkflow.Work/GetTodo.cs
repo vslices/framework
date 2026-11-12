@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using SampleWorkflow.Spaces;
 using VSlices.Monads;
@@ -9,10 +10,17 @@ public sealed class GetTodo :
     Feature<GetTodo, TodoAlgebra, GetTodo.Request, GetTodo.Response>
 {
     public sealed record Request(TodoId Id);
-    public sealed record Response(Option<Todo> Todo);
+    public sealed record Response
+    {
+        private Response(Option<Todo> todo) => Todo = todo;
+        public Option<Todo> Todo { get; }
+    }
 
-    public static Flow<TodoAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(Option<Todo> todo);
+
+    public static Eff<TodoAlgebra, Response> Get(Request request) =>
+        Eff<TodoAlgebra, Response>.LiftIO(algebra =>
             algebra.Reader.ReadOrDefault(request.Id).Run().As()
-                .Map(todo => new Response(todo)));
+                .Map(todo => NewResponse(todo)));
 }

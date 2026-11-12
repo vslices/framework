@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Monads;
 using VSlices.Work;
@@ -16,11 +17,8 @@ public sealed class PointAlgebraTests
             [new Account(id, "before")]);
 
         var response = await RenameAccount
-            .Get()
-            .RunFlow(
-                grounding.Algebra,
-                new RenameAccount.Request(id, "after"))
-            .RunAsync();
+            .Get(new RenameAccount.Request(id, "after")).RunIO(grounding.Algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.True(response.Account.IsSome);
         Assert.Equal(
@@ -43,7 +41,7 @@ public sealed class PointAlgebraTests
             .ReadOrDefault(id)
             .Run()
             .As()
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.True(result.IsNone);
     }
@@ -57,7 +55,7 @@ public sealed class PointAlgebraTests
         var error = await Assert.ThrowsAsync<InvalidOperationException>(
             async () =>
             {
-                _ = await grounding.Read(id).RunAsync();
+                _ = await grounding.Read(id).RunAsync(TestContext.Current.CancellationToken);
             });
 
         Assert.Equal(
@@ -74,7 +72,7 @@ public sealed class PointAlgebraTests
         var error = await Assert.ThrowsAsync<AccountNotFoundException>(
             async () =>
             {
-                _ = await reader.Read(id).RunAsync();
+                _ = await reader.Read(id).RunAsync(TestContext.Current.CancellationToken);
             });
 
         Assert.Equal(id, error.Id);
@@ -90,7 +88,7 @@ public sealed class PointAlgebraTests
         var error = await Assert.ThrowsAsync<AccountNotFoundException>(
             async () =>
             {
-                _ = await reader.Read(id).RunAsync();
+                _ = await reader.Read(id).RunAsync(TestContext.Current.CancellationToken);
             });
 
         Assert.Equal(id, error.Id);
@@ -106,10 +104,17 @@ public sealed class RenameAccount :
     Feature<RenameAccount, AccountAlgebra, RenameAccount.Request, RenameAccount.Response>
 {
     public sealed record Request(AccountId AccountId, string Name);
-    public sealed record Response(Option<Account> Account);
+    public sealed record Response
+    {
+        private Response(Option<Account> account) => Account = account;
+        public Option<Account> Account { get; }
+    }
 
-    public static Flow<AccountAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(Option<Account> account);
+
+    public static Eff<AccountAlgebra, Response> Get(Request request) =>
+        Eff<AccountAlgebra, Response>.LiftIO(algebra =>
             algebra.Reader
                 .ReadOrDefault(request.AccountId)
                 .Run()
@@ -121,9 +126,9 @@ public sealed class RenameAccount :
                                 .Write(account with { Name = request.Name })
                                 .Bind(_ => algebra.Reader.Read(request.AccountId))
                                 .Map(updated =>
-                                    new Response(Some(updated))),
+                                    NewResponse(Some(updated))),
                         None: static () =>
-                            IO.pure(new Response(Option<Account>.None)))));
+                            IO.pure(NewResponse(Option<Account>.None)))));
 }
 
 public readonly record struct AccountId(Guid Value);

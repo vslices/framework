@@ -1,163 +1,63 @@
 # Feature Model
 
-Features are the main executable unit of Work in VSlices.
+Features are executable operations owned by Work. A Feature has an executable algebra and an explicit public input request. The caller constructs the request, while only the owning Feature constructs its response.
 
-A Feature owns:
-
-- one nominal request type;
-- one nominal response type;
-- one executable runtime algebra;
-- one `Flow` that relates those three surfaces.
-
-## Core shape
+## Core contract
 
 ```csharp
-public sealed class SomeFeature :
-    Feature<
-        SomeFeature,
-        SomeAlgebra,
-        SomeFeature.Request,
-        SomeFeature.Response>
+public interface Feature<F, ALG, REQ, RES>
+    where F : Feature<F, ALG, REQ, RES>
 {
-    public sealed record Request(...);
-    public sealed record Response(...);
-
-    public static Flow<SomeAlgebra, Request, Response> Get() => ...;
+    static abstract Eff<ALG, RES> Get(REQ request);
 }
 ```
 
-Conceptually:
-
-```text
-Feature
-├── Request
-├── Response
-└── Flow<Algebra, Request, Response>
-```
-
-The runtime channel is not an arbitrary dependency carrier. For capability-backed Work it is the executable algebra exposed by the owning Work module.
-
-## Runtime and request are distinct channels
-
-```text
-ALG = executable operations available to Work
-REQ = input for this execution
-RES = result of this execution
-```
-
-They compose independently.
-
-A child Feature can be reused under a larger runtime:
+Example:
 
 ```csharp
-child.MapRuntime(
-    (AlgebraMix<A, B> sum) => sum.A)
+public sealed class ReadItem :
+    Feature<ReadItem, ItemAlgebra, ReadItem.Request, ReadItem.Response>
+{
+    public sealed record Request(ItemId Id);
+
+    public sealed record Response
+    {
+        private Response(Item item) => Item = item;
+        public Item Item { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(Item item);
+
+    public static Eff<ItemAlgebra, Response> Get(Request request) =>
+        Eff<ItemAlgebra, Response>.LiftIO(algebra =>
+            algebra.Reader.Read(request.Id).Map(NewResponse));
+}
 ```
 
-and under a different parent request:
+The request is applied at `Get(request)`, producing an `Eff<ALG, Response>` that is executed later using the algebra supplied by Grounding. Request is not `Transformable`; it is the nominal input to a proposed Work execution. Response uses encapsulated private construction because it is the Feature-owned outcome, not an arbitrary DTO.
+
+For structural checks and explicit limitations see [Feature Modeling Laws](work/feature-modeling.md).
+
+## Runtime and composition
+
+`ALG` is a module-owned algebra of executable capability atoms, e.g. `PointReader`, `PointWriter`, `PointRemover`. Do not infer durability, transactionality, or repository semantics from these capabilities.
+
+A parent Feature can compose children directly:
 
 ```csharp
-child.MapRequest(
-    (Parent.Request request) =>
-        new Child.Request(...))
+Eff<AlgebraMix<A, B>, Response>.LiftIO(mix =>
+    Child.Get(new Child.Request(...))
+        .RunIO(mix.A)
+        .Map(child => NewResponse(child.Result)));
 ```
 
-`ContraMap` adapts both channels together when that is clearer.
+This keeps child Feature ownership and projects only the required algebra. It does not require `MapRuntime`, `MapRequest`, or `ContraMap`.
 
-Result transformation remains ordinary `Map`.
+`Flow` remains an independent Framework abstraction, but no longer defines the Feature contract.
 
-## Module algebra
+## Errors
 
-A `[concept].Work` module should define the algebra used by its Features.
+Expected failures must remain explicit as `Error.New(...)` propagated by the effect or represented in modeled results. Throw .NET exceptions only for unexpected exceptional conditions. The broader `PointReader.Read` error policy is a separate review; this contract change does not claim to have revised it.
 
-Prefer a small record composed from executable capability atoms:
-
-```csharp
-public sealed record TodoAlgebra(
-    PointReader<Todo, TodoId> Reader,
-    PointWriter<Todo> Writer,
-    PointRemover<Todo, TodoId> Remover,
-    TodoIdSource Ids);
-```
-
-Do not create one algebra per Feature merely because Features consume different subsets. The module algebra represents the executable vocabulary owned by that Work module; individual Features simply use the operations they need.
-
-Do not inflate the algebra with hypothetical capabilities.
-
-## Grounding
-
-A `[concept].Grounding` realization implements the algebraic atoms and assembles the module algebra.
-
-```text
-Work owns:
-    TodoAlgebra
-    PointReader/Writer/Remover requirements
-
-Grounding owns:
-    how those requirements contact the world
-```
-
-No generic Grounding-to-algebra provider contract is currently required. A concrete Grounding may simply expose its assembled algebra as a property. The former `AlgebraIO<ALG>` marker was retired because no generic behavior consumed it.
-
-## Feature composition
-
-### Same module
-
-Features sharing the same algebra compose directly as Flows. Their requests can be adapted with `MapRequest`.
-
-### Independent modules
-
-A Feature that coordinates independently owned Work can currently use:
-
-```text
-AlgebraMix<A, B, ...>
-```
-
-and project each child algebra with `MapRuntime`.
-
-`AlgebraMix` intentionally describes structural availability without claiming that the Framework has established a categorical product/coproduct abstraction. The parent contains the required child algebras and projects the one required by each child Flow.
-
-This preserves child ownership:
-
-```text
-child Feature
-    knows only its own algebra
-
-parent Feature
-    owns the composition and projection
-
-Grounding
-    realizes the child atoms
-```
-
-## Presentation
-
-Presentation adapters should:
-
-1. receive external input;
-2. transform/refine it into the Feature request;
-3. obtain the required executable algebra from Grounding;
-4. run the Feature Flow;
-5. translate the Feature response outward.
-
-HTTP, UI, workers and transports do not define Feature semantics.
-
-## Failures
-
-Expected failures remain explicit values or effect failures.
-
-Transport-specific status codes do not belong to the base Feature error model. Presentation decides how semantic/application outcomes map to HTTP or another transport.
-
-## Current rules
-
-A Feature should:
-
-- own nominal Request and Response types;
-- expose `Flow<ALG, Request, Response>`;
-- use an executable Work algebra as its capability-backed runtime;
-- remain presentation-independent;
-- compose child Features rather than reimplementing them;
-- adapt runtime, request and result through explicit mappings;
-- avoid Free-monad/interpreter layers unless future evidence independently justifies a different mechanism.
-
-The implementation remains evidence. These rules are current and revisable.
+Presentation transforms/refines external inputs into public Feature Requests, runs effects against Grounding algebras, and maps the response to the transport. The transport does not own the Feature's semantic result.

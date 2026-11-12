@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Monads;
 using VSlices.Work;
@@ -26,38 +27,38 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
             .ReadOrDefault(id)
             .Run()
             .As()
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.True(missing.IsNone);
 
         await points
             .Write(new DirectRecord { Id = id, Name = "created" })
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
-        var created = await points.Read(id).RunAsync();
+        var created = await points.Read(id).RunAsync(TestContext.Current.CancellationToken);
         Assert.Equal("created", created.Name);
 
         await points
             .Write(new DirectRecord { Id = id, Name = "updated" })
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
-        var updated = await points.Read(id).RunAsync();
+        var updated = await points.Read(id).RunAsync(TestContext.Current.CancellationToken);
         Assert.Equal("updated", updated.Name);
 
-        await points.Remove(id).RunAsync();
+        await points.Remove(id).RunAsync(TestContext.Current.CancellationToken);
 
         var removed = await points
             .ReadOrDefault(id)
             .Run()
             .As()
-            .RunAsync();
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.True(removed.IsNone);
 
         await Assert.ThrowsAsync<InvalidOperationException>(
             async () =>
             {
-                _ = await points.Read(id).RunAsync();
+                _ = await points.Read(id).RunAsync(TestContext.Current.CancellationToken);
             });
     }
 
@@ -89,11 +90,8 @@ public sealed class EntityFrameworkPointIOTests(PostgreSqlFixture database)
         var id = Guid.NewGuid();
 
         var evidence = await ExerciseRecord
-            .Get()
-            .RunFlow(
-                algebra,
-                new ExerciseRecord.Request(id))
-            .RunAsync();
+            .Get(new ExerciseRecord.Request(id)).RunIO(algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(
             new Record(id, "created"),
@@ -117,13 +115,28 @@ public sealed class ExerciseRecord :
 {
     public sealed record Request(Guid Id);
 
-    public sealed record Response(
-        Record Created,
-        Record Updated,
-        Option<Record> Removed);
+    public sealed record Response
+    {
+        private Response(Record created, Record updated, Option<Record> removed)
+        {
+            Created = created;
+            Updated = updated;
+            Removed = removed;
+        }
 
-    public static Flow<RecordAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
+        public Record Created { get; }
+        public Record Updated { get; }
+        public Option<Record> Removed { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(
+        Record created,
+        Record updated,
+        Option<Record> removed);
+
+    public static Eff<RecordAlgebra, Response> Get(Request request) =>
+        Eff<RecordAlgebra, Response>.LiftIO(algebra =>
             algebra.Writer.Write(new Record(request.Id, "created"))
                 .Bind(_ => algebra.Reader.Read(request.Id))
                 .Bind(created =>
@@ -137,7 +150,7 @@ public sealed class ExerciseRecord :
                                         .Run()
                                         .As())
                                 .Map(removed =>
-                                    new Response(
+                                    NewResponse(
                                         created,
                                         updated,
                                         removed)))));

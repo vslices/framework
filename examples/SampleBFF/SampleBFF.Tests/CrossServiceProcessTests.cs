@@ -1,3 +1,4 @@
+using LanguageExt;
 using SampleFileRepo;
 using SampleWorkflow.Grounding;
 using SampleWorkflow.Spaces;
@@ -19,13 +20,10 @@ public sealed class CrossServiceFeatureCompositionTests
             .ThrowIfFail();
 
         var created = await CreateTodo
-            .Get()
-            .RunFlow(
-                todo.Algebra,
-                new CreateTodo.Request(
+            .Get(new CreateTodo.Request(
                     detail,
-                    Completed: false))
-            .RunAsync();
+                    Completed: false)).RunIO(todo.Algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         var createdTodo = created.Todo.Match(
             Left: error => throw error.ToException(),
@@ -38,14 +36,11 @@ public sealed class CrossServiceFeatureCompositionTests
             todo.Algebra);
 
         var response = await AttachFileToTodo
-            .Get()
-            .RunFlow(
-                algebra,
-                new AttachFileToTodo.Request(
+            .Get(new AttachFileToTodo.Request(
                     createdTodo.Id,
                     "evidence.txt",
-                    [1, 2, 3, 4]))
-            .RunAsync();
+                    [1, 2, 3, 4])).RunIO(algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         var attached = response.Attachment.Match(
             Left: error => throw error.ToException(),
@@ -60,22 +55,16 @@ public sealed class CrossServiceFeatureCompositionTests
             attached.Todo.Attachments[0].Value);
 
         var rereadTodo = await GetTodo
-            .Get()
-            .RunFlow(
-                todo.Algebra,
-                new GetTodo.Request(createdTodo.Id))
-            .RunAsync();
+            .Get(new GetTodo.Request(createdTodo.Id)).RunIO(todo.Algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Single(
             rereadTodo.Todo.IfNone(
                 () => throw new InvalidOperationException()).Attachments);
 
         var rereadFile = await GetFile
-            .Get()
-            .RunFlow(
-                files.Algebra,
-                new GetFile.Request(attached.File.Id))
-            .RunAsync();
+            .Get(new GetFile.Request(attached.File.Id)).RunIO(files.Algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(
             "evidence.txt",
@@ -97,14 +86,11 @@ public sealed class CrossServiceFeatureCompositionTests
             todo.Algebra);
 
         var response = await AttachFileToTodo
-            .Get()
-            .RunFlow(
-                algebra,
-                new AttachFileToTodo.Request(
+            .Get(new AttachFileToTodo.Request(
                     missingTodoId,
                     "orphan.txt",
-                    [9, 8, 7]))
-            .RunAsync();
+                    [9, 8, 7])).RunIO(algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         var attachment = response.Attachment.Match(
             Left: error => throw error.ToException(),

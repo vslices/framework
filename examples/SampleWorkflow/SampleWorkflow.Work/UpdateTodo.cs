@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using LanguageExt.Common;
 using SampleWorkflow.Spaces;
@@ -12,10 +13,17 @@ public sealed class UpdateTodo :
     Feature<UpdateTodo, TodoAlgebra, UpdateTodo.Request, UpdateTodo.Response>
 {
     public sealed record Request(TodoId Id, TodoDetail Detail, bool Completed);
-    public sealed record Response(Either<Error, Option<Todo>> Todo);
+    public sealed record Response
+    {
+        private Response(Either<Error, Option<Todo>> todo) => Todo = todo;
+        public Either<Error, Option<Todo>> Todo { get; }
+    }
 
-    public static Flow<TodoAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(Either<Error, Option<Todo>> todo);
+
+    public static Eff<TodoAlgebra, Response> Get(Request request) =>
+        Eff<TodoAlgebra, Response>.LiftIO(algebra =>
             algebra.Reader.ReadOrDefault(request.Id).Run().As()
                 .Bind(current =>
                     current.Match(
@@ -29,16 +37,16 @@ public sealed class UpdateTodo :
                                 Succ: updated =>
                                     algebra.Writer.Write(updated)
                                         .Map(_ =>
-                                            new Response(
+                                            NewResponse(
                                                 Either.Right<Error, Option<Todo>>(
                                                     Some(updated)))),
                                 Fail: error =>
                                     IO.pure(
-                                        new Response(
+                                        NewResponse(
                                             Either.Left<Error, Option<Todo>>(error)))),
                         None: static () =>
                             IO.pure(
-                                new Response(
+                                NewResponse(
                                     Either.Right<Error, Option<Todo>>(
                                         Option<Todo>.None))))));
 }

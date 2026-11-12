@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Monads;
 using VSlices.Spaces.Quantities;
@@ -19,13 +20,10 @@ public sealed class TemporalAlgebraTests
         var algebra = new TemporalAlgebra(grounding, grounding);
 
         var response = await TemporalProbe
-            .Get()
-            .RunFlow(
-                algebra,
-                new TemporalProbe.Request(
+            .Get(new TemporalProbe.Request(
                     new Duration<double>(2),
-                    new Duration<double>(5)))
-            .RunAsync();
+                    new Duration<double>(5))).RunIO(algebra)
+            .RunAsync(TestContext.Current.CancellationToken);
 
         Assert.Equal(origin, response.Observed);
         Assert.Equal(
@@ -45,17 +43,24 @@ public sealed class TemporalProbe :
         Duration<double> DelayFor,
         Duration<double> DelayUntilOffset);
 
-    public sealed record Response(Moment Observed);
+    public sealed record Response
+    {
+        private Response(Moment observed) => Observed = observed;
+        public Moment Observed { get; }
+    }
 
-    public static Flow<TemporalAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(Moment observed);
+
+    public static Eff<TemporalAlgebra, Response> Get(Request request) =>
+        Eff<TemporalAlgebra, Response>.LiftIO(algebra =>
             algebra.Clock.Now
                 .Bind(now =>
                     algebra.Delay.For(request.DelayFor)
                         .Bind(_ =>
                             algebra.Delay.Until(
                                 now + request.DelayUntilOffset))
-                        .Map(_ => new Response(now))));
+                        .Map(_ => NewResponse(now))));
 }
 
 public sealed class RecordingTemporalIO(Moment now) :

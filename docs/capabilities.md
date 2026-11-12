@@ -36,7 +36,7 @@ The algebra is the runtime of Features owned by that Work module:
 
 ```text
 Feature
-    -> Flow<TodoAlgebra, Request, Response>
+    -> Eff<TodoAlgebra, Response> Get(Request)
 ```
 
 This gives the runtime a structural meaning: it is the algebra of executable operations available to that module, rather than an arbitrary collection of dependencies.
@@ -68,12 +68,11 @@ A consumer that needs multiple independently owned algebras composes them struct
 AlgebraMix<FileAlgebra, TodoAlgebra>
 ```
 
-Child Flows are adapted by projection:
+Child Features receive explicit requests and run with their projected algebra:
 
 ```csharp
-AddFile.Get()
-    .MapRuntime(
-        (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
+AddFile.Get(new AddFile.Request(name, content))
+    .RunIO(mix.A);
 ```
 
 This makes the relationship explicit:
@@ -82,13 +81,7 @@ This makes the relationship explicit:
 larger algebra -> child algebra
 ```
 
-Request adaptation is separate:
-
-```csharp
-.MapRequest(
-    (ParentRequest request) =>
-        new ChildRequest(...))
-```
+Request adaptation is explicit construction of each child Feature's nominal Request. `MapRequest` and `MapRuntime` are not required by the Feature contract.
 
 ## Point capability atoms
 
