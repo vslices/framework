@@ -175,9 +175,7 @@ in a controlled repository experiment, but it is not a guarantee of the
 published package. The experimental analyzer's identifiers are `VST001`,
 `VST002`, `VST003`; these are not the Laws' `TA001`–`TA003`.
 
-The experimental diagnostics were:
-
-Current diagnostics are:
+The experimental diagnostics are:
 
 ```text
 VST001
