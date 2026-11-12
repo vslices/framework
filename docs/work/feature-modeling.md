@@ -49,9 +49,7 @@ recognizes.
 **Preferred realization:** Declare a public nested `Response` with encapsulated
 construction.
 
-**Alternative and limit:** Reusable result primitives (`Option<A>`,
-`Either<L,R>`, and similar types) can still appear *inside* Response.
-Reflection cannot prove an outcome was actually produced by successful work.
+**Alternative and limit:** Result primitives such as `Option<A>` and `Either<L,R>` can appear inside Response **only if their alternatives are meaningful, valid successful outcomes** of the Feature. They must not duplicate the failure channel already supplied by `Eff<RT, A>`. Reflection cannot prove an outcome was actually produced by successful work.
 
 ## FM004 — Nominal binding
 
@@ -176,21 +174,55 @@ proves effects were completed.
 This difference is a documented modeling decision, **not** an additional
 executable Law.
 
-## Modeling practice — Explicit outcomes are not exception control flow
+## Modeling practice — Success-only Responses and Fallible Eff
 
-Expected rejection, missing data, or validation failure belongs in explicit
-effect errors (`Error.New`) or in the modeled result when that distinction is
-semantically required. Reserve .NET exceptions for exceptional failures.
-An `Eff` return type by itself cannot enforce this practice.
+A Feature's nominal `Response` models **successful execution**. `Eff<RT, Response>`
+already implements fallible effect behavior: executing it produces
+`Fin<Response>`, with either the successful Response or a failure. Do not
+model the same failure a second time inside Response.
 
-A Feature's public Request expresses an attempted operation; the Response
-type expresses an owned outcome. A private constructor does **not** prove that
-an effect ran successfully or that external side effects committed. If a
-failure is expected, model it rather than creating a misleading successful
-response or throwing an ordinary `InvalidOperationException`.
+In particular, avoid `Response(Either<Error, Option<A>> Outcome)` when
+`Left` means failure and `None` merely stands for a rejected operation
+(such as creating an item whose ID is already present). This creates
+`Fin<Either<Error, Option<A>>>` in substance, adds redundant branches,
+and makes invalid operations look like successful Feature responses.
 
-This is **a design and behavior review practice**, not another executable
-reflection Law.
+Prefer a response with the **semantic name of the produced value**:
+
+```csharp
+public sealed record Response
+{
+    private Response(Item item) => Item = item;
+    public Item Item { get; }
+}
+
+[UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+private static extern Response NewResponse(Item item);
+```
+
+When an operation is rejected, use the fallible channel of `Eff`.
+An explicit failure constructor is `Eff<RT, Response>.Fail(error)`.
+Where type inference has already established `Eff<RT, Response>`,
+the `LanguageExt.Prelude.Fail(error)` shorthand can be preferable.
+Use a meaningful `Error` value that consumers can interpret; do not
+manufacture a successful Response to encode a rejected attempt.
+
+`Option<A>` remains appropriate **when absence itself is a valid
+successful result**, for instance a lookup whose contract explicitly permits
+no match. `Either<L,R>` remains appropriate for meaningful success-level
+alternatives that are not merely duplicates of `Eff` failure. Do not use
+a monadic type just because it is available; each branch must have an
+articulable meaning in that Feature's contract.
+
+Expected rejection or semantic validation failure belongs in the effect's
+failure channel rather than ordinary exception control flow. Unexpected
+runtime failures can remain exceptional. A Feature's Request expresses
+an attempted operation; a private Response constructor alone does not
+prove execution, authorization, or side-effect commitment.
+
+**This is a semantic review and behavior-testing practice, not a new
+reflection Law.** The existing Laws cannot determine whether an `Option.None`
+or nested `Either.Left` has a legitimate business meaning.
 
 ## Modeling practice — Composition and boundary ownership
 
