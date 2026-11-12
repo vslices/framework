@@ -9,7 +9,7 @@ PACKAGES = {
     "VSlices",
     "VSlices.Spaces",
     "VSlices.Work",
-    "VSlices.EntityFrameworkCore.Functional",
+    "VSlices.Grounding.EntityFrameworkCore.Functional",
     "VSlices.Grounding",
     "VSlices.Grounding.EntityFrameworkCore",
     "VSlices.Views.Abstract",

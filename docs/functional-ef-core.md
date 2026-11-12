@@ -1,4 +1,4 @@
-# VSlices.EntityFrameworkCore.Functional
+# VSlices.Grounding.EntityFrameworkCore.Functional
 
 Functional, effectful extensions for Entity Framework Core built on [LanguageExt](https://github.com/louthy/language-ext).
 
@@ -7,7 +7,7 @@ The package keeps ordinary query composition as ordinary EF Core composition and
 ## Install
 
 ```bash
-dotnet add package VSlices.EntityFrameworkCore.Functional
+dotnet add package VSlices.Grounding.EntityFrameworkCore.Functional
 ```
 
 ## Current surface
@@ -64,7 +64,7 @@ DisposeIO
 ## Example
 
 ```csharp
-using EntityFrameworkCore.Functional;
+using VSlices.Grounding.EntityFrameworkCore.Functional;
 
 var users =
     await db.Users
@@ -99,4 +99,4 @@ The package is young and its API is still being validated through real consumers
 
 ## Integration provenance
 
-Imported from [vslices/functional-ef-core](https://github.com/vslices/functional-ef-core) at commit `89d7d57b7c28de39960c633045e9465ba7d45eb7`, preserving its API and PostgreSQL integration tests. Package ID: `VSlices.EntityFrameworkCore.Functional`.
+Imported from [vslices/functional-ef-core](https://github.com/vslices/functional-ef-core) at commit `89d7d57b7c28de39960c633045e9465ba7d45eb7`, preserving its API and PostgreSQL integration tests. Package ID: `VSlices.Grounding.EntityFrameworkCore.Functional`.
