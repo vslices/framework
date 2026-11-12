@@ -37,5 +37,5 @@ public sealed class CreateAndGetTodo :
                                         Either.Right<Error, Option<Todo>>(read.Todo))),
                             None: () =>
                                 IO.pure(NewResponse(
-                                    Either.Right<Error, Option<Todo>>(Option<Todo>.None))))));
+                                    Either.Right<Error, Option<Todo>>(Option<Todo>.None)))))));
 }
