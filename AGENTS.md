@@ -329,8 +329,6 @@ For the current miniature, the branch should remain green for:
 
 ```text
 VSlices.Work build
-VSlices.Work.Services build
-VSlices.Work.Products build
 Work algebra tests
 SampleWorkflow API build
 composed Feature hoist/composition tests
@@ -375,3 +373,8 @@ When in doubt, prefer:
 - minimal viable abstraction over speculative architecture.
 
 The implementation is evidence about the design. If a real case contradicts this file, preserve the contradiction and revise the model rather than forcing the code to satisfy stale instructions.
+
+
+## Structural modeling Laws
+
+When defining or evolving semantic Spaces, consult [Space modeling rules](docs/spaces/modeling.md). The stable SM001-SM005 rule IDs explain errors, rationale, and rejected/limited alternatives. Consumers can call `SpaceModelingLaws.InspectDefinitions` from their test suite; it is a structural integrity check, not a semantic proof or a source-layout analyzer.

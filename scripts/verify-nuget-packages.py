@@ -5,15 +5,11 @@ import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-VERSION = "0.1.0-preview.2"
 PACKAGES = {
     "VSlices",
     "VSlices.Spaces",
-    "VSlices.Spaces.Services",
-    "VSlices.Spaces.Products",
     "VSlices.Work",
-    "VSlices.Work.Services",
-    "VSlices.Work.Products",
+    "VSlices.Grounding.EntityFrameworkCore.Functional",
     "VSlices.Grounding",
     "VSlices.Grounding.EntityFrameworkCore",
     "VSlices.Views.Abstract",
@@ -23,7 +19,12 @@ NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
 def fail(message):
     raise SystemExit(message)
 
-folder = Path(sys.argv[1] if len(sys.argv) > 1 else "artifacts/nuget")
+if len(sys.argv) != 3:
+    fail("Usage: verify-nuget-packages.py <artifacts-folder> <expected-version>")
+folder = Path(sys.argv[1])
+VERSION = sys.argv[2]
+if not VERSION:
+    fail("Expected package version cannot be empty")
 files = sorted(folder.glob("*.nupkg"))
 if len(files) != len(PACKAGES):
     fail(f"Expected {len(PACKAGES)} packages; found {len(files)}: {[x.name for x in files]}")
@@ -46,7 +47,13 @@ for path in files:
             fail(f"Unexpected or duplicate package ID: {package_id}")
         if version != VERSION:
             fail(f"{package_id}: unexpected version {version}")
-        if [author.strip() for author in (authors or "").replace(";", ",").split(",")] != ["Enryu20", "Limen"]:
+        expected_authors = (
+            ["Hernán Alvarez", "VSlices Development"]
+            if package_id == "VSlices.Grounding.EntityFrameworkCore.Functional"
+            else ["Enryu20", "Limen"]
+        )
+        actual_authors = [a.strip() for a in (authors or "").replace(";", ",").split(",")]
+        if actual_authors != expected_authors:
             fail(f"{package_id}: unexpected authors metadata {authors!r}")
         if "README.md" not in names or "icon.png" not in names:
             fail(f"{package_id}: missing package README or icon")
@@ -58,4 +65,4 @@ for path in files:
         print(f"Verified {package_id} {version}")
 if seen != PACKAGES:
     fail(f"Missing package IDs: {PACKAGES - seen}")
-print("All ten packages verified. This does NOT establish NuGet.org ID ownership or publish them.")
+print("All seven packages verified. This does NOT establish NuGet.org ID ownership or publish them.")

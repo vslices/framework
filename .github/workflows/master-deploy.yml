@@ -12,8 +12,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+    steps:
+      - name: Validate release tag
+        id: validate
+        shell: bash
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^v?0\.[0-9]+\.[0-9]+-preview\.[0-9]+$ ]]; then
+            echo "::error::Invalid preview tag: $TAG"
+            exit 1
+          fi
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
   build-test-pack:
-    if: github.event.release.tag_name == 'v0.1.0-preview.2'
+    needs: validate-tag
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
@@ -52,6 +71,7 @@ jobs:
           for project in \
             examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj \
             examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj \
+            tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests.csproj \
             tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj \
             tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj \
             tests/VSlices.Spaces.Analyzers.Tests/VSlices.Spaces.Analyzers.Tests.csproj \
@@ -60,19 +80,23 @@ jobs:
           do
             dotnet run --project "$project" -c Release --no-build --no-restore
           done
-      - name: Pack all ten libraries
+      - name: Pack all seven libraries
+        env:
+          VERSION: ${{ needs.validate-tag.outputs.version }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts/nuget
-          for project in VSlices VSlices.Spaces VSlices.Spaces.Services VSlices.Spaces.Products VSlices.Work VSlices.Work.Services VSlices.Work.Products VSlices.Grounding VSlices.Grounding.EntityFrameworkCore VSlices.Views.Abstract; do
-            dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore --no-build -p:Version=0.1.0-preview.2 -o artifacts/nuget
+          for project in VSlices VSlices.Spaces VSlices.Work VSlices.Grounding.EntityFrameworkCore.Functional VSlices.Grounding VSlices.Grounding.EntityFrameworkCore VSlices.Views.Abstract; do
+            dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore --no-build -p:Version="$VERSION" -o artifacts/nuget
           done
       - name: Verify package manifests and analyzer exclusion
-        run: python3 scripts/verify-nuget-packages.py artifacts/nuget
+        env:
+          VERSION: ${{ needs.validate-tag.outputs.version }}
+        run: python3 scripts/verify-nuget-packages.py artifacts/nuget "$VERSION"
       - uses: actions/upload-artifact@v4
         with:
-          name: vslices-nuget-0.1.0-preview.2
+          name: vslices-nuget
           path: artifacts/nuget/*.nupkg
           if-no-files-found: error
 
@@ -87,7 +111,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: vslices-nuget-0.1.0-preview.2
+          name: vslices-nuget
           path: artifacts/nuget
       - uses: actions/setup-dotnet@v4
         with:

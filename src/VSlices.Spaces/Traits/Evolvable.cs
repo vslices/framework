@@ -16,17 +16,21 @@ public interface Evolvable<SELF, STATE>
     STATE CurrentState { get; }
 
     /// <summary>
-    /// Gets the rules that determine whether a proposed state constitutes a valid next instance.
+    /// Validates a proposed transition from an accepted state to a new state
+    /// and, when admissible, materializes a new point without mutating the source.
+    /// The semantic owner decides which changes are allowed.
     /// </summary>
-    static abstract Fin<SELF> Evolve(STATE state);
+    static abstract Fin<SELF> Evolve(STATE old, STATE @new);
 
     /// <summary>
-    /// Proposes a transformation over the current state and, when accepted,
-    /// materializes a new <typeparamref name="SELF"/> instance.
-    /// The source instance is not modified.
+    /// Proposes a transformation over the current state. Both the previous
+    /// state and the candidate state are passed to the semantic transition rule.
     /// </summary>
-    Fin<SELF> Update(Func<STATE, STATE> update) =>
-        SELF.Evolve(update(CurrentState));
+    Fin<SELF> Update(Func<STATE, STATE> update)
+    {
+        var old = CurrentState;
+        return SELF.Evolve(old, update(old));
+    }
 }
 
 public static class Evolvable

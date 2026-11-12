@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using EntityFrameworkCore.Functional;
+using VSlices.Grounding.EntityFrameworkCore.Functional;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using VSlices.Work;
