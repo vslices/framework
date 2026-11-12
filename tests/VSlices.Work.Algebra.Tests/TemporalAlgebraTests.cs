@@ -22,7 +22,7 @@ public sealed class TemporalAlgebraTests
         var response = await TemporalProbe
             .Get(new TemporalProbe.Request(
                     new Duration<double>(2),
-                    new Duration<double>(5)).RunIO(algebra))
+                    new Duration<double>(5))).RunIO(algebra)
             .RunAsync();
 
         Assert.Equal(origin, response.Observed);
