@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace EntityFrameworkCore.Functional;
+namespace VSlices.Grounding.EntityFrameworkCore.Functional;
 
 public static class TransactionExtensions
 {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace EntityFrameworkCore.Functional;
+namespace VSlices.Grounding.EntityFrameworkCore.Functional;
 
 // ReSharper disable once CheckNamespace
 public static class DbContextExtensions

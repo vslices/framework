@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
-namespace EntityFrameworkCore.Functional;
+namespace VSlices.Grounding.EntityFrameworkCore.Functional;
 
 public static partial class QueryableExtensions
 {
