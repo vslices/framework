@@ -61,6 +61,18 @@ Archivo exclusivo para la evaluación. **No cargar ni mostrar a los agentes mien
 **Esperado:** `Option<CouponCode>` y `CouponCode` valida longitud; `None` para ausencia.
 
 **Fallo:** `Option<string>` sin invariantes o `Some(CouponCode(""))`.
+## E11 — Identificador artificial sin backing type explícito
+
+**Esperado:** Space nominal `ActivityId` con backing `Guid` **por defecto provisional**, informe que registre explícitamente backing type y formato no especificados, sin fingir que el dominio los exigía ni inventar reglas adicionales.
+
+**Fallo:** utilizar `string` sin justificación, afirmar que el formato GUID fue especificado o no emitir informe.
+
+## E12 — Informe de modelado sin inventar reglas
+
+**Esperado:** mantener Spaces semánticos diferenciados; reportar por separado falta de restricciones para `ActivityName`, normalización no definida e igualdad por identidad no especificada para participantes; distinguir lagunas de incoherencias comprobadas y no inventar restricciones.
+
+**Fallo:** no informar las lagunas, afirmar incoherencias sin evidencia o aplicar máximos/normalización arbitrarios.
+
 ## Rúbrica (por caso, 0 a 4)
 
 1. **Distinción** (1): describe los estados semánticos admitidos.
@@ -68,13 +80,13 @@ Archivo exclusivo para la evaluación. **No cargar ni mostrar a los agentes mien
 3. **Garantía** (1): ubica las invariantes en la autoridad correcta y no supone garantías inexistentes.
 4. **Contraejemplo** (1): identifica al menos una representación incorrecta y por qué.
 
-**Total:** 40 puntos (10 casos). Antes de comparar agentes, mantener los enunciados constantes y registrar modelo, versión, repositorio, disponibilidad del archivo Skill y fecha. Una nota de 40/40 en una revisión humana de los oráculos no prueba que un agente real pueda seguirlos.
+**Total:** 48 puntos (12 casos). Antes de comparar agentes, mantener los enunciados constantes y registrar modelo, versión, repositorio, disponibilidad del archivo Skill y fecha. Una nota de 40/40 en una revisión humana de los oráculos no prueba que un agente real pueda seguirlos.
 
 ## Protocolo de prueba reproducible
 
 1. Crear una sesión nueva por condición para evitar contaminación del contexto.
 2. Condición A: suministrar solo los enunciados, sin la Skill.
-3. Condición B: suministrar `SKILL.md` y `type-ordering.md`, sin esta sección de oráculos.
+3. Condición B: suministrar `SKILL.md`, `type-ordering.md` y `modeling-report.md`, sin esta sección de oráculos.
 4. Solicitar al agente una respuesta concreta por caso y registrar las decisiones sin intervención.
 5. Puntuar con la rúbrica y conservar errores de las dos condiciones.
 6. Solo entonces decidir cambios: un contraejemplo nuevo debe corresponder a un error observado, no a una posibilidad imaginada.
