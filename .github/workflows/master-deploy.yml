@@ -71,6 +71,7 @@ jobs:
           for project in \
             examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj \
             examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj \
+            tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests.csproj \
             tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj \
             tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj \
             tests/VSlices.Spaces.Analyzers.Tests/VSlices.Spaces.Analyzers.Tests.csproj \
@@ -79,14 +80,14 @@ jobs:
           do
             dotnet run --project "$project" -c Release --no-build --no-restore
           done
-      - name: Pack all ten libraries
+      - name: Pack all seven libraries
         env:
           VERSION: ${{ needs.validate-tag.outputs.version }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts/nuget
-          for project in VSlices VSlices.Spaces VSlices.Spaces.Services VSlices.Spaces.Products VSlices.Work VSlices.Work.Services VSlices.Work.Products VSlices.Grounding VSlices.Grounding.EntityFrameworkCore VSlices.Views.Abstract; do
+          for project in VSlices VSlices.Spaces VSlices.Work VSlices.Grounding.EntityFrameworkCore.Functional VSlices.Grounding VSlices.Grounding.EntityFrameworkCore VSlices.Views.Abstract; do
             dotnet pack "src/${project}/${project}.csproj" -c Release --no-restore --no-build -p:Version="$VERSION" -o artifacts/nuget
           done
       - name: Verify package manifests and analyzer exclusion

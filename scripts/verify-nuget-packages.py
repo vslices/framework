@@ -8,11 +8,8 @@ from xml.etree import ElementTree as ET
 PACKAGES = {
     "VSlices",
     "VSlices.Spaces",
-    "VSlices.Spaces.Services",
-    "VSlices.Spaces.Products",
     "VSlices.Work",
-    "VSlices.Work.Services",
-    "VSlices.Work.Products",
+    "VSlices.Grounding.EntityFrameworkCore.Functional",
     "VSlices.Grounding",
     "VSlices.Grounding.EntityFrameworkCore",
     "VSlices.Views.Abstract",
@@ -59,4 +56,4 @@ for path in files:
         print(f"Verified {package_id} {version}")
 if seen != PACKAGES:
     fail(f"Missing package IDs: {PACKAGES - seen}")
-print("All ten packages verified. This does NOT establish NuGet.org ID ownership or publish them.")
+print("All seven packages verified. This does NOT establish NuGet.org ID ownership or publish them.")
