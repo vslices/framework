@@ -1,0 +1,40 @@
+# Alternativas semánticas y uniones discriminadas en Spaces
+
+## Pregunta central
+
+Cuando una propiedad conceptual admite **alternativas de significado mutuamente excluyentes**, identificar cada caso y sus invariantes antes de escoger representación. Ejemplo: una inscripción puede corresponder a una persona con nombre de pila o a una organización identificada mediante razón social. El hecho de que ambas variantes puedan representarse técnicamente como texto **no las convierte en el mismo concepto**.
+
+Distinguir:
+- **Ausencia**: `Option<A>` cuando el valor puede no existir.
+- **Alternativa exclusiva**: unión discriminada cuando existe **exactamente una** entre variantes semánticamente distintas.
+- **Conjunción**: estructura compuesta cuando deben coexistir varias propiedades.
+- **Error de transformación**: `Fin<A>`, que no sustituye la distinción entre variantes válidas.
+- **Evolución**: las invariantes que prohíben o permiten cambiar de variante se determinan por el dominio, no por la forma de la unión.
+
+## Procedimiento
+
+1. Determinar qué variantes admite el dominio, qué evidencia identifica a cada una y qué restricciones son propias.
+2. Modelar los valores básicos como Spaces diferenciados cuando tienen significado propio, aun si comparten backing `string`.
+3. Representar la selección de **una variante** mediante una unión discriminada cerrada: usar `Either<A,B>` si las dos ramas son simétricamente válidas y la API vigente resulta adecuada; considerar una jerarquía sellada de records/casos nominales o mecanismo equivalente si aporta mejor claridad. El nombre concreto y la representación se justifican por el contexto. No obligar a utilizar `Either` en todos los casos ni interpretar `Left` como error.
+4. Impedir estados ambiguos o imposibles como dos propiedades opcionales independientes `Option<GivenName>` y `Option<LegalName>` cuando el contrato exige exactamente una: esa forma permitiría **ninguna** o **ambas**.
+5. No resolver una variante a partir de heurísticas del texto (mayúsculas, espacios, longitud, palabras como «SpA»); exigir evidencia discriminadora en la frontera de construcción si no hay mecanismo fiable. No inventar requisitos para nombres, apellidos, registro comercial, documentos o personería.
+6. Preservar invariantes de cada variante mediante su Space propietario, y de la unión mediante una composición que no acepte combinaciones imposibles.
+7. Probar ambas ramas, los intentos de ambigüedad y las transformaciones pertinentes. Cuando el discriminador o las reglas de transición entre variantes no estén claros, incluirlos como información no especificada en el informe.
+
+## Ejemplo conceptual (sin imponer contratos)
+
+```text
+ParticipantDesignation
+  = Personal(GivenName)
+  | Organization(LegalName)
+```
+
+La forma es ilustrativa. `GivenName` y `LegalName` representan conceptos distintos; `ParticipantDesignation` representa exactamente uno. No inferir que el nombre de pila equivale al nombre completo o que necesariamente se requieren apellidos. Si ambos nombres comparten el mismo tipo primitivo, `Either<string,string>` pierde la distinción nominal pretendida.
+
+## Errores a evitar
+
+- `string ParticipantName` sin evidencia del tipo de participante cuando las variantes son semánticamente relevantes.
+- `Option<GivenName>` junto a `Option<LegalName>` sin una regla de exclusión y existencia demostrable.
+- `Either<Error, GivenName>` para expresar persona/organización: confunde un caso válido con fallo.
+- Crear subtipos de participante, identificaciones tributarias o registros externos que no estén exigidos por el dominio.
+- Tratar la ausencia de apellidos, el formato legal o la posibilidad de cambiar de variante como reglas resueltas sin evidencia.
