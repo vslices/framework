@@ -33,7 +33,10 @@ public sealed class FeatureModelingLawsTests
     {
         var violations = FeatureModelingLaws.InspectDefinitions(
             typeof(FeatureModelingLawsTests).Assembly, typeof(ValidFeature).Namespace!);
-        Assert.Empty(violations); // All test fixtures below are nested; assembly scan considers only top-level Features.
+        Assert.Contains(violations, item =>
+            item.RuleId == "FM006" && item.Definition == typeof(InvalidTopLevelFeature).FullName);
+        Assert.DoesNotContain(violations, item =>
+            item.Definition == typeof(ValidTopLevelFeature).FullName);
     }
 
     public sealed class ValidFeature : Feature<ValidFeature, string, ValidFeature.Request, ValidFeature.Response>
@@ -138,4 +141,32 @@ public sealed class FeatureModelingLawsTests
         public static Eff<string, Response> Get(Request request) =>
             Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
     }
+}
+
+public sealed class ValidTopLevelFeature :
+    Feature<ValidTopLevelFeature, string, ValidTopLevelFeature.Request, ValidTopLevelFeature.Response>
+{
+    public sealed record Request(string Value);
+
+    public sealed record Response
+    {
+        private Response(string value) => Value = value;
+        public string Value { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(string value);
+
+    public static Eff<string, Response> Get(Request request) =>
+        Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+}
+
+public sealed class InvalidTopLevelFeature :
+    Feature<InvalidTopLevelFeature, string, InvalidTopLevelFeature.Request, InvalidTopLevelFeature.Response>
+{
+    public sealed record Request(string Value);
+    public sealed record Response(string Value);
+
+    public static Eff<string, Response> Get(Request request) =>
+        Eff<string, Response>.LiftIO(_ => IO.pure(new Response(request.Value)));
 }
