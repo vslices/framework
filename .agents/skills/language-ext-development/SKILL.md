@@ -12,7 +12,7 @@ description: >-
 
 ## Objetivo
 
-Escribir código idiomático, legible y comprobable usando **la versión efectiva** de LanguageExt del proyecto. Esta Skill enseña mecanismos funcionales, **no decide** los significados, invariantes o autoridades de VSlices. Si el problema es definir un Space, seguir además `vslices-spaces-development`; para Features y Grounding, respetar sus contratos propietarios.
+Escribir código idiomático, legible y comprobable usando **la versión efectiva** de LanguageExt del proyecto. **LanguageExt es una dependencia conceptual deliberada de VSlices**, además de una dependencia técnica de su realización .NET: el modelo funcional forma parte de la orientación de diseño y la evolución prevista incluye desarrollar un fork propio de LanguageExt sobre el que se construirá VSlices. **Ese fork es una dirección futura, no una dependencia ya implementada**; hasta su existencia y adopción verificadas, trabajar con las APIs del paquete realmente instalado. Esta Skill enseña sus mecanismos funcionales y su uso dentro de VSlices; las decisiones concretas de invariantes, propiedad semántica y responsabilidades siguen perteneciendo a los contratos de VSlices. Si el problema es definir un Space, seguir además `vslices-spaces-development`; para Features y Grounding, respetar sus contratos propietarios.
 
 ## Procedimiento mínimo
 
