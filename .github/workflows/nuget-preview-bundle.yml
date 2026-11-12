@@ -36,10 +36,10 @@ jobs:
             dotnet pack "src/${project}/${project}.csproj" -c Release -o artifacts/nuget
           done
       - name: Verify package IDs, dependencies, and excluded analyzers
-        run: python3 scripts/verify-nuget-packages.py artifacts/nuget 0.1.0-preview.1
+        run: python3 scripts/verify-nuget-packages.py artifacts/nuget 0.3.0-preview.1
       - name: Upload package bundle for review
         uses: actions/upload-artifact@v4
         with:
-          name: vslices-nuget-preview-0.1.0-preview.1
+          name: vslices-nuget-preview-0.3.0-preview.1
           path: artifacts/nuget/*.nupkg
           if-no-files-found: error

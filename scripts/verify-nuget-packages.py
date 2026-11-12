@@ -42,10 +42,19 @@ for path in files:
             return entry.text if entry is not None else None
         package_id = val("id")
         version = val("version")
+        authors = val("authors")
         if package_id not in PACKAGES or package_id in seen:
             fail(f"Unexpected or duplicate package ID: {package_id}")
         if version != VERSION:
             fail(f"{package_id}: unexpected version {version}")
+        expected_authors = (
+            ["Hernán Alvarez", "VSlices Development"]
+            if package_id == "VSlices.Grounding.EntityFrameworkCore.Functional"
+            else ["Enryu20", "Limen"]
+        )
+        actual_authors = [a.strip() for a in (authors or "").replace(";", ",").split(",")]
+        if actual_authors != expected_authors:
+            fail(f"{package_id}: unexpected authors metadata {authors!r}")
         if "README.md" not in names or "icon.png" not in names:
             fail(f"{package_id}: missing package README or icon")
         if any(x.startswith("analyzers/") for x in names):

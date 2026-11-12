@@ -1,9 +1,23 @@
-## NuGet preview bundle (candidate)
+## Coordinated VSlices prerelease
 
-The ten packable libraries under `src/` are prepared as a coordinated `0.1.0-preview.1` bundle. `VSlices.Spaces.Analyzers` is deliberately excluded from distribution pending controlled validation; it remains available in source builds. `LanguageExt.Core` is pinned at `5.0.0-beta-78`.
+The seven packable libraries under `src/` form the coordinated `0.3.0-preview.1` prerelease bundle. `VSlices.Spaces.Analyzers` remains source-only and is excluded from NuGet distribution pending controlled validation.
 
-Run `dotnet pack src/VSlices/VSlices.csproj -c Release` to pack a single library, or run the `Verify VSlices NuGet preview bundle` GitHub Actions workflow to pack and inspect all ten. That workflow **never pushes packages**.
+The seven packages are:
 
-The root package ID is provisionally `VSlices`. Prior to publication, confirm that the ID is available or controlled by the intended NuGet.org owner. If not, select `VSlices.Core` and adjust the root project `PackageId` and all dependent nuspec/verification expectations **together**. An existing `VSlices.Core` family is known, so do not assume this fallback is available either. No NuGet API key should be stored in the repository or shared in chat.
+- `VSlices`
+- `VSlices.Spaces`
+- `VSlices.Work`
+- `VSlices.Grounding`
+- `VSlices.Grounding.EntityFrameworkCore`
+- `VSlices.Grounding.EntityFrameworkCore.Functional`
+- `VSlices.Views.Abstract`
 
-Refer to `src/README.nuget.md` for the actual package readme. Source remains authoritative for semantic/API behavior.
+`VSlices.Grounding.EntityFrameworkCore.Functional` replaces the former `VSlices.EntityFrameworkCore.Functional` package ID and is built from source inside this repository. Existing releases under the old ID are not modified or republished.
+
+The `Verify VSlices NuGet preview bundle` workflow packs and checks all seven; it **never publishes** packages. The `Publish VSlices NuGet` workflow is triggered only by a published GitHub Release, validates the version from the tag, requires the tagged commit to be on `master`, runs tests, packages, verifies manifests and publishes via OIDC in the `nuget-release` environment.
+
+For `v0.3.0-preview.1`, publish a GitHub prerelease using the tag on the reviewed `master` commit. Creating a tag alone is insufficient to trigger the publisher.
+
+The package verifier confirms each expected package ID, common version, README/icon, excluded experimental analyzers, and package-specific author metadata. The imported functional EF Core package preserves its own original authors in NuGet; its provenance is documented in `docs/functional-ef-core.md`.
+
+`LanguageExt.Core` remains a dependency of the core VSlices project. No NuGet credentials should be stored in this repository.
