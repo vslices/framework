@@ -6,7 +6,7 @@ The current model is:
 
 ```text
 Feature
-    -> Flow<TodoAlgebra, Request, Response>
+    -> Eff<TodoAlgebra, Response> Get(Request)
 
 TodoAlgebra
     -> executable capability atoms
@@ -50,7 +50,7 @@ SampleWorkflow.Process
 
 SampleWorkflow.Api
     HTTP presentation
-    obtains TodoAlgebra from Grounding and executes Feature Flows
+    obtains TodoAlgebra from Grounding and executes Feature effects
 ```
 
 ## Module algebra
@@ -67,24 +67,13 @@ public sealed record TodoAlgebra(
 
 The algebra is the runtime of the module's Features. Individual Features use only the atoms they require.
 
-For example:
-
-```csharp
-public sealed class GetTodo :
-    Feature<GetTodo, TodoAlgebra, GetTodo.Request, GetTodo.Response>
-{
-    public static Flow<TodoAlgebra, Request, Response> Get() =>
-        new((algebra, request) =>
-            algebra.Reader.Read(request.Id)
-                .Map(todo => new Response(todo)));
-}
-```
+For example, `GetTodo.Get(new GetTodo.Request(id))` returns `Eff<TodoAlgebra, GetTodo.Response>` and can run using `RunIO(grounding.Algebra)`. The Response constructor is private and is reached through a Feature-owned `NewResponse` accessor.
 
 ## Same-module Feature composition
 
 `CreateAndGetTodo` demonstrates that Features sharing the same module algebra compose directly.
 
-The child Features keep ownership of their own request/response contracts. The composing Feature adapts requests with `MapRequest` and composes the resulting Flows.
+The child Features keep ownership of their own request/response contracts. The composing Feature passes explicit child Requests and composes effects using their shared algebra.
 
 No algebra hoisting or interpreter composition is required.
 

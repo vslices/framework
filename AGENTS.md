@@ -65,7 +65,7 @@ The current validated direction uses `Flow` directly over executable Work algebr
 
 ```text
 Feature
-    -> Flow<ALG, Request, Response>
+    -> Eff<ALG, Response> Get(Request)
 
 ALG
     -> executable algebra owned by a Work module
@@ -80,12 +80,12 @@ There is no Free-monad/interpreter layer in the current Work model.
 
 ### Feature / WorkFlow
 
-A Feature owns its request/response contract and exposes execution through Flow:
+A Feature owns public nested Request/Response contracts and exposes execution through Eff; Request is publicly constructible, while Response is privately constructed through the owning Feature's `NewResponse` accessor:
 
 ```csharp
 Feature<F, ALG, REQ, RES>
 {
-    static abstract Flow<ALG, REQ, RES> Get();
+    static abstract Eff<ALG, RES> Get(REQ request);
 }
 ```
 
@@ -133,27 +133,19 @@ AlgebraMix<A, B, C, D, E, F, G>
 
 `AlgebraMix` is intentionally modest vocabulary: it means that independently owned executable algebras are available together to a composing Flow. It does not claim categorical product/coproduct semantics, ordering, priority, transactionality, or shared ownership.
 
-A child Flow is adapted to the parent runtime by projection:
+A parent constructs explicit child requests and projects the required child algebra at execution:
 
 ```csharp
-child.MapRuntime(
-    (AlgebraMix<FileAlgebra, TodoAlgebra> mix) => mix.A)
+Child.Get(new Child.Request(...)).RunIO(mix.A);
 ```
 
-Request adaptation is independent:
-
-```csharp
-child.MapRequest(
-    (Parent.Request request) => new Child.Request(...))
-```
-
-Use `ContraMap` when both runtime and request should be adapted together.
+Do not restore `MapRuntime`, `MapRequest` or `ContraMap` solely for Feature composition. `Flow` remains an independent Framework abstraction.
 
 Ownership rules:
 
 ```text
 child Work module owns its algebra
-child Feature owns its Flow
+child Feature owns its Eff factory and nominal Request/Response
 parent Feature owns composition/projection
 Grounding owns realization
 ```
@@ -317,8 +309,8 @@ Testing should preserve the same architectural model.
 Current evidence should include, where relevant:
 
 - direct tests of executable capability atoms;
-- Feature execution through `Flow<ALG, Request, Response>`;
-- composed Feature runtime projection through `AlgebraMix` and `MapRuntime`;
+- Feature execution through `Eff<ALG, Response> Get(Request)`;
+- composed Feature runtime projection through `AlgebraMix` and `RunIO`;
 - compile/build evidence for dependent Framework surfaces;
 - presentation/API smoke behavior;
 - preservation of semantic state transitions.
