@@ -4,6 +4,11 @@
 
 # VSlices Framework
 
+[![Release: preview](https://img.shields.io/badge/release-0.3.0--preview.1-orange)](https://github.com/vslices/framework/releases/tag/v0.3.0-preview.1)
+[![Target: .NET 10](https://img.shields.io/badge/.NET-10-512bd4)](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+[![NuGet bundle CI](https://github.com/vslices/framework/actions/workflows/nuget-preview-bundle.yml/badge.svg?branch=master)](https://github.com/vslices/framework/actions/workflows/nuget-preview-bundle.yml?query=branch%3Amaster)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 **Feel the semantics.**
 
 VSlices is an experimental, modular framework for C# and .NET 10. Its current design distinguishes semantic meaning (**Spaces**), executable behavior (**Work**) and the concrete realization of capabilities (**Grounding**). Presentation can consume these contracts without becoming their semantic owner.
