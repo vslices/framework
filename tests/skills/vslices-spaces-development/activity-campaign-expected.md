@@ -1,4 +1,4 @@
-# Oráculo privado — campaña de actividades, iteración 3
+# Oráculo privado — campaña de actividades, iteración 4
 
 **NO compartir con el agente evaluado.** Evaluar por comportamiento y garantías demostrables, no por nombres exactos o una única implementación.
 
@@ -17,8 +17,9 @@
 11. **Informe final (0–2):** categorías distintas de incoherencia, vacío, decisión provisional, riesgo; evidencia y consecuencias; sin inventar restricciones.
 12. **No sobreingeniería (0–2):** sin IO, persistencia, Features completas, traits especulativos, mecanismos históricos ficticios ni integración remota.
 13. **Unión discriminada (0–2):** exactamente una alternativa válida entre nombre de pila y razón social, con tipos semánticos propios y discriminación explícita; `Either<GivenName,LegalName>` o ADT equivalente justificada; no dos Option independientes sin invariantes adicionales, ni interpretación de Left como error.
+14. **Ausencia frente a texto vacío en un campo condicional (0–2):** representa y distingue, en la solicitud de inscripción, campo no mostrado, campo mostrado y vacío, y campo mostrado con texto de 1 a 500 caracteres; permite cero caracteres en valor mostrado, rechaza más de 500; no confunde reglas de request con las del Space elemental o transporte, ni universaliza la semántica de `None`.
 
-**Máximo: 26 puntos.** Puntuación por criterio: 2 logrado y evidenciado; 1 parcial o solo declarado; 0 ausente/incorrecto. Un comportamiento compilado vale más que una declaración, pero registrar los dos ejes independientemente.
+**Máximo: 28 puntos.** Puntuación por criterio: 2 logrado y evidenciado; 1 parcial o solo declarado; 0 ausente/incorrecto. Un comportamiento compilado vale más que una declaración, pero registrar los dos ejes independientemente.
 
 ## Casos de contraste necesarios
 
@@ -30,6 +31,8 @@
 - La búsqueda conceptual por `ac` encuentra `ACT 1` y `ACt 2` sin reemplazar su grafía.
 - No se impone formato de AccountReference, ni número máximo de cuentas, ni unicidad por cuenta externa.
 - La presentación del participante distingue persona individual (nombre de pila) de organización (razón social); construir ambas variantes, sin permitir ninguna o ambas en una sola inscripción.
+- En el request de registro, persona individual implica que el campo de coordinación no estuvo visible; organización implica que estuvo visible, aun cuando la persona lo dejó en blanco. Distinguir ausencia, vacío y texto; aceptar longitud 0 y 500, rechazar 501.
+- Si el agente modela la invariante de visibilidad, debe ubicarla en el contexto que conoce el tipo de participante y el campo recibido, no en un Space genérico de texto. No exigir UI, JSON ni Features completas.
 - No se supone que un nombre de pila requiera apellidos ni que la razón social tenga un patrón no levantado; la posibilidad de cambiar de variante se reporta pendiente.
 - No se agrega `Evolve(State)` público ni se equipara igualdad por ParticipantId con igualdad de todos los datos de inscripción.
 - El reporte revela ausencia del contrato externo, las restricciones no especificadas y decisiones provisionales.
