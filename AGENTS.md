@@ -200,7 +200,7 @@ Do not smuggle those guarantees into capability names, Feature names, Grounding 
 Failures expected by the modeled Work must remain explicit.
 
 - do not throw exceptions for expected flows;
-- use `Error.New` for expected failures carried by effects, or explicit typed alternatives where absence/rejection is a modeled result;
+- use `Error.New` for expected effect failures where useful, or explicit typed alternatives for modeled absence/rejection; preserve the established required-presence contract of `PointReader.Read` instead of adding catchable error types without consumer pressure;
 - preserve error information through composed Feature effects (use `Error.New` for expected failures; reserve .NET exceptions for exceptional conditions);
 - distinguish semantic rejection from effect execution or Grounding failure;
 - do not collapse missing authority or unsupported semantics into a plausible default.
@@ -370,5 +370,7 @@ The implementation is evidence about the design. If a real case contradicts this
 ## Structural modeling Laws
 
 When defining or evolving semantic Spaces, consult [Space modeling rules](docs/spaces/modeling.md). The stable SM001–SM007 identifiers explain errors, rationale, and rejected/limited alternatives. Consumers can call `SpaceModelingLaws.InspectDefinitions` from their test suite; the check is structural, not a semantic proof or source-layout analyzer.
+
+For a closed `TransformAdapter<FROM, TO>` pair, run `TransformAdapterModelingLaws.Inspect(typeof(FROM), typeof(TO))` in a consumer test, or `InspectTextInput(typeof(TO))` for `vTextInput<TO>`. The analyzer stays source-only and is not distributed in NuGet. See [TransformAdapter modeling](docs/transform-adapter.md). NativeAOT compatibility is not yet established.
 
 When defining or evolving Work Features, consult [Feature modeling rules](docs/work/feature-modeling.md) and [the current Feature contract](docs/feature-model.md). `FeatureModelingLaws.InspectDefinitions` checks the compiled, selected Feature definitions. The current active IDs are FM001–FM006 and FM008–FM010; FM007 is intentionally retired because the C# interface already enforces `Get(Request) -> Eff<ALG, Response>` at compile time. The reflection Laws do not prove correct outcomes, completed effects, authorization, or cancellation.
