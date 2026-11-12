@@ -14,6 +14,8 @@ Convertir **material conceptual ya disponible** (concepto, reglas, evidencia, in
 
 No implementar operaciones de Work, adquisición de datos, persistencia ni transporte dentro de un Space.
 
+Al componer `Fin`, `Option` u otras abstracciones funcionales, consultar además `language-ext-development` para verificar semántica y APIs de LanguageExt.
+
 ## Procedimiento mínimo
 
 1. **Localizar la autoridad.** Identificar el repositorio y la versión efectiva de `VSlices.Spaces`; leer el código y los contratos instalados, no confiar en ejemplos desactualizados. Consultar [Modeling semantic Spaces](https://github.com/vslices/framework/blob/master/docs/spaces/modeling.md) y los traits concretos.
