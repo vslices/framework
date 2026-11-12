@@ -1,47 +1,55 @@
-# Prueba integral ciega — campaña de inscripción a actividades (iteración 2)
+# Caso de estudio — campaña de actividades comunitarias (iteración 2)
 
-**Entregar este archivo al agente evaluado; NO entregar `expected.md` ni `activity-campaign-expected.md`.** El caso es deliberadamente acotado a Spaces; los comportamientos de búsqueda e inscripción se describen para establecer requisitos semánticos, no para solicitar una aplicación completa.
+> **Material para el agente evaluado.** Este documento reproduce un levantamiento funcional resumido, no un diseño técnico. No consultar otros archivos dentro de `tests/skills/vslices-spaces-development/`: ese directorio contiene material reservado de evaluación.
 
-## Dominio
+## Contexto del encargo
 
-Se está construyendo un módulo para administrar una campaña de inscripción a actividades.
+Una organización comunitaria está preparando un sistema para organizar actividades y recibir inscripciones. Hasta ahora llevan parte del trabajo en planillas y quieren evitar errores cuando varias personas gestionan actividades.
 
-### Actividad
+Después de conversar con quienes organizan las actividades, se recogieron las siguientes observaciones y acuerdos. No existe aún un diseño del modelo de software.
 
-- Cada actividad tiene un identificador **artificial**, un nombre y capacidad.
-- No se especificó el tipo subyacente, formato serializado ni política de generación del identificador artificial.
-- El nombre es obligatorio. No se especificaron longitud, reglas de espacios ni caracteres permitidos.
-- Puede existir una descripción. Si no se proporciona, significa que la actividad no tiene descripción; una descripción sin contenido significativo no es válida.
-- La capacidad se establece al crear la actividad, debe ser un entero positivo y **no puede modificarse después**.
-- El nombre y la descripción pueden cambiar una vez creada la actividad.
-- La identidad de la actividad debe permanecer estable entre evoluciones.
+## Notas del levantamiento
 
-### Participantes e inscripciones
+**Sobre las actividades**
 
-- Cada participante inscrito tiene identificador propio, nombre y puede estar asociado a una cuenta administrada por **otro sistema**. El módulo actual no es propietario de esas cuentas.
-- El identificador del participante es artificial; no se proporcionaron tipo subyacente ni formato.
-- No se especificaron requisitos adicionales para el nombre del participante.
-- Una persona inscrita puede no tener cuenta asociada. La representación de la identidad de cuenta está determinada por el sistema externo, cuyo contrato aún no está disponible.
-- Una actividad tiene una colección ordenada de participantes inscritos. Al crearse, puede estar vacía.
-- Dos participantes con el mismo identificador no pueden aparecer inscritos simultáneamente en la misma actividad.
-- El orden de inscripción es significativo y debe preservarse.
-- Después de la creación se pueden añadir participantes al final, sin superar la capacidad. Los ya inscritos no se eliminan ni se reordenan en este escenario.
-- El identificador de un participante ya inscrito no puede sustituirse por otro durante la evolución de esa inscripción.
-- No se definieron políticas adicionales sobre participantes asociados a una misma cuenta externa.
+«Cuando abrimos una actividad tenemos que darle un nombre y definir los cupos disponibles. No tiene sentido anunciar una actividad para cero personas ni para una cantidad negativa».
 
-### Búsqueda por nombre
+«A veces acompañamos el nombre con un texto explicativo. Si no tenemos nada útil que decir, preferimos dejar ese texto sin completar; no queremos guardar descripciones hechas solamente de espacios».
 
-- El módulo necesita buscar actividades por prefijo de nombre, **sin distinguir mayúsculas de minúsculas**. Por ejemplo, una búsqueda por el prefijo `ac` debe encontrar tanto `ACT 1` como `ACt 2`.
-- Debe conservarse la grafía original del nombre para presentarla.
-- No se definió si la búsqueda ignora diacríticos, signos, espacios u otras equivalencias Unicode.
-- En el futuro, persistencia podría optimizar la búsqueda mediante una columna derivada, pero ese mecanismo no forma parte del problema que se implementará ahora.
+«Nos ha pasado que dos actividades tienen nombres muy parecidos, así que la organización necesita poder reconocer cada actividad de manera inequívoca, aunque luego se le cambie el nombre. El sistema les asignará un identificador propio cuando se registren. No hemos decidido cómo se representará ese identificador ni cómo se generará».
 
-## Encargo
+«Después de publicar una actividad podemos corregir su nombre o el texto explicativo. Los cupos comprometidos, en cambio, no se pueden aumentar ni reducir. Tampoco queremos que una actividad pase a ser otra solo por editar sus datos».
 
-Usa la Skill `vslices-spaces-development` del repositorio `https://github.com/vslices/framework`, en `.agents/skills/vslices-spaces-development/SKILL.md`, y consulta sus referencias y los contratos actuales del Framework. **No consultes ninguna ruta bajo `tests/skills/vslices-spaces-development/` durante la resolución:** este texto se te entrega directamente como enunciado, y ese directorio contiene materiales privados de evaluación.
+**Sobre las inscripciones**
 
-Modela e implementa los Spaces pertinentes para este dominio en C#, con su construcción, evolución cuando corresponda y pruebas representativas. Puedes elegir nombres de tipos y organización razonables acordes al Framework. Limita la implementación al modelo semántico: no construyas una base de datos, API ni Feature completa.
+«Una actividad puede publicarse sin personas inscritas. Después van llegando las solicitudes, una a una, y necesitamos saber quién llegó primero».
 
-Entrega el código o archivos completos que hayas podido producir, indica qué compilaste y ejecutaste realmente, y termina con el informe de modelado exigido por la Skill. Si una decisión de dominio es desconocida, no la presentes como regla confirmada.
+«A veces alguien vuelve a intentar inscribirse porque olvidó que ya lo había hecho. Eso no debe ocupar otro cupo de la misma actividad, pero esa persona sí puede inscribirse en otra actividad».
 
-No consultes respuestas de evaluaciones previas ni infieras reglas únicamente de convenciones del lenguaje.
+«Cuando se completan los cupos, no se reciben más participantes. En esta etapa del proyecto tampoco se contempla retirar personas ya inscritas ni cambiarles el lugar que ocuparon en el orden de llegada: solo se incorporan nuevas inscripciones al final».
+
+«Tenemos datos para distinguir a los participantes, incluso cuando dos comparten nombre. También se les asigna un identificador interno, pero todavía no decidimos su representación o formato. El nombre de cada participante se registra tal como lo conocemos; no levantamos otras restricciones para ese campo. Si alguien ya está inscrito, una edición no debería convertir su inscripción en la de otra persona».
+
+**Sobre cuentas de otra plataforma**
+
+«Algunas personas tienen una cuenta en una plataforma administrada por otra organización y quieren dejarla asociada a su inscripción. Otras no tienen ninguna, y eso está bien».
+
+«Nosotros no administramos esas cuentas. Todavía no nos entregan la documentación que explica cómo se identifican o consultan desde nuestro sistema. Por ahora no necesitamos comunicarnos con esa plataforma».
+
+«No conversamos aún sobre si varias personas pueden asociar una misma cuenta ni sobre otras condiciones de esa relación».
+
+**Sobre encontrar actividades**
+
+«Los encargados quieren encontrar actividades escribiendo las primeras letras del nombre. Por ejemplo, al escribir `ac` esperan ver tanto `ACT 1` como `ACt 2`, y que cada nombre siga apareciendo con la escritura que se registró».
+
+«No hemos conversado qué debería pasar con las tildes, signos, espacios o letras que tengan distintas representaciones. Lo importante por ahora es el comportamiento respecto de mayúsculas y minúsculas».
+
+## Solicitud al equipo de desarrollo
+
+A partir de este levantamiento, preparar el **modelo semántico de Spaces** para el módulo. Utilizar la Skill `vslices-spaces-development` disponible en el repositorio [vslices/framework](https://github.com/vslices/framework), consultando sus referencias y los contratos efectivos del Framework.
+
+Implementar los Spaces pertinentes con construcción y, cuando el dominio lo necesite, evolución. Preparar pruebas que permitan verificar tanto casos admitidos como rechazos relevantes. Limitar esta iteración al modelo semántico; no se solicita construir interfaces, Features completas, persistencia ni integración con la plataforma externa.
+
+Entregar los archivos o el código completo que se produzca, distinguir las verificaciones realmente ejecutadas de las pendientes y cerrar con el informe de modelado que solicita la Skill.
+
+No completar por intuición las decisiones que no surgieron del levantamiento. Cuando falte información, registrar qué falta y qué implicaciones tiene para el modelo.
