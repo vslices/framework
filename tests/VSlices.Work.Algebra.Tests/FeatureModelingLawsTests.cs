@@ -26,6 +26,8 @@ public sealed class FeatureModelingLawsTests
     [InlineData(typeof(MissingNestedResponse), "FM003", "fm003-response-ownership")]
     [InlineData(typeof(MissingNestedResponse), "FM004", "fm004-nominal-binding")]
     [InlineData(typeof(WrongResponseFactory), "FM008", "fm008-response-factory")]
+    [InlineData(typeof(InternalResponseFactory), "FM008", "fm008-response-factory")]
+    [InlineData(typeof(WrongSelfFeature), "FM001", "fm001-feature-identity")]
     [InlineData(typeof(PublicInitResponse), "FM010", "fm010-response-immutability")]
     public void Reports_exact_structural_failure(Type feature, string id, string documentAnchor)
     {
@@ -186,6 +188,26 @@ public sealed class FeatureModelingLawsTests
         private static extern Response NewResponse(string value);
         public static Eff<string, Response> Get(Request request) =>
             Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+    }
+
+    public sealed class InternalResponseFactory :
+        Feature<InternalResponseFactory, string, InternalResponseFactory.Request, InternalResponseFactory.Response>
+    {
+        public sealed record Request(string Value);
+        public sealed record Response
+        {
+            private Response(string value) => Value = value;
+            public string Value { get; }
+        }
+        [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+        internal static extern Response NewResponse(string value);
+        public static Eff<string, Response> Get(Request request) =>
+            Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+    }
+
+    public sealed class WrongSelfFeature :
+        Feature<ValidFeature, string, ValidFeature.Request, ValidFeature.Response>
+    {
     }
 
     public sealed class NonPublicRequestConstruction :

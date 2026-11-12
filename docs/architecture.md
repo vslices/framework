@@ -8,7 +8,7 @@ Core language and reusable mechanisms shared by the rest of the Framework.
 
 Current examples include:
 
-- `Req` / `ReqK`;
+- LanguageExt effects and explicit failures;
 - `Flow`;
 - category/arrow traits;
 - literals and small cross-cutting primitives.

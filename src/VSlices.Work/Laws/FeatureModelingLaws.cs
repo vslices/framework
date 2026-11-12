@@ -71,7 +71,7 @@ public static class FeatureModelingLaws
                 violations.Add(Violation(type, "FM006", "Response must be public with exclusively private instance constructors.", "fm006-response-construction"));
 
             var factory = type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
-                .Where(m => m.Name == "NewResponse" && m.ReturnType == response)
+                .Where(m => m.Name == "NewResponse" && m.IsPrivate && m.ReturnType == response)
                 .Where(m => m.GetCustomAttribute<UnsafeAccessorAttribute>()?.Kind == UnsafeAccessorKind.Constructor)
                 .ToArray();
             if (factory.Length != 1 || !constructors.Any(ctor => ctor.GetParameters().Select(p => p.ParameterType)

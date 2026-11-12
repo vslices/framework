@@ -14,7 +14,7 @@ The seven packages are:
 
 `VSlices.Grounding.EntityFrameworkCore.Functional` replaces the former `VSlices.EntityFrameworkCore.Functional` package ID and is built from source inside this repository. Existing releases under the old ID are not modified or republished.
 
-The `Verify VSlices NuGet preview bundle` workflow packs and checks all seven; it **never publishes** packages. The `Publish VSlices NuGet` workflow is triggered only by a published GitHub Release, validates the version from the tag, requires the tagged commit to be on `master`, runs tests, packages, verifies manifests and publishes via OIDC in the `nuget-release` environment.
+The `Verify VSlices NuGet preview bundle` workflow packs and checks all seven; it **never publishes** packages. The preview verifier derives its expected version from the VSlices MSBuild project and its shared `src/Directory.Build.props`. The release publisher derives its version independently from the GitHub Release tag. The `Publish VSlices NuGet` workflow is triggered only by a published GitHub Release, validates the version from the tag, requires the tagged commit to be on `master`, runs tests, packages, verifies manifests and publishes via OIDC in the `nuget-release` environment.
 
 For `v0.3.0-preview.1`, publish a GitHub prerelease using the tag on the reviewed `master` commit. Creating a tag alone is insufficient to trigger the publisher.
 

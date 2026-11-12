@@ -125,7 +125,7 @@ private static extern Response NewResponse(Item item);
 ```
 
 **Alternative and limit:** `UnsafeAccessor` is the present .NET mechanism,
-**not** the semantic guarantee. Reflection does not prove that every Response
+**not** the semantic guarantee. The accessor must be private, not merely non-public. Reflection does not prove that every Response
 was constructed through this accessor or that it follows successful execution.
 FM008 checks parameter *types*, not all possible runtime binding failures.
 
