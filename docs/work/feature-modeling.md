@@ -53,7 +53,7 @@ construction.
 `Either<L,R>`, and similar types) can still appear *inside* Response.
 Reflection cannot prove an outcome was actually produced by successful work.
 
-## FM004 — Nominal Request/Response binding
+## FM004 — Nominal binding
 
 **Error:** The generic `REQ` or `RES` differs from the declared nested
 `Request` or `Response`.
@@ -68,7 +68,7 @@ contract actually accepts or returns unrelated types.
 ownership convention can be legitimate elsewhere, but is not this Feature
 model. The check proves equality of CLR types, not the adequacy of their data.
 
-## FM005 — Public Request construction
+## FM005 — Request construction
 
 **Error:** Request is not public, or has no public instance constructor.
 
@@ -84,7 +84,7 @@ could provide construction, but the current structural convention deliberately
 requires a public constructor. The Law cannot verify parameter validation or
 whether the caller's proposed values are meaningful.
 
-## FM006 — Private Response construction
+## FM006 — Response construction
 
 **Error:** Response is not public, lacks a declared instance constructor, or
 has any instance constructor that is not private.
@@ -100,7 +100,7 @@ other code in the assembly, so they do not satisfy this convention.
 Private constructors are **not** proof of execution, authorization, or deep
 immutability. FM008 checks the current construction mechanism separately.
 
-## FM007 — Effectful execution contract
+## FM007 — Execution contract
 
 **Error:** There is no matching public static
 `Eff<ALG, Response> Get(Request request)` method.
@@ -116,7 +116,7 @@ the runtime is supplied and executed.
 in Framework. This Law checks the signature, not effect laziness, cancellation,
 or the handling of expected errors.
 
-## FM008 — Response constructor accessor
+## FM008 — Response factory
 
 **Error:** The Feature does not expose exactly one private static
 `NewResponse` marked with `UnsafeAccessor(UnsafeAccessorKind.Constructor)`
@@ -143,7 +143,7 @@ private static extern Response NewResponse(Item item);
 was constructed through this accessor or that it follows successful execution.
 FM008 checks parameter *types*, not all possible runtime binding failures.
 
-## FM009 — Explicit optionality in Request and Response
+## FM009 — Explicit optionality
 
 **Error:** A public instance property, public instance field, or instance
 constructor parameter in owned Request or Response uses a C# nullable type
@@ -161,7 +161,7 @@ transport/interop boundaries outside the Feature. The reflection check cannot
 prove semantic appropriateness of `Option`, nested generic nullability,
 or non-null runtime values. It does not scan arbitrary private fields.
 
-## FM010 — Read-only Response exposure
+## FM010 — Response immutability
 
 **Error:** Response exposes a publicly settable property (including a public
 `init` setter) or a mutable public instance field.
