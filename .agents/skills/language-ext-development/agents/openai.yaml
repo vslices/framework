@@ -1,0 +1,3 @@
+interface:
+  display_name: "LanguageExt Development"
+  short_description: "Compose functional results and effects using verified LanguageExt APIs"
