@@ -41,3 +41,11 @@ Presentar cada entrada a un agente SIN `expected.md`. Pedir significado, represe
 ## E10 — Restricción semántica que no se deduce de Option
 
 «El código de cupón puede faltar. Cuando existe, debe tener entre 6 y 12 caracteres. Un string vacío significa que no hay cupón».
+
+## E11 — Identificador artificial sin backing type explícito
+
+«Una actividad tiene un ActivityId artificial; no se indicó backing type, formato ni restricciones adicionales. Construye el modelo y entrega un informe final».
+
+## E12 — Informe de modelado sin inventar reglas
+
+«Una actividad tiene un nombre obligatorio, una descripción opcional y un conjunto de participantes sin duplicados. No se documentaron límites de longitud, política de normalización ni contrato de igualdad para participantes. Construye el modelo y entrega un informe final».
