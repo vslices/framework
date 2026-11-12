@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace EntityFrameworkCore.Functional.Tests;
+namespace VSlices.Grounding.EntityFrameworkCore.Functional.Tests;
 
 public sealed class TestDbContext(DbContextOptions<TestDbContext> options)
     : DbContext(options)

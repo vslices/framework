@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <PackageId>VSlices.EntityFrameworkCore.Functional</PackageId>
+    <PackageId>VSlices.Grounding.EntityFrameworkCore.Functional</PackageId>
     <Authors>Hernán Alvarez; VSlices Development</Authors>
     <Company>VSlices</Company>
     <Description>Functional, effectful Entity Framework Core extensions built on LanguageExt.</Description>
