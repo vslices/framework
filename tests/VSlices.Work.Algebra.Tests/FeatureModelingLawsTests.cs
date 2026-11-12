@@ -15,18 +15,18 @@ public sealed class FeatureModelingLawsTests
     }
 
     [Theory]
-    [InlineData(typeof(ExternalRequestFeature), "FM002")]
-    [InlineData(typeof(ExternalRequestFeature), "FM004")]
-    [InlineData(typeof(PublicResponseConstructor), "FM006")]
-    [InlineData(typeof(PublicResponseConstructor), "FM008")]
-    [InlineData(typeof(ExternallyMutableResponse), "FM010")]
-    [InlineData(typeof(NullableRequest), "FM009")]
-    [InlineData(typeof(NullableResponse), "FM009")]
-    [InlineData(typeof(NonPublicRequestConstruction), "FM005")]
-    [InlineData(typeof(MissingNestedResponse), "FM003")]
-    [InlineData(typeof(MissingNestedResponse), "FM004")]
-    [InlineData(typeof(WrongResponseFactory), "FM008")]
-    [InlineData(typeof(PublicInitResponse), "FM010")]
+    [InlineData(typeof(ExternalRequestFeature), "FM002", "fm002-request-ownership")]
+    [InlineData(typeof(ExternalRequestFeature), "FM004", "fm004-nominal-binding")]
+    [InlineData(typeof(PublicResponseConstructor), "FM006", "fm006-response-construction")]
+    [InlineData(typeof(PublicResponseConstructor), "FM008", "fm008-response-factory")]
+    [InlineData(typeof(ExternallyMutableResponse), "FM010", "fm010-response-immutability")]
+    [InlineData(typeof(NullableRequest), "FM009", "fm009-explicit-optionality")]
+    [InlineData(typeof(NullableResponse), "FM009", "fm009-explicit-optionality")]
+    [InlineData(typeof(NonPublicRequestConstruction), "FM005", "fm005-request-construction")]
+    [InlineData(typeof(MissingNestedResponse), "FM003", "fm003-response-ownership")]
+    [InlineData(typeof(MissingNestedResponse), "FM004", "fm004-nominal-binding")]
+    [InlineData(typeof(WrongResponseFactory), "FM008", "fm008-response-factory")]
+    [InlineData(typeof(PublicInitResponse), "FM010", "fm010-response-immutability")]
     public void Reports_exact_structural_failure(Type feature, string id, string documentAnchor)
     {
         var violation = Assert.Single(
