@@ -14,6 +14,17 @@ Usar `Evolvable<SELF, SELF.State>` cuando el Space represente un punto con estad
 
 No poner operaciones como `Enroll`, `Approve` o `Cancel` dentro del Space por defecto. Un ejemplo autocontenido puede condensar responsabilidades, pero no establecer esa forma como convención.
 
+## Invariantes y vías de realización
+
+Identificar las **invariantes del concepto antes de distribuir validaciones por método**. Una invariante puede describir un estado aceptado (`I(state)`) o preservar una relación entre estados (`R(old,new)`); ambas son invariantes del modelo, no dos autoridades separadas. `Transform` y `Evolve` realizan y preservan las garantías del Space propietario. Si un Space compuesto contiene otro Space, reutilizar las garantías del componente en lugar de reimplementar sus reglas por duplicado; solo colocar en el compuesto las invariantes que necesitan su contexto, como capacidad frente a cantidad de inscritos.
+
+Ejemplo: una secuencia sin duplicados satisface su validez interna; si el dominio exige conservar los inscritos previos y agregar nuevos al final, una secuencia reordenada puede seguir siendo internamente válida pero **no preservar la invariante de continuidad**. A su vez, `[A,B,C]` desde `[A,B]` es una transición admisible si respeta capacidad y unicidad. Rechazar **todo** cambio de colección incumpliría un permiso expreso del dominio.
+
+La igualdad del Space puede comparar por identidad; esa igualdad no es prueba de que todos sus datos relevantes permanezcan iguales durante una transición. Comprobar el estado pertinente cuando las invariantes lo exijan.
+
+No incorporar sobrecargas históricas ni rutas públicas alternativas que materialicen nuevos puntos eludiendo las invariantes. Por ejemplo, `Evolve(proposed)` no pertenece al contrato actual `Evolvable<SELF,STATE>`; no añadirla alegando compatibilidad antigua ni permitir que una construcción externa escape de `Evolve(old,proposed)`.
+
+
 ## State y mutabilidad selectiva
 
 En la realización vigente:
@@ -58,10 +69,11 @@ Por tanto:
 ## Matriz mínima de pruebas
 
 - `Transform` acepta estados iniciales válidos y rechaza los inválidos.
-- `Update` con propuesta admisible produce un nuevo `SELF` y no altera al original.
+- `Update` con propuesta admisible produce un nuevo `SELF` y no altera al original; probar **aceptación de una transición expresamente permitida**, por ejemplo agregar al final, no solo casos negativos.
 - `Evolve` rechaza propuestas que cambien la identidad, incluso si ambos `State` fueron aceptados por construcciones independientes.
 - `Evolve` rechaza transiciones inválidas que conservan la identidad: cardinalidad, unicidad, restricciones entre propiedades, orden o ciclo de vida **solo si el dominio las estableció**.
-- Las validaciones de Spaces componentes se preservan durante la evolución.
+- Las invariantes del concepto, de los Spaces componentes y de relación entre estados se preservan durante la evolución, sin equiparar igualdad por identidad con igualdad de todos los datos. Detectar también prohibiciones excesivas.
+- Inspeccionar métodos públicos de construcción/evolución: ninguna sobrecarga ajena al contrato actual debe permitir saltarse invariantes.
 - Comprobar mediante compilación o prueba de compilación negativa que `with { Id = ... }` no compila cuando `Id` es `get`-only; las Laws estructurales no prueban ese requisito ni todas las transiciones.
 - Si no se puede compilar o no hay reglas suficientes, informar el límite en el informe obligatorio de modelado; no sustituir evidencia por afirmaciones.
 
