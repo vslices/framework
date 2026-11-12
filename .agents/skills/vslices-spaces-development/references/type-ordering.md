@@ -10,7 +10,7 @@
 4. **Solo para estructuras con estado vacío**, preguntar si «colección inexistente» y «colección existente pero vacía» son situaciones semánticamente diferentes. Si ambas significan «aún no hay elementos», preferir `Seq<A>` vacío; no inventar `Option<Seq<A>>`. Esta pregunta no es universal para todo `A`.
 5. **Si la estructura satisface el contrato sin reglas nuevas**, usar el tipo de LanguageExt directamente: `Seq<OrderItem>` (o `Arr`, `Lst` u otro cuando corresponda). Si una regla propia de la colección necesita autoridad y construcción, definir un Space que la envuelva: `OrderItems` sobre `Seq<OrderItem>` para prohibir identificadores duplicados, o `NonEmptyOrderItems` para exigir al menos uno.
 6. **Solo si coexisten distinciones independientes**, componer capas: `Option<NonEmptyOrderItems>` es justificable únicamente cuando «el grupo no existe» significa algo diferente de «el grupo existe y contiene cero elementos». No deducirlo de «puede tener órdenes».
-7. **Revisar los estados representables**. Dos representaciones distintas con exactamente el mismo significado son evidencia de redundancia; no prohibir estados distintos que sí tengan significado propio.
+7. **Revisar los estados representables**. Dos representaciones distintas con exactamente el mismo significado son evidencia de redundancia; no prohibir estados distintos que sí tengan significado propio. Un valor vacío puede ser válido y diferente de `None`: por ejemplo, campo condicional no mostrado frente a campo mostrado sin contenido. Distinguir significado del request, del dominio y del transporte.
 8. **Verificar garantías reales**: el envoltorio nominal no prueba una invariante por sí solo. Validar en la construcción y preservar en la evolución; tener cuidado con colecciones evaluadas de forma diferida.
 
 ## Ejemplos y contraejemplos
@@ -26,6 +26,24 @@ Option<Description> Description
 `Description` establece sus invariantes (`string.Empty` no es una descripción admisible **en este dominio**). `None` significa ausencia de descripción.
 
 **Incorrecto:** aceptar `Some(Description(""))` como equivalente de `None`, o crear `OptionalDescription` sin otro significado. Tampoco universalizar «ningún Space de texto acepta vacío»: otros conceptos pueden admitirlo con un significado diferente.
+
+### Campo condicional mostrado o no mostrado: ausencia distinta de texto vacío
+
+En un formulario dinámico, otros datos pueden determinar si un campo de observaciones aparece. El contrato del **request** distingue tres situaciones:
+
+| Representación conceptual | Significado |
+| --- | --- |
+| `None` | El campo no se mostró; la persona no tuvo ocasión de escribir |
+| `Some(Text(""))` | El campo se mostró, pero quedó vacío |
+| `Some(Text("Necesito ayuda"))` | El campo se mostró y recibió contenido |
+
+Aquí `Text` es notación conceptual (longitud admisible **0 a 500**), no un tipo C# provisto por VSlices. Se puede modelar con un Space concreto que acepte texto vacío y establezca el máximo. Así, `Option<Text>` **no es redundante**: ausencia y valor vacío expresan hechos distintos.
+
+Si el request incluye la información necesaria para determinar visibilidad, y el contrato garantiza que un campo visible se remite incluso vacío, es pertinente comprobar la invariante `Visible(campo, respuestas) == IsSome(valor)` en el propietario semántico de esa relación. No colocar esa regla en `Text`, cuyo significado no depende de la interfaz. La UI, el transporte y la validación del request no se convierten automáticamente en responsabilidades de un Space elemental.
+
+**Contraste:** una descripción opcional del dominio puede prohibir un texto sin contenido, porque su ausencia ya se expresa mediante `None`. No extrapolar esa restricción a todo texto: en este formulario, aceptar `Some(Text(""))` es una exigencia del contrato.
+
+**No universalizar:** `None` no siempre significa «el control no se mostró»; podría significar dato desconocido, no aplicable o valor voluntariamente omitido. Confirmar el significado en el contexto. Tampoco asumir que la ausencia del campo en JSON, `null` o un string vacío representan automáticamente los tres estados: esa correspondencia pertenece al contrato de transporte y debe verificarse.
 
 ### Elementos que pueden ser cero o más
 
@@ -98,7 +116,7 @@ Seq<Option<SeatAssignment>> Seats
 - ¿Qué concepto existe y qué significa?
 - ¿La condición se refiere a la existencia del concepto, a cada elemento, o a la colección completa?
 - Si hay colección vacía: ¿qué diferencia observable hay entre «vacía» e «inexistente»? **No preguntar esto para cada valor individual.**
-- ¿Qué estados distintos admite el tipo propuesto? ¿Alguno representa exactamente lo mismo que otro?
+- ¿Qué estados distintos admite el tipo propuesto? ¿Alguno representa exactamente lo mismo que otro? Si hay `Option<A>` y `A` admite vacío, ¿ausencia y vacío describen hechos diferentes y verificables?
 - ¿Qué invariantes aporta el Space por encima del constructor funcional?
 - ¿Qué ejemplo refuta la alternativa descartada?
 - ¿Qué evidencia verifica admisibilidad y preservación de invariantes?
