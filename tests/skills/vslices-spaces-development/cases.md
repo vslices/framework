@@ -1,5 +1,7 @@
 # Casos ciegos — vslices-spaces-development
 
+**Prueba integral de regresión:** [activity-campaign.md](activity-campaign.md). Mantener su oráculo [activity-campaign-expected.md](activity-campaign-expected.md) oculto al agente evaluado.
+
 Presentar cada entrada a un agente SIN `expected.md`. Pedir significado, representación propuesta, distinciones de estado, invariantes y contraejemplos. No proporcionar respuestas esperadas durante la ejecución.
 
 ## E01 — Descripción opcional
