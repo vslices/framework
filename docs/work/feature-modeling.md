@@ -195,7 +195,7 @@ public sealed record ItemAlgebra(
 
 `HasPointReader<POINT, ID>`, `HasPointWriter<POINT>` and
 `HasPointRemover<POINT, ID>` are reusable capability projections defined in
-`VSlices.Work`. They are **not** the point atoms themselves: the respective
+`VSlices.Work.Algebra`, beside the corresponding `Point*` interface. They are **not** the point atoms themselves: the respective
 properties expose `PointReader`, `PointWriter` and `PointRemover` implementations.
 A Feature with no external capabilities may declare an empty `Algebra` interface. In C# 12+, a memberless interface may end with `;` instead of `{ }`; this is an authoring style preference and is not separately enforced by FM011.
 
