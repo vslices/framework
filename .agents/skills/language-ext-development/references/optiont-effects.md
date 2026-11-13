@@ -19,6 +19,21 @@ Consultar los tipos de retorno antes de combinar `K<F,A>`, `IO<A>`, `Eff<RT,A>` 
 
 La ausencia puede ser respuesta válida, no encontrado, condición de una alternativa o requisito incumplido, según contrato. Evitar reglas universales sobre cuándo fallar con `Eff`; la observación previa sobre Approval no basta para establecerlas.
 
+## Convertir ausencia en error de manera explícita (VSlices PR #197)
+
+Cuando `None` signifique **rechazo** para la operación consumidora, VSlices incorpora en `src/VSlices/Monads/OptionT/Syntax/OptionT.Fallible.cs` la extensión:
+
+```csharp
+K<M, A> IfNone<M, A>(this OptionT<M, A> optional, Func<Error> fe)
+    where M : Monad<M>, Fallible<M>;
+```
+
+La implementación emplea `optional.Run().Bind(option => option.Match(Some: M.Pure, None: () => M.Fail<A>(fe())))`. El `Some(a)` se conserva como `M.Pure(a)`; `None` invoca `fe()` y produce `M.Fail<A>`; un fallo previo de `M` se propaga sin entrar al `Match`. Se requieren **ambos** traits: `Monad<M>` para `Bind`/`Pure` y `Fallible<M>` para `Fail`.
+
+La fábrica `fe` se evalúa **únicamente si** el `Option` observado es `None` y en el momento en que el monad exterior evalúe ese paso. Para `OptionT<Eff<RT>,A>`, esto mantiene el fallo diferido a la ejecución del efecto. No fuerza `None` a error cuando la ausencia sea un resultado válido; continuar con `OptionT` o con `Option<A>` en ese caso. Pruebas de `Fin` y de `Eff<RT>` se encuentran en `tests/VSlices.Work.Algebra.Tests/OptionTFallibleTests.cs`.
+
+**Disponibilidad:** esta extensión pertenece al trabajo no fusionado del PR #197 de VSlices. Confirmar versión/commit del Framework; no atribuirla a `LanguageExt.Core 5.0.0-beta-78` ni a la versión NuGet anterior de VSlices.
+
 ## Pruebas sugeridas
 
 Verificar `Some`, `None`, fallo de efecto, orden/laziness de operaciones y propagación de errores de la realización, con el runtime que corresponda.
