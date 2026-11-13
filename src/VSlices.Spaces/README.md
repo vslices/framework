@@ -20,7 +20,7 @@ For the current .NET conventions for defining/evolving points, and structural in
 
 ## Quantities
 
-The current quantitative surface lives under `VSlices.Spaces.Quantities`.
+The current quantitative surface lives under `VSlices.Spaces.Definitions`.
 
 ```text
 M            algebraic magnitude shape

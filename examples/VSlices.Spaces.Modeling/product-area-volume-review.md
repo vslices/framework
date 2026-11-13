@@ -97,7 +97,7 @@ Area<C,T>
 Consumption remains explicit:
 
 ```csharp
-using static VSlices.Spaces.Quantities.Conversions;
+using static VSlices.Spaces.Definitions.Conversions;
 
 var structural = width * depth;
 var semantic = area(structural);
