@@ -43,6 +43,29 @@ public sealed class FeatureModelingLawsTests
     }
 
     [Fact]
+    public void FM011_rejects_a_module_wide_algebra_without_feature_owned_interface()
+    {
+        var violation = Assert.Single(
+            FeatureModelingLaws.Inspect(typeof(ExternalRequestFeature)),
+            issue => issue.RuleId == "FM011");
+
+        Assert.Equal(FeatureModelingLaws.Guide + "#fm011-feature-owned-algebra", violation.GuidanceUrl);
+    }
+
+    [Fact]
+    public void FM011_rejects_a_feature_that_does_not_bind_its_owned_algebra()
+    {
+        Assert.Contains(FeatureModelingLaws.Inspect(typeof(MismatchedAlgebraFeature)),
+            issue => issue.RuleId == "FM011");
+    }
+
+    [Fact]
+    public void FM011_accepts_a_feature_owned_algebra_with_only_its_required_capability()
+    {
+        Assert.Empty(FeatureModelingLaws.Inspect(typeof(MinimalAlgebraFeature)));
+    }
+
+    [Fact]
     public void Consumer_scan_is_scoped_and_reports_owners()
     {
         var violations = FeatureModelingLaws.InspectDefinitions(
@@ -65,8 +88,9 @@ public sealed class FeatureModelingLawsTests
             item.Definition == typeof(ValidTopLevelFeature).FullName);
     }
 
-    public sealed class ValidFeature : Feature<ValidFeature, string, ValidFeature.Request, ValidFeature.Response>
+    public sealed class ValidFeature : Feature<ValidFeature, ValidFeature.Algebra, ValidFeature.Request, ValidFeature.Response>
     {
+        public interface Algebra { }
         public sealed record Request(string Value);
         public sealed record Response
         {
@@ -75,7 +99,7 @@ public sealed class FeatureModelingLawsTests
         }
         [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
         private static extern Response NewResponse(string value);
-        public static Eff<string, Response> Get(Request request) =>
+        public static Eff<Algebra, Response> Get(Request request) =>
             Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
     }
 
@@ -234,8 +258,9 @@ public sealed class FeatureModelingLawsTests
 }
 
 public sealed class ValidTopLevelFeature :
-    Feature<ValidTopLevelFeature, string, ValidTopLevelFeature.Request, ValidTopLevelFeature.Response>
+    Feature<ValidTopLevelFeature, ValidTopLevelFeature.Algebra, ValidTopLevelFeature.Request, ValidTopLevelFeature.Response>
 {
+    public interface Algebra { }
     public sealed record Request(string Value);
 
     public sealed record Response
@@ -247,8 +272,50 @@ public sealed class ValidTopLevelFeature :
     [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
     private static extern Response NewResponse(string value);
 
+    public static Eff<Algebra, Response> Get(Request request) =>
+        Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+}
+
+public interface TestReaderCapability
+{
+    string Read();
+}
+
+public interface TestWriterCapability
+{
+    void Write(string value);
+}
+
+public sealed class MismatchedAlgebraFeature :
+    Feature<MismatchedAlgebraFeature, string, MismatchedAlgebraFeature.Request, MismatchedAlgebraFeature.Response>
+{
+    public interface Algebra : TestReaderCapability { }
+    public sealed record Request(string Value);
+    public sealed record Response
+    {
+        private Response(string value) => Value = value;
+        public string Value { get; }
+    }
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(string value);
     public static Eff<string, Response> Get(Request request) =>
         Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+}
+
+public sealed class MinimalAlgebraFeature :
+    Feature<MinimalAlgebraFeature, MinimalAlgebraFeature.Algebra, MinimalAlgebraFeature.Request, MinimalAlgebraFeature.Response>
+{
+    public interface Algebra : TestReaderCapability { }
+    public sealed record Request;
+    public sealed record Response
+    {
+        private Response(string value) => Value = value;
+        public string Value { get; }
+    }
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(string value);
+    public static Eff<Algebra, Response> Get(Request request) =>
+        Eff<Algebra, Response>.LiftIO(algebra => IO.pure(NewResponse(algebra.Read())));
 }
 
 public sealed class InvalidTopLevelFeature :
