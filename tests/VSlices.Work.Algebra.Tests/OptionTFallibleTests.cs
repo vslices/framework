@@ -22,6 +22,27 @@ public sealed class OptionTFallibleTests
     }
 
     [Fact]
+    public void Eff_runtime_defers_the_error_factory_until_execution()
+    {
+        var calls = 0;
+        var effect = OptionT.lift<Eff<TestRuntime>, int>(Option<int>.None)
+            .IfNone(() =>
+            {
+                calls++;
+                return Error.New("missing_eff");
+            }).As();
+
+        Assert.Equal(0, calls);
+
+        var result = effect.Run(new TestRuntime());
+        Assert.True(result.IsFail);
+        Assert.Contains("missing_eff", result.ToString());
+        Assert.Equal(1, calls);
+    }
+
+    private sealed record TestRuntime;
+
+    [Fact]
     public void None_is_converted_to_the_supplied_failure()
     {
         var calls = 0;
