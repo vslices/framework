@@ -1,8 +1,8 @@
 using System.Numerics;
-using VSlices.Spaces.Quantities;
-using VSlices.Spaces.Quantities.Abstract;
+using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Definitions.Abstract;
 
-namespace VSlices.Spaces;
+namespace VSlices.Spaces.Definitions;
 
 /// <summary>
 /// Explicit semantic establishments for VSlices-owned algebraic quantities.

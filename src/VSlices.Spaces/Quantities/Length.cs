@@ -1,8 +1,8 @@
 using System.Numerics;
 using LanguageExt;
-using VSlices.Spaces.Quantities.Abstract;
+using VSlices.Spaces.Definitions.Abstract;
 
-namespace VSlices.Spaces.Quantities;
+namespace VSlices.Spaces.Definitions;
 
 /// <summary>
 /// Most general nominally closed Length family.
