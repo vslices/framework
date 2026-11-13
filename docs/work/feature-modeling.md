@@ -193,9 +193,11 @@ public sealed record ItemAlgebra(
     CreateItem.Algebra, ReadItem.Algebra, UpdateItem.Algebra, DeleteItem.Algebra;
 ```
 
-`HasPointReader` and `HasPointWriter` here are **illustrative consumer
-contracts**, not pre-existing Framework interfaces. A Feature with no external
-capabilities may declare an empty `Algebra` interface.
+`HasPointReader<POINT, ID>`, `HasPointWriter<POINT>` and
+`HasPointRemover<POINT, ID>` are reusable capability projections defined in
+`VSlices.Work`. They are **not** the point atoms themselves: the respective
+properties expose `PointReader`, `PointWriter` and `PointRemover` implementations.
+A Feature with no external capabilities may declare an empty `Algebra` interface.
 
 **Alternative and limit:** The Law checks only public nested-interface
 ownership and exact CLR type binding. It **cannot** prove that all members or
