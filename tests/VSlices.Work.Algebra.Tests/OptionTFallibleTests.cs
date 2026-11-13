@@ -10,7 +10,7 @@ public sealed class OptionTFallibleTests
     public void Some_is_preserved_without_evaluating_the_missing_error()
     {
         var calls = 0;
-        Fin<int> result = OptionT.lift<Fin, int>(Option<int>.Some(42))
+        Fin<int> result = OptionT.lift<Fin, int>(Prelude.Some(42))
             .IfNone(() =>
             {
                 calls++;
