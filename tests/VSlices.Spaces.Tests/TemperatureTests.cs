@@ -1,6 +1,6 @@
 using LanguageExt;
-using VSlices.Spaces.Quantities;
-using VSlices.Spaces.Quantities.Abstract;
+using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Definitions.Abstract;
 
 namespace VSlices.Spaces.Tests;
 

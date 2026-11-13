@@ -1,7 +1,7 @@
-using VSlices.Spaces.Quantities;
-using VSlices.Spaces.Quantities.Abstract;
+using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Definitions.Abstract;
 using static VSlices.Spaces.Conversions;
-using static VSlices.Spaces.Quantities.PowerOperations;
+using static VSlices.Spaces.Definitions.PowerOperations;
 
 namespace VSlices.Spaces.Tests;
 

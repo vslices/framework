@@ -1,5 +1,5 @@
-using VSlices.Spaces.Quantities;
-using VSlices.Spaces.Quantities.Abstract;
+using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Definitions.Abstract;
 using static VSlices.Spaces.Conversions;
 
 namespace VSlices.Spaces.Tests;

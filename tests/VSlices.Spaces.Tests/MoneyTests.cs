@@ -1,5 +1,5 @@
 using LanguageExt;
-using VSlices.Spaces.Finance;
+using VSlices.Spaces.Definitions;
 
 namespace VSlices.Spaces.Tests;
 
