@@ -18,9 +18,9 @@ Escribir código idiomático, legible y comprobable usando **la versión efectiv
 
 1. **Identificar la versión real.** Leer el `PackageReference`, lockfile o dependencia transitiva y el código que efectivamente compila. En `vslices/framework` (al crear esta Skill) `src/VSlices/VSlices.csproj` referencia `LanguageExt.Core 5.0.0-beta-78`; tratarlo como evidencia localizada, no como versión universal.
 2. **Clasificar el resultado y el contexto.** Separar valor puro, ausencia admisible (`Option<A>`), resultado fallible (`Fin<A>` o `Either<L,R>` según el contrato), operación de mundo (`IO<A>`) y ejecución dependiente de un runtime (`Eff<RT,A>`). No apilar wrappers que dupliquen un mismo canal de fallo.
-3. **Elegir la composición mínima.** Preferir `Map`, `Bind`, `Match` y LINQ cuando expresen directamente el flujo. Mantener puros los cálculos puros y explícitos los efectos. Antes de usar `LiftIO`, `liftEff`, `Run`, `As` u otras conversiones, inspeccionar los tipos y sobrecargas concretas.
-4. **Respetar los tipos.** Comprobar si una API devuelve `A`, `Option<A>`, `Fin<A>`, `IO<A>`, `OptionT<IO,A>` o una forma `K<F,A>`: no asumir que todas las operaciones disponibles sobre los tipos concretos están disponibles sobre `K`. En una consulta LINQ, examinar especialmente el tipo de la primera fuente y las sobrecargas de `SelectMany`.
-5. **Verificar en el consumidor.** Compilar con la versión instalada y probar al menos el caso exitoso, ausencia si aplica, rechazo esperado y propagación de errores/efectos. Si el compilador contradice un ejemplo, corregir el ejemplo desde las firmas verificadas, no introducir conversiones a ciegas.
+3. **Elegir la composición mínima.** Para `Fin<A>`, distinguir validaciones independientes —combinar de forma aplicativa y acumular errores— de validaciones dependientes —encadenar monádicamente y propagar fallo—; consultar [validación con Fin](references/fin-composition.md). Preferir `Map`, `Bind`, pattern matching y LINQ cuando expresen directamente el flujo; utilizar `Match` cuando realmente se necesite examinar ramas, no anidar múltiples `Match` para simular composición. Mantener puros los cálculos puros y explícitos los efectos. Antes de usar `LiftIO`, `liftEff`, `Run`, `As` u otras conversiones, inspeccionar los tipos y sobrecargas concretas.
+4. **Respetar los tipos.** Comprobar si una API devuelve `A`, `Option<A>`, `Fin<A>`, `IO<A>`, `OptionT<IO,A>`, `OptionT<Eff<RT>,A>` o una forma `K<F,A>`: no asumir que todas las operaciones disponibles sobre los tipos concretos están disponibles sobre `K`. En una consulta LINQ, examinar especialmente el tipo de la primera fuente y las sobrecargas de `SelectMany`. Para las dos formas de `OptionT`, consultar [transformadores de ausencia](references/optiont-effects.md), sin convertir `None` en error de `Eff` por rutina.
+5. **Verificar en el consumidor.** Compilar con la versión instalada y probar al menos el caso exitoso, ausencia si aplica, rechazo esperado y propagación de errores/efectos. Confirmar el comportamiento de errores simultáneos cuando se promete acumulación. Si el compilador contradice un ejemplo, corregir el ejemplo desde las firmas verificadas, no introducir conversiones a ciegas. Buscar ejemplos de dominios diferentes; distinguir las [realizaciones observadas](references/observed-realizations.md) de APIs normativas.
 
 ## Decisiones rápidas
 
@@ -30,10 +30,21 @@ Escribir código idiomático, legible y comprobable usando **la versión efectiv
 | Transformación que puede rechazar un valor | `Fin<A>` o contrato fallible existente |
 | Error tipado específico de una alternativa | `Either<L,R>`, solo si el contrato necesita distinguirla |
 | Lectura/escritura externa | `IO<A>` y, cuando hay ausencia, `OptionT<IO,A>` |
+| Lectura opcional dependiente del runtime | `OptionT<Eff<RT>,A>` si la ausencia conserva significado y el runtime aporta capacidades |
+| Validaciones independientes | `Fin<A>` con aplicación que acumule errores; comprobar la operación real |
+| Validaciones dependientes | `Fin<A>` con `Bind` o LINQ; no prometer acumulación de errores no evaluados |
 | Efecto que necesita capacidades del runtime | `Eff<RT,A>` |
 | Secuencia de operaciones | LINQ o `Bind`, verificando sobrecargas disponibles |
 
 No usar estas correspondencias como una taxonomía absoluta; las firmas y el significado del contrato prevalecen.
+
+## Composición de errores y efectos
+
+- Consultar [Fin: applicative y monad](references/fin-composition.md) para distinguir validaciones simultáneas y encadenadas, y preservar errores propios de cada invariante.
+- Consultar [OptionT con IO y Eff](references/optiont-effects.md) para componer ausencia y efectos sin colapsar prematuramente los canales.
+- Consultar [realizaciones observadas y extensiones por evaluar](references/observed-realizations.md) antes de trasladar patrones de Hual u otro consumidor a VSlices. Las extensiones `IfNone`, `IfNoneExtract` y `BiBindExtract` no se incorporan automáticamente: revisar equivalencia en LanguageExt v5 y posponer cambios de VSlices a la revisión de Framework.
+- No recomendar universalmente convertir `None` en fallo de `Eff` por el caso aislado de Approval; respetar primero las convenciones del Framework y requerir nueva evidencia.
+- Utilizar sintaxis moderna de C# compatible con el proyecto (pattern matching y expresiones de colección para `Seq<A>` cuando compile en v5); no extrapolar restricciones históricas de LanguageExt v4.
 
 ## Fuentes y ejemplos verificables
 
@@ -42,6 +53,7 @@ No usar estas correspondencias como una taxonomía absoluta; las firmas y el sig
 - [Point Algebras](https://github.com/vslices/framework/blob/master/docs/point-algebras.md), para `IO` y `OptionT<IO,A>`.
 - [Feature Model](https://github.com/vslices/framework/blob/master/docs/feature-model.md), para `Eff<ALG, Response>` en VSlices.
 - [Spaces Modeling](https://github.com/vslices/framework/blob/master/docs/spaces/modeling.md), para fallos de construcción y opcionalidad.
+- [Hual: Tare.New](https://github.com/HernanFAR/Hual/blob/master/LogisticsContext.Domain/Aggregates/Tare.cs) y [Hual: PdiBook.Module](https://github.com/HernanFAR/Hual/blob/master/Legals.Domain/Aggregates/PdiBook/PdiBook.Module.cs), como realizaciones, no normas universales.
 
 ## Entrega
 
