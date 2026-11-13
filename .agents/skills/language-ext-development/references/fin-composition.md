@@ -6,17 +6,16 @@
 - **Monad:** una validación depende del resultado de otra. `Bind` o `from` encadenan las operaciones y detienen la continuación dependiente al fallar una anterior.
 - **Combinación:** validar independientemente las propiedades primero; después comprobar una relación entre los valores aceptados.
 
-## Evidencia concreta: Hual / Tare
+## Ejemplo de combinación aplicativa
 
-En [`Tare.New`](https://github.com/HernanFAR/Hual/blob/master/LogisticsContext.Domain/Aggregates/Tare.cs), cuatro validaciones producen `Fin<TareId>`, `Fin<string>`, `Fin<string>` y `Fin<NonNegativeKilogram>`, y se combinan así:
+Cuatro validaciones independientes producen `Fin<TareId>`, `Fin<string>`, `Fin<string>` y `Fin<NonNegativeKilogram>`. La combinación puede escribirse así:
 
 ```csharp
-return (idVal, detailVal, referencedNameVal, massVal)
-    .Apply((id, detail, refName, mass) => new Tare(id, detail, refName, mass))
-    .As();
+return +(idVal, detailVal, referencedNameVal, massVal)
+    .Apply((id, detail, refName, mass) => new Tare(id, detail, refName, mass));
 ```
 
-Es evidencia de la sintaxis utilizada en Hual; comprobar la versión de paquete que efectivamente compila ese consumidor antes de copiarla. Cuando se requiere **acumulación**, ejecutar pruebas con dos o más errores independientes: no inferirla solo por encontrar `.Apply`.
+El `+` unario sustituye el `.As()` de cierre cuando ese downcast es la **última instrucción efectiva del método**, y la versión instalada admite el operador para el tipo devuelto. Para prometer **acumulación**, ejecutar pruebas con dos o más errores independientes: no inferirla solo por encontrar `.Apply`. Véase [operadores de LanguageExt v5](v5-operators.md).
 
 ## Dependencia semántica (conceptual)
 
