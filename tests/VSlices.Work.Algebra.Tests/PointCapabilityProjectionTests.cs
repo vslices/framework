@@ -1,3 +1,4 @@
+using VSlices.Work.Algebra;
 using VSlices.Work;
 using Xunit;
 
