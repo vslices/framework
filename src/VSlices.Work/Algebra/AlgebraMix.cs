@@ -1,4 +1,4 @@
-namespace VSlices.Work;
+namespace VSlices.Work.Algebra;
 
 /// <summary>
 /// Mixes independently owned executable algebras into one larger Flow runtime.
