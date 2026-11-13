@@ -1,3 +1,4 @@
+using VSlices.Work.Algebra;
 using System.Runtime.CompilerServices;
 using LanguageExt;
 using LanguageExt.Common;
