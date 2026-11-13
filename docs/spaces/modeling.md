@@ -192,3 +192,27 @@ model and its owner.
 The message emitted by a failing Law includes its stable ID, the concrete
 definition, a specific error, and the URL of the corresponding rule and its
 rationale. Automated detection and conceptual justification are distinct.
+
+## SM008 — Nominal DiscreteSpace contract
+
+**Error:** A concrete Space does not implement `DiscreteSpace<SELF>` for its own type.
+
+**Why:** Structural equivalence to `IEquatable<SELF>` and `IEqualityOperators<SELF,SELF,bool>` does not declare the nominal Space equality contract.
+
+**Preferred realization:** Implement `DiscreteSpace<SELF>` directly or through a trait that inherits it (for example `MaintainedSpace<SELF>`). A `record` may supply the equality operations automatically, but it still must declare the nominal interface. Do not demand handwritten `Equals`/operator overrides merely because they are generated.
+
+**Scope and limit:** The structural check identifies presence of the intended interface, not correctness of the chosen equality relation. Select identity, value or other equivalence based on the domain. By default examine all semantically relevant properties unless the domain explicitly establishes another relation.
+
+## DiscreteSpace semantic laws
+
+`DiscreteSpaceSemanticLaws.Verify<A>(left, right, third)`, constrained by `A : DiscreteSpace<A>`, checks the supplied witnesses for:
+
+- **DS001:** reflexivity;
+- **DS002:** symmetry;
+- **DS003:** transitivity;
+- **DS004:** consistency of `Equals`, `==`, `!=` and `EqualityComparer<A>.Default`;
+- **DS005:** equal values have equal hash codes.
+
+This is a **witness-based check**, not an exhaustive proof over all inhabitants. Deliberately supply equivalent, distinct and boundary cases for the semantic relation in question. The API requires concrete values from the consumer; the reflection facade does not construct arbitrary points or infer which domain invariants ought to hold.
+
+`SpaceModelingLaws` is a coordinating facade for **structural laws**. `TransformableStructuralLaws` and `EvolvableStructuralLaws` preserve the existing SM001–SM007 checks; `DiscreteSpaceStructuralLaws` adds SM008. Semantic equality checks are separate and explicit. Additional `TransformableSemanticLaws` or `EvolvableSemanticLaws` are research possibilities, not included merely for naming symmetry.
