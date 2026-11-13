@@ -1,6 +1,6 @@
 # Consumo de variantes nominales en Features
 
-Una Feature puede recibir o producir un Space que represente variantes nominales de un mismo concepto. Por ejemplo, `DraftEvaluationReport` y `CompletedEvaluationReport` pueden ser subtipos de `EvaluationReport`, con características propias y una identidad compartida.
+Una Feature puede recibir o producir un Space que represente variantes nominales de un mismo concepto. Por ejemplo, `DraftReport` y `CompletedReport` pueden ser subtipos de `Report`, con características propias y una identidad compartida.
 
 La Feature debe distinguir las variantes de forma explícita —por pattern matching o mecanismo exhaustivo disponible— para ejecutar la operación correspondiente. No envolver una jerarquía nominal ya discriminada en `Either<Draft,Completed>` sin otra distinción semántica: duplicaría la alternativa.
 

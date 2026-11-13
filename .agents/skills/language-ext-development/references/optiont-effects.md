@@ -13,22 +13,9 @@ Consultar los tipos de retorno antes de combinar `K<F,A>`, `IO<A>`, `Eff<RT,A>` 
 
 [`PointReader<POINT,ID>.ReadOrDefault`](https://github.com/vslices/framework/blob/master/docs/point-algebras.md) retorna `OptionT<IO,POINT>`; es una lectura opcional con efecto. En el ejemplo de `GetTodo`, `ReadOrDefault(id).Run().As().Map(NewResponse)` preserva la opción hasta construir la respuesta. `Read` es la vista de valor requerido del contrato, no la representación obligatoria de todo lookup.
 
-## Referencia Hual (OptionT<Eff<RT>,A>)
-
-[`PdiBook.Module.cs`](https://github.com/HernanFAR/Hual/blob/master/Legals.Domain/Aggregates/PdiBook/PdiBook.Module.cs) utiliza:
-
-```csharp
-public static OptionT<Eff<HualRuntime>, PdiBook> SearchInRepository(this PdiBookCode code) =>
-    from repository in provide<IPdiBookRepository>()
-    from book in repository.Read(code)
-    select book;
-```
-
-La obtención de una capacidad del runtime y la lectura opcional se componen conservando el canal de ausencia. Esta sintaxis pertenece a la realización observada en Hual; verificar versiones y sobrecargas antes de trasplantar.
-
 ## Extracción y conversión
 
-`Run()` extrae el transformador a un efecto con `Option<A>`; `Match` puede decidir entonces qué hacer con `Some` o `None`. Utilizar `As()` únicamente cuando sea compatible con los tipos concretos retornados. No asumir que `OptionT<IO,A>` y `OptionT<Eff<RT>,A>` tienen idénticas conversiones.
+`Run()` extrae el transformador a un efecto con `Option<A>`; `Match` puede decidir entonces qué hacer con `Some` o `None`. Utilizar `As()` únicamente cuando sea compatible con los tipos concretos retornados; si el downcast es la última instrucción efectiva y el tipo admite el operador unario de LanguageExt v5, preferir `+` (véase [operadores](v5-operators.md)). No asumir que `OptionT<IO,A>` y `OptionT<Eff<RT>,A>` tienen idénticas conversiones.
 
 La ausencia puede ser respuesta válida, no encontrado, condición de una alternativa o requisito incumplido, según contrato. Evitar reglas universales sobre cuándo fallar con `Eff`; la observación previa sobre Approval no basta para establecerlas.
 

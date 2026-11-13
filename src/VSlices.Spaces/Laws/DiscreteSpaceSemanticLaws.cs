@@ -26,7 +26,10 @@ public static class DiscreteSpaceSemanticLaws
         for (var i = 0; i < values.Length; i++)
         {
             var a = values[i];
-            if (!a.Equals(a) || !comparer.Equals(a, a) || !(a == a) || a != a)
+            // The indexed witness is intentionally the same value: reflexivity is the property under test.
+            // Use an indexed operand to avoid a false-positive self-comparison diagnostic.
+            if (!a.Equals(values[i]) || !comparer.Equals(a, values[i]) ||
+                !(a == values[i]) || a != values[i])
                 Fail("DS001", "Equality is not reflexive for a supplied witness.");
 
             for (var j = 0; j < values.Length; j++)

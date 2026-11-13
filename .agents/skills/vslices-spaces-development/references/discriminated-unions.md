@@ -15,7 +15,7 @@ Distinguir:
 
 1. Determinar qué variantes admite el dominio, qué evidencia identifica a cada una y qué restricciones son propias.
 2. Modelar los valores básicos como Spaces diferenciados cuando tienen significado propio, aun si comparten backing `string`.
-3. Representar las variantes nominales del mismo concepto mediante una abstracción común y subtipos/casos concretos (por ejemplo `EvaluationReport` con `DraftEvaluationReport` y `CompletedEvaluationReport`). Conservar la identidad compartida y estudiar explícitamente si dos variantes con el mismo identificador son iguales o no. `Either<A,B>` puede representar dos alternativas válidas cuando tenga significado propio, pero no envolver automáticamente una jerarquía nominal en `Either<Draft,Completed>`: duplicaría la discriminación. Comprobar las restricciones de exhaustividad y construcción del lenguaje elegido.
+3. Representar las variantes nominales del mismo concepto mediante una abstracción común y subtipos/casos concretos (por ejemplo `Report` con `DraftReport` y `CompletedReport`). Conservar la identidad compartida y estudiar explícitamente si dos variantes con el mismo identificador son iguales o no. `Either<A,B>` puede representar dos alternativas válidas cuando tenga significado propio, pero no envolver automáticamente una jerarquía nominal en `Either<Draft,Completed>`: duplicaría la discriminación. Comprobar las restricciones de exhaustividad y construcción del lenguaje elegido.
 4. Impedir estados ambiguos o imposibles como dos propiedades opcionales independientes `Option<GivenName>` y `Option<LegalName>` cuando el contrato exige exactamente una: esa forma permitiría **ninguna** o **ambas**.
 5. No resolver una variante a partir de heurísticas del texto (mayúsculas, espacios, longitud, palabras como «SpA»); exigir evidencia discriminadora en la frontera de construcción si no hay mecanismo fiable. No inventar requisitos para nombres, apellidos, registro comercial, documentos o personería.
 6. Preservar invariantes de cada variante mediante su Space propietario, y de la unión mediante una composición que no acepte combinaciones imposibles.
@@ -24,12 +24,12 @@ Distinguir:
 ## Variante nominal con identidad compartida (conceptual)
 
 ```csharp
-abstract record EvaluationReport(TicketId Id);
-sealed record DraftEvaluationReport(TicketId Id) : EvaluationReport(Id);
-sealed record CompletedEvaluationReport(TicketId Id, EvaluationResult Result) : EvaluationReport(Id);
+abstract record Report(ReportId Id);
+sealed record DraftReport(ReportId Id) : Report(Id);
+sealed record CompletedReport(ReportId Id, ReportResult Result) : Report(Id);
 ```
 
-El ejemplo no declara todos los contratos de VSlices ni pretende compilar aislado: sus transformaciones, constructores, igualdad y garantías deben resolverse contra el Framework actual. Un `DraftEvaluationReport` y un `CompletedEvaluationReport` son dos variantes de `EvaluationReport`, sin `Either<DraftEvaluationReport,CompletedEvaluationReport>` adicional.
+El ejemplo no declara todos los contratos de VSlices ni pretende compilar aislado: sus transformaciones, constructores, igualdad y garantías deben resolverse contra el Framework actual. Un `DraftReport` y un `CompletedReport` son dos variantes de `Report`, sin `Either<DraftReport,CompletedReport>` adicional.
 
 ## Ejemplo conceptual (sin imponer contratos)
 
