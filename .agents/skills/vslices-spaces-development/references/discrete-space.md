@@ -20,7 +20,9 @@ public interface DiscreteSpace<SELF> :
 
 ## Realizar la igualdad
 
-- Implementar `Equals(SELF?)`, `GetHashCode`, operadores `==` y `!=`, y `Equals(object?)` cuando corresponda, manteniendo una misma relación de igualdad. Para `record`, revisar la igualdad generada; no duplicarla innecesariamente ni asumir que coincide con la relación semántica.
+- Declarar explícitamente `DiscreteSpace<SELF>` en todo Space concreto, de forma directa o heredándolo mediante otro trait (por ejemplo `MaintainedSpace<SELF>`). Implementar solamente `IEquatable<SELF>` e `IEqualityOperators<SELF,SELF,bool>` no sustituye ese contrato nominal.
+- Por defecto, considerar todas las propiedades semánticamente relevantes mediante la igualdad de cada una. Solo adoptar igualdad por identidad u otra equivalencia cuando esté justificada por el dominio; consignar ambigüedades como decisiones pendientes.
+- Verificar que `Equals(SELF?)`, `GetHashCode`, operadores `==` y `!=`, y `Equals(object?)` cuando corresponda, mantengan una misma relación de igualdad. Para `record`, revisar la igualdad generada; **no exigir overrides manuales** si ya cumple la semántica elegida. Tampoco asumir que una colección en un record se compara por contenido.
 - Si dos valores son iguales, **sus códigos hash deben coincidir**. Los hashes iguales no obligan a que los valores sean iguales.
 - Mantener la relación reflexiva, simétrica y transitiva; comprobar consistencia con los operadores, incluso con null donde corresponda.
 - No incorporar reglas globales como "todos los IDs son iguales por su representación" ni "todo Space compuesto es igual por identidad". Determinarlo según el dominio.
