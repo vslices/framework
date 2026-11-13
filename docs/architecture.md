@@ -23,6 +23,8 @@ A Space does not acquire external facts merely because a realization can do so.
 
 ## VSlices.Work
 
+Algebra contracts are grouped under `VSlices.Work.Algebra`; `VSlices.Work` retains the Feature contract and Laws remain in `VSlices.Work.Laws`. Import `VSlices.Work.Algebra` to use point and temporal atoms, `HasPoint*` projections or `AlgebraMix`.
+
 Owns executable behavior.
 
 The current Feature contract is:
