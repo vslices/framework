@@ -1,3 +1,4 @@
+using VSlices.Work.Algebra;
 using System.Linq.Expressions;
 using VSlices.Grounding.EntityFrameworkCore.Functional;
 using LanguageExt;
