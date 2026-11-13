@@ -165,7 +165,7 @@ Review and test the owned result shape separately.
 ## FM011 — Feature-owned capability Algebra
 
 **Error:** A Feature does not declare a directly nested **public interface**
-`Algebra`, or the `ALG` type parameter of `Feature<SELF,ALG,REQ,RES>`
+`Algebra` or `Alg`, or the `ALG` type parameter of `Feature<SELF,ALG,REQ,RES>`
 is not that exact interface.
 
 **Why:** An operation must depend on its own declared capability contract.
@@ -173,7 +173,7 @@ Binding it directly to a module-wide concrete algebra exposes capabilities the
 Feature never requested. The module's runtime can implement several Features'
 interfaces without granting each operation all of those capabilities.
 
-**Preferred realization:** Express each Feature's minimal executable
+**Preferred realization:** The owned interface may be named `Algebra` or `Alg`; both are accepted when the exact type is bound as `ALG`. Express each Feature's minimal executable
 requirements in its own nested interface:
 
 ```csharp
