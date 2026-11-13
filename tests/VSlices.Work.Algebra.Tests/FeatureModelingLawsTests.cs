@@ -100,7 +100,7 @@ public sealed class FeatureModelingLawsTests
         [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
         private static extern Response NewResponse(string value);
         public static Eff<Algebra, Response> Get(Request request) =>
-            Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+            Eff<Algebra, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
     }
 
     public sealed record ExternalRequest(string Value);
@@ -273,7 +273,7 @@ public sealed class ValidTopLevelFeature :
     private static extern Response NewResponse(string value);
 
     public static Eff<Algebra, Response> Get(Request request) =>
-        Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+        Eff<Algebra, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
 }
 
 public interface TestReaderCapability
