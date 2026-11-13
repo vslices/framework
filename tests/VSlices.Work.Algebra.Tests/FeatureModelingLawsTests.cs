@@ -66,6 +66,22 @@ public sealed class FeatureModelingLawsTests
     }
 
     [Fact]
+    public void FM011_accepts_feature_owned_Alg_as_well_as_Algebra()
+    {
+        Assert.Empty(FeatureModelingLaws.Inspect(typeof(ShortAlgFeature)));
+        Assert.Empty(FeatureModelingLaws.Inspect(typeof(MinimalAlgebraFeature)));
+    }
+
+    [Fact]
+    public void FM011_rejects_non_interface_Alg_and_mismatched_Alg()
+    {
+        Assert.Contains(FeatureModelingLaws.Inspect(typeof(NonInterfaceAlgFeature)),
+            issue => issue.RuleId == "FM011");
+        Assert.Contains(FeatureModelingLaws.Inspect(typeof(MismatchedShortAlgFeature)),
+            issue => issue.RuleId == "FM011");
+    }
+
+    [Fact]
     public void Consumer_scan_is_scoped_and_reports_owners()
     {
         var violations = FeatureModelingLaws.InspectDefinitions(
@@ -316,6 +332,60 @@ public sealed class MinimalAlgebraFeature :
     private static extern Response NewResponse(string value);
     public static Eff<Algebra, Response> Get(Request request) =>
         Eff<Algebra, Response>.LiftIO(algebra => IO.pure(NewResponse(algebra.Read())));
+}
+
+public sealed class ShortAlgFeature :
+    Feature<ShortAlgFeature, ShortAlgFeature.Alg, ShortAlgFeature.Request, ShortAlgFeature.Response>
+{
+    public interface Alg : TestReaderCapability;
+    public sealed record Request(string Value);
+    public sealed record Response
+    {
+        private Response(string value) => Value = value;
+        public string Value { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(string value);
+
+    public static Eff<Alg, Response> Get(Request request) =>
+        Eff<Alg, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+}
+
+public sealed class NonInterfaceAlgFeature :
+    Feature<NonInterfaceAlgFeature, NonInterfaceAlgFeature.Alg, NonInterfaceAlgFeature.Request, NonInterfaceAlgFeature.Response>
+{
+    public sealed class Alg;
+    public sealed record Request(string Value);
+    public sealed record Response
+    {
+        private Response(string value) => Value = value;
+        public string Value { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(string value);
+
+    public static Eff<Alg, Response> Get(Request request) =>
+        Eff<Alg, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
+}
+
+public sealed class MismatchedShortAlgFeature :
+    Feature<MismatchedShortAlgFeature, string, MismatchedShortAlgFeature.Request, MismatchedShortAlgFeature.Response>
+{
+    public interface Alg;
+    public sealed record Request(string Value);
+    public sealed record Response
+    {
+        private Response(string value) => Value = value;
+        public string Value { get; }
+    }
+
+    [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
+    private static extern Response NewResponse(string value);
+
+    public static Eff<string, Response> Get(Request request) =>
+        Eff<string, Response>.LiftIO(_ => IO.pure(NewResponse(request.Value)));
 }
 
 public sealed class InvalidTopLevelFeature :
