@@ -180,7 +180,7 @@ requirements in its own nested interface:
 public sealed class CreateItem :
     Feature<CreateItem, CreateItem.Algebra, CreateItem.Request, CreateItem.Response>
 {
-    public interface Algebra : HasPointReader<Item, ItemId>, HasPointWriter<Item> { }
+    public interface Algebra : HasPointReader<Item, ItemId>, HasPointWriter<Item>;
 
     // Request / Response...
     public static Eff<Algebra, Response> Get(Request request) => /* ... */;
@@ -197,7 +197,7 @@ public sealed record ItemAlgebra(
 `HasPointRemover<POINT, ID>` are reusable capability projections defined in
 `VSlices.Work`. They are **not** the point atoms themselves: the respective
 properties expose `PointReader`, `PointWriter` and `PointRemover` implementations.
-A Feature with no external capabilities may declare an empty `Algebra` interface.
+A Feature with no external capabilities may declare an empty `Algebra` interface. In C# 12+, a memberless interface may end with `;` instead of `{ }`; this is an authoring style preference and is not separately enforced by FM011.
 
 **Alternative and limit:** The Law checks only public nested-interface
 ownership and exact CLR type binding. It **cannot** prove that all members or
