@@ -1,3 +1,4 @@
+using VSlices.Work.Algebra;
 using System.Collections.Concurrent;
 using LanguageExt;
 using SampleWorkflow.Spaces;
