@@ -7,6 +7,21 @@ namespace VSlices.Work.Tests;
 public sealed class PointCapabilityProjectionTests
 {
     [Fact]
+    public void Executable_algebra_contracts_share_the_owned_namespace()
+    {
+        const string owned = "VSlices.Work.Algebra";
+        Assert.Equal(owned, typeof(PointReader<Account, AccountId>).Namespace);
+        Assert.Equal(owned, typeof(PointWriter<Account>).Namespace);
+        Assert.Equal(owned, typeof(PointRemover<Account, AccountId>).Namespace);
+        Assert.Equal(owned, typeof(HasPointReader<Account, AccountId>).Namespace);
+        Assert.Equal(owned, typeof(HasPointWriter<Account>).Namespace);
+        Assert.Equal(owned, typeof(HasPointRemover<Account, AccountId>).Namespace);
+        Assert.Equal(owned, typeof(ClockIO).Namespace);
+        Assert.Equal(owned, typeof(DelayIO).Namespace);
+        Assert.Equal(owned, typeof(AlgebraMix<int, int>).Namespace);
+    }
+
+    [Fact]
     public void Capability_projections_expose_the_exact_point_atoms()
     {
         Assert.Equal(typeof(PointReader<Account, AccountId>),
