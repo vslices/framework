@@ -1,7 +1,7 @@
 using System.Numerics;
 using LanguageExt;
 
-namespace VSlices.Spaces.Finance;
+namespace VSlices.Spaces.Definitions;
 
 /// <summary>
 /// An established positive conversion relation from one currency space to another.

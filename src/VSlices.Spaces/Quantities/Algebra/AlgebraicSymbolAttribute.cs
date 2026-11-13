@@ -1,4 +1,4 @@
-namespace VSlices.Spaces.Quantities;
+namespace VSlices.Spaces.Definitions;
 
 /// <summary>
 /// Names the explicit algebraic establishment function associated with a semantic quantity.

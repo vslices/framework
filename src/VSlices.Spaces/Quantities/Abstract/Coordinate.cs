@@ -1,4 +1,4 @@
-namespace VSlices.Spaces.Quantities.Abstract;
+namespace VSlices.Spaces.Definitions.Abstract;
 
 /// <summary>
 /// Primitive measurement basis for a quantity value.

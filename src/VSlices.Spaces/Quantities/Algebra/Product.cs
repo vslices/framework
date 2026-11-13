@@ -1,7 +1,7 @@
 using System.Numerics;
-using VSlices.Spaces.Quantities.Abstract;
+using VSlices.Spaces.Definitions.Abstract;
 
-namespace VSlices.Spaces.Quantities;
+namespace VSlices.Spaces.Definitions;
 
 /// <summary>
 /// Structural multiplication of one magnitude by itself over one shared primitive basis.
