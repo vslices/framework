@@ -2,7 +2,7 @@
 
 ## Status
 
-Point operations are currently modeled as executable algebraic capability atoms and composed into Work-module algebras used directly as `Eff` runtimes.
+Point operations are currently modeled as executable algebraic capability atoms and composed into Work-module runtimes. Each Feature declares a minimal `Algebra` interface implemented by the concrete module runtime.
 
 The validated point atoms are:
 
@@ -73,22 +73,24 @@ The `IO` foundation keeps world contact explicit while leaving realization to Gr
 
 ## Work algebra
 
-A module composes the atoms its Features may execute:
+A module composes the atoms its Features may execute, while each Feature declares only the atoms it needs through the reusable `HasPoint*` capability projections:
 
 ```csharp
 public sealed record TodoAlgebra(
     PointReader<Todo, TodoId> Reader,
     PointWriter<Todo> Writer,
     PointRemover<Todo, TodoId> Remover,
-    TodoIdSource Ids);
+    TodoIdSource Ids) : GetTodo.Algebra;
 ```
 
 Features then use that algebra directly:
 
 ```csharp
 public sealed class GetTodo :
-    Feature<GetTodo, TodoAlgebra, GetTodo.Request, GetTodo.Response>
+    Feature<GetTodo, GetTodo.Algebra, GetTodo.Request, GetTodo.Response>
 {
+    public interface Algebra : HasPointReader<Todo, TodoId> { }
+
     public sealed record Request(TodoId Id);
     public sealed record Response
     {
@@ -99,17 +101,14 @@ public sealed class GetTodo :
     [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
     private static extern Response NewResponse(Option<Todo> todo);
 
-    public static Eff<TodoAlgebra, Response> Get(Request request) =>
-        Eff<TodoAlgebra, Response>.LiftIO(algebra =>
+    public static Eff<Algebra, Response> Get(Request request) =>
+        Eff<Algebra, Response>.LiftIO(algebra =>
             algebra.Reader.ReadOrDefault(request.Id).Run().As()
                 .Map(NewResponse));
 }
 ```
 
-The algebra is both:
-
-- an explicit description of the executable operations available to the module;
-- the runtime required by the module's Effects.
+The concrete module algebra assembles the operations available to the module and implements its Features' capability interfaces. Each Feature effect requires only its own `Algebra` view, not the entire concrete runtime. `HasPointReader<POINT, ID>`, `HasPointWriter<POINT>` and `HasPointRemover<POINT, ID>` live in `VSlices.Work` and expose the corresponding point atoms through `Reader`, `Writer` and `Remover` properties.
 
 ## Grounding
 
