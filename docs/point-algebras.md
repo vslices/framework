@@ -32,6 +32,10 @@ It does not establish Repository, Store, tracking, transactions, Unit of Work, o
 
 The smallest supported vocabulary preserves continuity from documentary evidence into executable Work without inventing a larger infrastructure pattern.
 
+All algebra atoms and their capability projections live in `VSlices.Work.Algebra`. Each `HasPoint*` interface is declared alongside its corresponding `Point*` atom, rather than in a separate catch-all capabilities file. Consumers must import `using VSlices.Work.Algebra;`.
+
+The temporal atoms `ClockIO` and `DelayIO` are colocated in `src/VSlices.Work/Algebra/Temporal.cs` under the same namespace; `AlgebraMix` also belongs to that namespace.
+
 ## Executable atoms
 
 ### PointReader
@@ -108,7 +112,7 @@ public sealed class GetTodo :
 }
 ```
 
-The concrete module algebra assembles the operations available to the module and implements its Features' capability interfaces. Each Feature effect requires only its own `Algebra` view, not the entire concrete runtime. `HasPointReader<POINT, ID>`, `HasPointWriter<POINT>` and `HasPointRemover<POINT, ID>` live in `VSlices.Work` and expose the corresponding point atoms through `Reader`, `Writer` and `Remover` properties.
+The concrete module algebra assembles the operations available to the module and implements its Features' capability interfaces. Each Feature effect requires only its own `Algebra` view, not the entire concrete runtime. `HasPointReader<POINT, ID>`, `HasPointWriter<POINT>` and `HasPointRemover<POINT, ID>` live in `VSlices.Work.Algebra` and expose the corresponding point atoms through `Reader`, `Writer` and `Remover` properties.
 
 ## Grounding
 
