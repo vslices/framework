@@ -1,7 +1,7 @@
 using System.Numerics;
 using VSlices.Spaces.Definitions;
 using VSlices.Spaces.Definitions.Abstract;
-using static VSlices.Spaces.Conversions;
+using static VSlices.Spaces.Definitions.Conversions;
 using static VSlices.Spaces.Definitions.PowerOperations;
 
 namespace VSlices.Spaces.Tests;

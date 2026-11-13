@@ -1,6 +1,6 @@
 using VSlices.Spaces.Definitions;
 using VSlices.Spaces.Definitions.Abstract;
-using static VSlices.Spaces.Conversions;
+using static VSlices.Spaces.Definitions.Conversions;
 
 namespace VSlices.Spaces.Tests;
 
