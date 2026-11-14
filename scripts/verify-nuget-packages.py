@@ -13,10 +13,13 @@ PACKAGES = {
     "VSlices.Grounding",
     "VSlices.Grounding.EntityFrameworkCore",
     "VSlices.Views.Abstract",
+    "VSlices.Spaces.Authentication",
+    "VSlices.Work.Authentication",
+    "VSlices.Grounding.Authentication.AspNetCore",
 }
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
 # Direct package references that must remain visible to NuGet consumers.
-# Keep this graph aligned with the seven packable .csproj files.
+# Keep this graph aligned with the ten packable .csproj files.
 INTERNAL_DEPENDENCIES = {
     "VSlices": set(),
     "VSlices.Spaces": {"VSlices"},
@@ -27,6 +30,9 @@ INTERNAL_DEPENDENCIES = {
         "VSlices.Work", "VSlices.Grounding.EntityFrameworkCore.Functional",
     },
     "VSlices.Views.Abstract": {"VSlices.Spaces"},
+    "VSlices.Spaces.Authentication": {"VSlices.Spaces"},
+    "VSlices.Work.Authentication": {"VSlices.Work", "VSlices.Spaces.Authentication"},
+    "VSlices.Grounding.Authentication.AspNetCore": {"VSlices.Work.Authentication"},
 }
 
 
@@ -96,4 +102,4 @@ for path in files:
         print(f"Verified {package_id} {version}")
 if seen != PACKAGES:
     fail(f"Missing package IDs: {PACKAGES - seen}")
-print("All seven packages verified. This does NOT establish NuGet.org ID ownership or publish them.")
+print("All ten packages verified. This does NOT establish NuGet.org ID ownership or publish them.")
