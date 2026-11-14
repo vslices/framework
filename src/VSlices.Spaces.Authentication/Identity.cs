@@ -2,7 +2,7 @@ using LanguageExt;
 using VSlices.Spaces;
 using VSlices.Spaces.Traits;
 
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Identities;
 
 /// <summary>
 /// Extensible semantic identity. Concrete identities own their construction and

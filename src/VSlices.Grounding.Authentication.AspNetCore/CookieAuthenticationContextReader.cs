@@ -1,4 +1,4 @@
-using VSlices.Spaces.Constants;
+using VSlices.Spaces.Authentication;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Authentication;
@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Identities;
 using VSlices.Work.Algebra;
 
-namespace VSlices.Grounding.Authentication.AspNetCore;
+namespace VSlices.Grounding.Algebra;
 
 /// <summary>
 /// Cookie authentication observation shared across ASP.NET Core hosts.
@@ -82,7 +82,7 @@ public abstract class CookieAuthenticationContextReader(
             new(CookieMethod, identity)));
     }
 
-    protected abstract Fin<VSlices.Spaces.Definitions.Identity> TransformIdentity(System.Security.Claims.ClaimsPrincipal principal);
+    protected abstract Fin<VSlices.Spaces.Identities.Identity> TransformIdentity(System.Security.Claims.ClaimsPrincipal principal);
 
     private static T Require<T>(Fin<T> value) =>
         value.Match(

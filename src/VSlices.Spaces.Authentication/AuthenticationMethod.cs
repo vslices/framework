@@ -3,7 +3,7 @@ using LanguageExt.Common;
 using VSlices.Spaces;
 using VSlices.Spaces.Traits;
 
-namespace VSlices.Spaces.Constants;
+namespace VSlices.Spaces.Authentication;
 
 /// <summary>
 /// Complete set of authentication methods currently recognized by VSlices.
