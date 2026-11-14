@@ -2,9 +2,9 @@
 
 ## Status
 
-Point operations are currently modeled as executable algebraic capability atoms and composed into Work-module runtimes. Each Feature declares a minimal `Algebra` interface implemented by the concrete module runtime.
+Point operations are currently modeled as executable algebraic contracts and composed into Work-module runtimes. Each Feature declares a minimal `Algebra` interface implemented by the concrete module runtime.
 
-The validated point atoms are:
+The validated point contracts are:
 
 ```text
 PointReader<POINT, ID>
@@ -32,9 +32,9 @@ It does not establish Repository, Store, tracking, transactions, Unit of Work, o
 
 The smallest supported vocabulary preserves continuity from documentary evidence into executable Work without inventing a larger infrastructure pattern.
 
-All algebra atoms and their capability projections live in `VSlices.Work.Algebra`. Each `HasPoint*` interface is declared alongside its corresponding `Point*` atom, rather than in a separate catch-all capabilities file. Consumers must import `using VSlices.Work.Algebra;`.
+Point algebras and their projections are distributed by `VSlices.Work.DataAccess` and live in namespace `VSlices.Work.Algebra`. Each `HasPoint*` interface is declared alongside its corresponding `Point*` atom, rather than in a separate catch-all capabilities file. Consumers must import `using VSlices.Work.Algebra;`.
 
-The temporal atoms `ClockIO` and `DelayIO` are colocated in `src/VSlices.Work/Algebra/Temporal.cs` under the same namespace; `AlgebraMix` also belongs to that namespace.
+The temporal algebras `Clock` and `Delay` live in separate files inside `src/VSlices.Work/Algebra/` under the same namespace; `AlgebraMix` also belongs to that namespace.
 
 ## Executable atoms
 
