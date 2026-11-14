@@ -1,3 +1,4 @@
+using LanguageExt;
 namespace VSlices.Work.Algebra;
 
 /// <summary>
