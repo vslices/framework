@@ -48,6 +48,10 @@ public sealed record TodoAlgebra(
 
 The algebra is the runtime required by the Feature's Eff. It is not a Free program, interpreter vocabulary, DI service bag, Repository, or Infrastructure layer.
 
+## Work observability (investigation)
+
+An opt-in, first-party mechanism for logs, distributed traces and metrics is under investigation. It must observe actual Feature execution, not merely the construction of an `Eff`, and must keep Work meaning separate from .NET instrumentation and Hosting export policy. No API has been adopted yet; see [Work observability research](work/observability-research.md).
+
 ## VSlices.Grounding
 
 Owns concrete contact with the external world.
