@@ -16,8 +16,8 @@ public sealed class PointCapabilityProjectionTests
         Assert.Equal(owned, typeof(HasPointReader<Account, AccountId>).Namespace);
         Assert.Equal(owned, typeof(HasPointWriter<Account>).Namespace);
         Assert.Equal(owned, typeof(HasPointRemover<Account, AccountId>).Namespace);
-        Assert.Equal(owned, typeof(ClockIO).Namespace);
-        Assert.Equal(owned, typeof(DelayIO).Namespace);
+        Assert.Equal(owned, typeof(Clock).Namespace);
+        Assert.Equal(owned, typeof(Delay).Namespace);
         Assert.Equal(owned, typeof(AlgebraMix<int, int>).Namespace);
     }
 
