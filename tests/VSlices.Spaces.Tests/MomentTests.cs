@@ -1,5 +1,7 @@
-using VSlices.Spaces.Definitions;
-using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Temporal;
+using VSlices.Spaces.Quantities;
+
+
 
 namespace VSlices.Spaces.Tests;
 

@@ -1,5 +1,8 @@
-using VSlices.Spaces.Definitions;
-using VSlices.Spaces.Definitions.Abstract;
+using VSlices.Spaces;
+using VSlices.Spaces.Finance;
+using VSlices.Spaces.Temporal;
+using VSlices.Spaces.Quantities;
+using VSlices.Spaces.Quantities.Abstract;
 using Xunit;
 
 namespace VSlices.Spaces.Tests;
@@ -7,27 +10,23 @@ namespace VSlices.Spaces.Tests;
 public sealed class DefinitionNamespaceTests
 {
     [Fact]
-    public void Framework_definitions_use_the_canonical_namespace()
+    public void Semantic_definitions_retain_their_respective_namespaces()
     {
-        const string expected = "VSlices.Spaces.Definitions";
-
-        Assert.Equal(expected, typeof(Currency).Namespace);
-        Assert.Equal(expected, typeof(Money<,>).Namespace);
-        Assert.Equal(expected, typeof(Moment).Namespace);
-        Assert.Equal(expected, typeof(Length<>).Namespace);
-        Assert.Equal(expected, typeof(vMass).Namespace);
-        Assert.Equal(expected, typeof(Area<,>).Namespace);
-        Assert.Equal(expected, typeof(Conversions).Namespace);
-        Assert.Equal(expected, typeof(AlgebraicSymbolAttribute).Namespace);
+        Assert.Equal("VSlices.Spaces.Finance", typeof(Currency).Namespace);
+        Assert.Equal("VSlices.Spaces.Finance", typeof(Money<,>).Namespace);
+        Assert.Equal("VSlices.Spaces.Temporal", typeof(Moment).Namespace);
+        Assert.Equal("VSlices.Spaces.Quantities", typeof(Length<>).Namespace);
+        Assert.Equal("VSlices.Spaces.Quantities", typeof(vMass).Namespace);
+        Assert.Equal("VSlices.Spaces.Quantities", typeof(Area<,>).Namespace);
+        Assert.Equal("VSlices.Spaces", typeof(Conversions).Namespace);
+        Assert.Equal("VSlices.Spaces.Quantities", typeof(AlgebraicSymbolAttribute).Namespace);
     }
 
     [Fact]
-    public void Abstract_quantity_definitions_use_the_abstract_namespace()
+    public void Abstract_quantity_definitions_use_the_quantities_abstract_namespace()
     {
-        const string expected = "VSlices.Spaces.Definitions.Abstract";
-
-        Assert.Equal(expected, typeof(Coordinate).Namespace);
-        Assert.Equal(expected, typeof(Grams).Namespace);
-        Assert.Equal(expected, typeof(M).Namespace);
+        Assert.Equal("VSlices.Spaces.Quantities.Abstract", typeof(Coordinate).Namespace);
+        Assert.Equal("VSlices.Spaces.Quantities.Abstract", typeof(Grams).Namespace);
+        Assert.Equal("VSlices.Spaces.Quantities.Abstract", typeof(M).Namespace);
     }
 }
