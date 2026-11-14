@@ -2,7 +2,7 @@ using System.Numerics;
 using LanguageExt;
 using VSlices.Spaces.Definitions.Abstract;
 
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Quantities;
 
 /// <summary>
 /// Most general nominally closed Duration family.

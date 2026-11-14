@@ -1,6 +1,6 @@
 using VSlices.Spaces.Definitions;
 
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Temporal;
 
 /// <summary>
 /// A temporal point. Moment is not a duration and does not carry a scalar origin;

@@ -1,7 +1,7 @@
 using System.Numerics;
 using VSlices.Spaces.Definitions.Abstract;
 
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Quantities;
 
 /// <summary>
 /// Semantic volume established from cubed Length.
