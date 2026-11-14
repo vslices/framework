@@ -1,7 +1,7 @@
 using System.Numerics;
 using VSlices.Spaces.Definitions.Abstract;
 
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Quantities;
 
 /// <summary>
 /// Structural division whose numerator and denominator retain their own primitive

@@ -1,4 +1,4 @@
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Finance;
 
 /// <summary>
 /// Identifies a nominal currency vocabulary.

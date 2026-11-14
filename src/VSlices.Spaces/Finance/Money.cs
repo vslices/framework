@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Finance;
 
 /// <summary>
 /// A monetary amount expressed in one nominal currency.

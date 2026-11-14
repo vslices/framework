@@ -1,4 +1,4 @@
-namespace VSlices.Spaces.Definitions.Abstract;
+namespace VSlices.Spaces.Quantities.Abstract;
 
 /// <summary>
 /// Marker vocabulary for algebraic exponents used by M.Pow.

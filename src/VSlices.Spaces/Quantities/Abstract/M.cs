@@ -1,4 +1,4 @@
-namespace VSlices.Spaces.Definitions.Abstract;
+namespace VSlices.Spaces.Quantities.Abstract;
 
 /// <summary>
 /// Algebraic magnitude language used by quantity values.

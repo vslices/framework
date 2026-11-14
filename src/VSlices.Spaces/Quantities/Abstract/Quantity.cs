@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace VSlices.Spaces.Definitions.Abstract;
+namespace VSlices.Spaces.Quantities.Abstract;
 
 /// <summary>
 /// Quantity membership: algebraic magnitude F, one primitive coordinate basis C,
