@@ -7,5 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\VSlices.Work\VSlices.Work.csproj" />
+    <ProjectReference Include="..\..\..\src\VSlices.Work.DataAccess\VSlices.Work.DataAccess.csproj" />
   </ItemGroup>
 </Project>

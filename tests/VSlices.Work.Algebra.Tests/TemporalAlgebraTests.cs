@@ -34,8 +34,8 @@ public sealed class TemporalAlgebraTests
 }
 
 public sealed record TemporalAlgebra(
-    ClockIO Clock,
-    DelayIO Delay);
+    Clock Clock,
+    Delay Delay);
 
 public sealed class TemporalProbe :
     Feature<TemporalProbe, TemporalAlgebra, TemporalProbe.Request, TemporalProbe.Response>
@@ -65,8 +65,8 @@ public sealed class TemporalProbe :
 }
 
 public sealed class RecordingTemporalIO(Moment now) :
-    ClockIO,
-    DelayIO
+    Clock,
+    Delay
 {
     public List<string> Trace { get; } = [];
 

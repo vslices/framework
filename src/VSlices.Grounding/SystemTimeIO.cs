@@ -10,8 +10,8 @@ namespace VSlices.Grounding.Algebra;
 /// Grounds clock observation and temporal delay in a concrete <see cref="TimeProvider"/>.
 /// </summary>
 public sealed class SystemTimeIO(TimeProvider timeProvider) :
-    ClockIO,
-    DelayIO
+    Clock,
+    Delay
 {
     public IO<Moment> Now =>
         IO.lift(() => new Moment(timeProvider.GetLocalNow()));

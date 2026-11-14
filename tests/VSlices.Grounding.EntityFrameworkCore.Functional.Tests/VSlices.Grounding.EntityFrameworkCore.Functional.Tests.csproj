@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\VSlices.Grounding.EntityFrameworkCore.Functional\VSlices.Grounding.EntityFrameworkCore.Functional.csproj" />
+    <ProjectReference Include="..\..\src\VSlices.Extensions.EFCore\VSlices.Extensions.EFCore.csproj" />
   </ItemGroup>
 
 </Project>

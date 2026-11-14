@@ -1,5 +1,6 @@
 using VSlices.Grounding.Algebra;
 using VSlices.Work.Algebra;
+using VSlices.Grounding.Algebra;
 using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Monads;

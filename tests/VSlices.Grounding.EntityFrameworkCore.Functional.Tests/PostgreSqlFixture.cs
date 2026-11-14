@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Testcontainers.PostgreSql;
 using Xunit;
 
-namespace VSlices.Grounding.EntityFrameworkCore.Functional.Tests;
+namespace VSlices.Extensions.EFCore.Tests;
 
 public sealed class PostgreSqlFixture : IAsyncLifetime
 {
