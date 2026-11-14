@@ -1,6 +1,6 @@
 using System.Numerics;
 using LanguageExt;
-using VSlices.Spaces.Definitions.Abstract;
+using VSlices.Spaces.Quantities.Abstract;
 
 namespace VSlices.Spaces.Quantities;
 
