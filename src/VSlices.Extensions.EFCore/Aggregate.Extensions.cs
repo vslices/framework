@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace VSlices.Grounding.EntityFrameworkCore.Functional;
+namespace VSlices.Extensions.EFCore;
 
 public static partial class QueryableExtensions
 {
