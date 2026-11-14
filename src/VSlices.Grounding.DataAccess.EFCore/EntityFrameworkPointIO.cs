@@ -1,6 +1,6 @@
 using VSlices.Work.Algebra;
 using System.Linq.Expressions;
-using VSlices.Grounding.EntityFrameworkCore.Functional;
+using VSlices.Extensions.EFCore;
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using VSlices.Work;
