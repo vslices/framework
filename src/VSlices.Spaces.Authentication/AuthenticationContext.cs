@@ -1,4 +1,5 @@
 using VSlices.Spaces.Identities;
+using Identity = VSlices.Spaces.Identities.Identity;
 using LanguageExt;
 using LanguageExt.Common;
 using VSlices.Spaces;
