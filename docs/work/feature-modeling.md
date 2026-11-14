@@ -162,6 +162,53 @@ construction, and choose immutable values for their contents.
 referencing a mutable object or collection can still expose mutable state.
 Review and test the owned result shape separately.
 
+## FM011 — Feature-owned capability Algebra
+
+**Error:** A Feature does not declare a directly nested **public interface**
+`Algebra` or `Alg`, or the `ALG` type parameter of `Feature<SELF,ALG,REQ,RES>`
+is not that exact interface.
+
+**Why:** An operation must depend on its own declared capability contract.
+Binding it directly to a module-wide concrete algebra exposes capabilities the
+Feature never requested. The module's runtime can implement several Features'
+interfaces without granting each operation all of those capabilities.
+
+**Preferred realization:** The owned interface may be named `Algebra` or `Alg`; both are accepted when the exact type is bound as `ALG`. Express each Feature's minimal executable
+requirements in its own nested interface:
+
+```csharp
+public sealed class CreateItem :
+    Feature<CreateItem, CreateItem.Algebra, CreateItem.Request, CreateItem.Response>
+{
+    public interface Algebra : HasPointReader<Item, ItemId>, HasPointWriter<Item>;
+
+    // Request / Response...
+    public static Eff<Algebra, Response> Get(Request request) => /* ... */;
+}
+
+public sealed record ItemAlgebra(
+    PointReader<Item, ItemId> Reader,
+    PointWriter<Item> Writer,
+    PointRemover<Item, ItemId> Remover) :
+    CreateItem.Algebra, ReadItem.Algebra, UpdateItem.Algebra, DeleteItem.Algebra;
+```
+
+`HasPointReader<POINT, ID>`, `HasPointWriter<POINT>` and
+`HasPointRemover<POINT, ID>` are reusable capability projections defined in
+`VSlices.Work.Algebra`, beside the corresponding `Point*` interface. They are **not** the point atoms themselves: the respective
+properties expose `PointReader`, `PointWriter` and `PointRemover` implementations.
+A Feature with no external capabilities may declare an empty `Algebra` interface. In C# 12+, a memberless interface may end with `;` instead of `{ }`; this is an authoring style preference and is not separately enforced by FM011.
+
+**Alternative and limit:** The Law checks only public nested-interface
+ownership and exact CLR type binding. It **cannot** prove that all members or
+inherited capabilities are genuinely needed, inspect effect-body usage, or
+guarantee absence of side channels. Review the operation and test its declared
+capabilities separately. `Feature` itself remains invariant; C# `in ALG`
+variance is unnecessary for a concrete module algebra implementing its Feature
+interfaces. This rule introduces a new structural convention; existing
+consumers with module-wide `ALG` need to migrate before opting into the new
+inspection behavior.
+
 ## Modeling practice — Response is not Evolvable State
 
 The construction policies are intentionally related but not identical.
@@ -206,7 +253,8 @@ realization of executable capability atoms. `AlgebraMix` expresses availability
 of child algebras, not a transaction, rollback, or compensation guarantee.
 
 Transport independence, outcome semantics and composition correctness are
-review and test obligations, **not** unverified FM011–FM013 executable Laws.
+review and test obligations, **not** unverified FM012–FM013 executable Laws.
+FM011 checks nominal capability ownership, not those behavioral guarantees.
 `Flow` remains independently available, but `MapRuntime`, `MapRequest`
 and `ContraMap` are not needed in the current Feature contract.
 

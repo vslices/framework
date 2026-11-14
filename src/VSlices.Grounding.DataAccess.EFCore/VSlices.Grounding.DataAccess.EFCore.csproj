@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\VSlices.Work.DataAccess\VSlices.Work.DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <ProjectReference Include="..\VSlices.Extensions.EFCore\VSlices.Extensions.EFCore.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,3 +1,4 @@
+using VSlices.Work.Algebra;
 using LanguageExt;
 using SampleFileRepo;
 using SampleWorkflow.Grounding;

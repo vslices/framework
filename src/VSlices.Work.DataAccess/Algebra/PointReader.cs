@@ -1,6 +1,6 @@
 using LanguageExt;
 
-namespace VSlices.Work;
+namespace VSlices.Work.Algebra;
 
 /// <summary>
 /// Executable algebraic atom for reading a semantic point by identity.
@@ -55,4 +55,12 @@ public static class PointReaderExtensions
         this PointReader<POINT, ID> reader,
         ID id) =>
         reader.Read(id);
+}
+
+/// <summary>
+/// Projects the point-reading atom into a Feature's runtime Algebra.
+/// </summary>
+public interface HasPointReader<POINT, ID>
+{
+    PointReader<POINT, ID> Reader { get; }
 }

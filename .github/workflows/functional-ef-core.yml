@@ -3,14 +3,14 @@ name: Functional EF Core integration
 on:
   pull_request:
     paths:
-      - 'src/VSlices.Grounding.EntityFrameworkCore.Functional/**'
+      - 'src/VSlices.Extensions.EFCore/**'
       - 'tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests/**'
       - '.github/workflows/functional-ef-core.yml'
       - 'VSlices.slnx'
   push:
     branches: [master]
     paths:
-      - 'src/VSlices.Grounding.EntityFrameworkCore.Functional/**'
+      - 'src/VSlices.Extensions.EFCore/**'
       - 'tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests/**'
       - '.github/workflows/functional-ef-core.yml'
       - 'VSlices.slnx'
@@ -35,4 +35,4 @@ jobs:
       - name: PostgreSQL / Testcontainers integration
         run: dotnet run --project tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests.csproj -c Release --no-restore
       - name: Pack functional EF Core
-        run: dotnet pack src/VSlices.Grounding.EntityFrameworkCore.Functional/VSlices.Grounding.EntityFrameworkCore.Functional.csproj -c Release -o artifacts/nuget --no-restore
+        run: dotnet pack src/VSlices.Extensions.EFCore/VSlices.Extensions.EFCore.csproj -c Release -o artifacts/nuget --no-restore

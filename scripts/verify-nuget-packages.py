@@ -9,9 +9,10 @@ PACKAGES = {
     "VSlices",
     "VSlices.Spaces",
     "VSlices.Work",
-    "VSlices.Grounding.EntityFrameworkCore.Functional",
+    "VSlices.Work.DataAccess",
+    "VSlices.Extensions.EFCore",
     "VSlices.Grounding",
-    "VSlices.Grounding.EntityFrameworkCore",
+    "VSlices.Grounding.DataAccess.EFCore",
     "VSlices.Views.Abstract",
     "VSlices.Spaces.Authentication",
     "VSlices.Work.Authentication",
@@ -19,15 +20,16 @@ PACKAGES = {
 }
 NS = {"n": "http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"}
 # Direct package references that must remain visible to NuGet consumers.
-# Keep this graph aligned with the ten packable .csproj files.
+# Keep this graph aligned with the eleven packable .csproj files.
 INTERNAL_DEPENDENCIES = {
     "VSlices": set(),
     "VSlices.Spaces": {"VSlices"},
     "VSlices.Work": {"VSlices", "VSlices.Spaces"},
     "VSlices.Grounding": {"VSlices.Work"},
-    "VSlices.Grounding.EntityFrameworkCore.Functional": {"VSlices"},
-    "VSlices.Grounding.EntityFrameworkCore": {
-        "VSlices.Work", "VSlices.Grounding.EntityFrameworkCore.Functional",
+    "VSlices.Work.DataAccess": {"VSlices.Work"},
+    "VSlices.Extensions.EFCore": {"VSlices"},
+    "VSlices.Grounding.DataAccess.EFCore": {
+        "VSlices.Work.DataAccess", "VSlices.Extensions.EFCore",
     },
     "VSlices.Views.Abstract": {"VSlices.Spaces"},
     "VSlices.Spaces.Authentication": {"VSlices.Spaces"},
@@ -69,7 +71,7 @@ for path in files:
             fail(f"{package_id}: unexpected version {version}")
         expected_authors = (
             ["Hernán Alvarez", "VSlices Development"]
-            if package_id == "VSlices.Grounding.EntityFrameworkCore.Functional"
+            if package_id == "VSlices.Extensions.EFCore"
             else ["Enryu20", "Limen"]
         )
         actual_authors = [a.strip() for a in (authors or "").replace(";", ",").split(",")]
@@ -102,4 +104,4 @@ for path in files:
         print(f"Verified {package_id} {version}")
 if seen != PACKAGES:
     fail(f"Missing package IDs: {PACKAGES - seen}")
-print("All ten packages verified. This does NOT establish NuGet.org ID ownership or publish them.")
+print("All eleven packages verified. This does NOT establish NuGet.org ID ownership or publish them.")

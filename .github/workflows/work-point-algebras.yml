@@ -32,7 +32,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Build Work
-        run: dotnet build src/VSlices.Work/VSlices.Work.csproj
+        run: dotnet build src/VSlices.Work.DataAccess/VSlices.Work.DataAccess.csproj
 
       - name: Run point algebra tests
         run: dotnet run --project tests/VSlices.Work.Algebra.Tests/VSlices.Work.Algebra.Tests.csproj

@@ -1,10 +1,10 @@
-using VSlices.Grounding.EntityFrameworkCore.Functional;
+using VSlices.Extensions.EFCore;
 using LanguageExt;
 using LanguageExt.Traits;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace VSlices.Grounding.EntityFrameworkCore.Functional.Tests;
+namespace VSlices.Extensions.EFCore.Tests;
 
 public sealed class FunctionalEfCoreIntegrationTests(PostgreSqlFixture database)
     : IClassFixture<PostgreSqlFixture>

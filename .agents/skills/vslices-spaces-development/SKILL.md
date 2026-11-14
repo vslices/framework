@@ -94,3 +94,7 @@ La precedencia se deriva del significado, no de palabras como «puede»:
 ## Resultado esperado
 
 Entregar las definiciones implementadas con su construcción/transformación y, si corresponde, evolución; pruebas aplicables; un resumen de **significado, invariantes, decisiones, evidencia ejecutada y límites**; y **siempre un informe de modelado** según [modeling-report.md](references/modeling-report.md). Separar errores o incoherencias demostradas de información no especificada y convenciones provisionales. No bloquear el desarrollo ni inventar reglas porque falte información, salvo que esa ausencia impida establecer una garantía indispensable.
+
+## Namespaces de las definiciones del propio Framework
+
+Para `src/VSlices.Spaces/Finance/`, `Quantities/` y `Temporal/`, utilizar `VSlices.Spaces.Definitions` incluso en subcarpetas de `Quantities/` como `Algebra/` y `Derived/`. Solo `Quantities/Abstract/` utiliza `VSlices.Spaces.Definitions.Abstract`. Consultar [organización de Spaces](references/space-organization.md). No suponer que el namespace replica toda la estructura física de carpetas.

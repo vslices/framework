@@ -1,3 +1,4 @@
+using VSlices.Work.Algebra;
 using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Monads;
@@ -98,11 +99,13 @@ public sealed class PointAlgebraTests
 
 public sealed record AccountAlgebra(
     PointReader<Account, AccountId> Reader,
-    PointWriter<Account> Writer);
+    PointWriter<Account> Writer) : RenameAccount.Algebra;
 
 public sealed class RenameAccount :
-    Feature<RenameAccount, AccountAlgebra, RenameAccount.Request, RenameAccount.Response>
+    Feature<RenameAccount, RenameAccount.Algebra, RenameAccount.Request, RenameAccount.Response>
 {
+    public interface Algebra : HasPointReader<Account, AccountId>, HasPointWriter<Account> { }
+
     public sealed record Request(AccountId AccountId, string Name);
     public sealed record Response
     {
@@ -113,8 +116,8 @@ public sealed class RenameAccount :
     [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
     private static extern Response NewResponse(Option<Account> account);
 
-    public static Eff<AccountAlgebra, Response> Get(Request request) =>
-        Eff<AccountAlgebra, Response>.LiftIO(algebra =>
+    public static Eff<Algebra, Response> Get(Request request) =>
+        Eff<Algebra, Response>.LiftIO(algebra =>
             algebra.Reader
                 .ReadOrDefault(request.AccountId)
                 .Run()

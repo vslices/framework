@@ -1,5 +1,5 @@
 using LanguageExt;
-using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Authentication;
 
 namespace VSlices.Work.Algebra;
 

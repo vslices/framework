@@ -48,6 +48,19 @@ public static class FeatureModelingLaws
         var request = type.GetNestedType("Request", BindingFlags.Public | BindingFlags.NonPublic);
         var response = type.GetNestedType("Response", BindingFlags.Public | BindingFlags.NonPublic);
 
+        // Every Feature declares its own runtime view; the module runtime can
+        // implement several such interfaces without exposing all capabilities.
+        var ownedAlgebras = new[] { "Algebra", "Alg" }
+            .Select(name => type.GetNestedType(name, BindingFlags.Public | BindingFlags.NonPublic))
+            .Where(candidate => candidate is not null
+                && candidate.DeclaringType == type
+                && candidate.IsNestedPublic && candidate.IsInterface)
+            .ToArray();
+        if (!ownedAlgebras.Any(candidate => candidate == algebra))
+            violations.Add(Violation(type, "FM011",
+                "Declare a public nested interface Algebra or Alg and bind ALG to that exact Feature-owned interface.",
+                "fm011-feature-owned-algebra"));
+
         if (request is null || request.DeclaringType != type)
             violations.Add(Violation(type, "FM002", "Request must be declared directly inside its Feature.", "fm002-request-ownership"));
 

@@ -1,5 +1,7 @@
 # Capabilities
 
+Executable Work algebra contracts, including `PointReader`, `PointWriter`, `PointRemover`, `HasPoint*`, `ClockIO`, `DelayIO` and `AlgebraMix`, are under `VSlices.Work.Algebra` (import `using VSlices.Work.Algebra;`). The temporal contracts share `Algebra/Temporal.cs`; point capability projections are colocated with their individual point atoms.
+
 ## Current meaning
 
 A Work capability is the smallest executable operation for which current evidence justifies an independent contract.

@@ -1,10 +1,11 @@
-using VSlices.Spaces.Constants;
+using VSlices.Spaces.Identities;
+using Identity = VSlices.Spaces.Identities.Identity;
 using LanguageExt;
 using LanguageExt.Common;
 using VSlices.Spaces;
 using VSlices.Spaces.Traits;
 
-namespace VSlices.Spaces.Definitions;
+namespace VSlices.Spaces.Authentication;
 
 /// <summary>
 /// The observation of an authentication mechanism. Read succeeds when a valid

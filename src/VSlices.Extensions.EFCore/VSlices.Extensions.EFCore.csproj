@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <PackageId>VSlices.Grounding.EntityFrameworkCore.Functional</PackageId>
     <Authors>Hernán Alvarez; VSlices Development</Authors>
     <Company>VSlices</Company>
     <Description>Functional, effectful Entity Framework Core extensions built on LanguageExt.</Description>
@@ -9,7 +8,7 @@
     <RepositoryUrl>https://github.com/vslices/framework</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\\VSlices\\VSlices.csproj" />
+    <ProjectReference Include="../VSlices/VSlices.csproj" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.11" />
   </ItemGroup>

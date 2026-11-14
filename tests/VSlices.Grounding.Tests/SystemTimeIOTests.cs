@@ -1,5 +1,6 @@
-using VSlices.Spaces.Quantities;
 using VSlices.Spaces.Temporal;
+using VSlices.Spaces.Quantities;
+using VSlices.Grounding.Algebra;
 using Xunit;
 
 namespace VSlices.Grounding.Tests;

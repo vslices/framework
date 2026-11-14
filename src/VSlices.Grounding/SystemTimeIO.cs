@@ -1,16 +1,17 @@
-using LanguageExt;
-using VSlices.Spaces.Quantities;
 using VSlices.Spaces.Temporal;
+using VSlices.Spaces.Quantities;
+using VSlices.Work.Algebra;
+using LanguageExt;
 using VSlices.Work;
 
-namespace VSlices.Grounding;
+namespace VSlices.Grounding.Algebra;
 
 /// <summary>
 /// Grounds clock observation and temporal delay in a concrete <see cref="TimeProvider"/>.
 /// </summary>
 public sealed class SystemTimeIO(TimeProvider timeProvider) :
-    ClockIO,
-    DelayIO
+    Clock,
+    Delay
 {
     public IO<Moment> Now =>
         IO.lift(() => new Moment(timeProvider.GetLocalNow()));

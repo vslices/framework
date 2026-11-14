@@ -38,3 +38,17 @@ Este ejemplo ilustra dependencia monádica: la comparación no se puede hacer an
 3. Probar aceptación, cada rechazo aislado y fallos simultáneos para confirmar comportamiento y atribución.
 4. Usar `Map` para proyectar éxito, `Bind`/LINQ para dependencias y `Match` para interpretar ambos resultados cuando sea necesario; no sustituir composición por `Match` anidados.
 5. Evitar añadir operadores o abstracciones propias si la API instalada ya expresa el contrato.
+
+## Cruce con Eff<RT> en VSlices
+
+VSlices aporta `Fin.Monad.Eff2.cs` y `Eff2.Monad.Fin.cs` (namespace `LanguageExt`) con `Bind` y `SelectMany` en ambos sentidos. La primera fuente de una consulta LINQ **puede ser `Fin<A>`** y su siguiente paso `Eff<RT,B>`; `SelectMany` devuelve `Eff<RT,C>`, conservando el fracaso de `Fin` sin construir manualmente un `liftEff`:
+
+```csharp
+Eff<Alg, Response> Get(Request request) =>
+    from item in Item.Transform(new(request.Id, request.Name)) // Fin<Item>
+    from alg in runtime<Alg>()                             // Eff<Alg, Alg>
+    from stored in alg.Reader.Read(item.Id)                 // IO<Item> (composición posterior)
+    select NewResponse(stored);
+```
+
+**Semántica temporal:** la primera llamada a `Item.Transform` se evalúa cuando se invoca `Get`, mientras que `liftEff(() => Item.Transform(...))` la evalúa al ejecutar el efecto. No asumir equivalencia temporal o de excepciones; estas extensiones solo gobiernan la composición de los resultados. En el sentido inverso, `Eff<RT,A>` puede continuar con un `Fin<B>` mediante las sobrecargas de VSlices, preservando el runtime `RT`. Comprobar las firmas efectivas y compilar en el consumidor; no extrapolar estas extensiones al paquete LanguageExt sin VSlices.

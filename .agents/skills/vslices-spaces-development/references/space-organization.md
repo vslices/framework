@@ -29,3 +29,7 @@ La presencia de una función dentro del Space no justifica introducir `IO`, `Eff
 Preferir nullability expresiva fuera de contratos semánticos que exijan opcionalidad algebraica explícita; respetar SM007 en `Input`/`State`. Usar pattern matching, expresiones modernas y composición legible. Las expresiones de colección `[]` para `Seq<T>` solo son recomendables tras verificar compatibilidad de la versión instalada de LanguageExt v5. No extrapolar limitaciones de LanguageExt v4.
 
 Comprobar el contrato real de cada trait, la compilación y las pruebas de comportamiento antes de declarar un patrón válido.
+
+## Namespaces canónicos de las definiciones del Framework
+
+Dentro de `src/VSlices.Spaces/Finance/`, `Quantities/` (incluidas `Algebra/` y `Derived/`) y `Temporal/`, todas las definiciones viven en `VSlices.Spaces.Definitions`, independientemente de la subcarpeta. **Única excepción:** `src/VSlices.Spaces/Quantities/Abstract/` utiliza `VSlices.Spaces.Definitions.Abstract`. No inferir el namespace a partir de `Finance`, `Quantities` ni `Temporal`: las carpetas organizan los archivos, mientras que el contrato público usa la superficie de definiciones. En consumidores importar el namespace canónico y revisar referencias cualificadas durante la migración; esto cambia nombres CLR públicos.
