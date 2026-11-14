@@ -71,8 +71,8 @@ jobs:
           for project in \
             examples/SampleBFF/SampleBFF.Tests/SampleBFF.Tests.csproj \
             examples/SampleWorkflow/SampleWorkflow.Process.Tests/SampleWorkflow.Process.Tests.csproj \
-            tests/VSlices.Extensions.EFCore.Tests/VSlices.Extensions.EFCore.Tests.csproj \
-            tests/VSlices.Grounding.DataAccess.EFCore.Tests/VSlices.Grounding.DataAccess.EFCore.Tests.csproj \
+            tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests.csproj \
+            tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj \
             tests/VSlices.Grounding.Tests/VSlices.Grounding.Tests.csproj \
             tests/VSlices.Spaces.Analyzers.Tests/VSlices.Spaces.Analyzers.Tests.csproj \
             tests/VSlices.Views.Abstract.Tests/VSlices.Views.Abstract.Tests.csproj \
