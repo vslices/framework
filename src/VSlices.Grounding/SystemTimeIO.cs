@@ -4,7 +4,7 @@ using VSlices.Spaces.Definitions;
 using VSlices.Spaces.Definitions;
 using VSlices.Work;
 
-namespace VSlices.Grounding;
+namespace VSlices.Grounding.Algebra;
 
 /// <summary>
 /// Grounds clock observation and temporal delay in a concrete <see cref="TimeProvider"/>.
