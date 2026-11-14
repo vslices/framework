@@ -211,3 +211,49 @@ Use `SampleWorkflow.GetTodo` or `CreateTodo` with a tiny prototype of `Flow<RT,A
 - Framework current Feature: [Feature.cs](https://github.com/vslices/framework/blob/master/src/VSlices.Work/Feature.cs); [existing Flow](https://github.com/vslices/framework/blob/master/src/VSlices/Monads/Flow/Flow.Definition.cs).
 - LanguageExt official release notes: [beta-51 Deriving](https://github.com/louthy/language-ext/releases/tag/v5.0.0-beta-51), [beta-42 IO DSL](https://github.com/louthy/language-ext/releases/tag/v5.0.0-beta-42), [beta-43 IO execution](https://github.com/louthy/language-ext/releases/tag/v5.0.0-beta-43), [beta-61 uninterruptible/timeout](https://github.com/louthy/language-ext/releases/tag/v5.0.0-beta-61), [beta-64 Monad.Recur](https://github.com/louthy/language-ext/releases/tag/v5.0.0-beta-64).
 - LanguageExt source files linked inline above; reviewed upstream main tree `54d27a2d76cf3f14b964ce1ab421ae80a080bb7a`.
+
+
+## 8. Agreed tracing semantics: implicit nesting via .NET execution context (2026-11-14)
+
+> **Design decision recorded from discussion; implementation not yet verified in VSlices.** This section supersedes the earlier question about manually declaring Feature-to-Feature parentage. No `NestedIn<A>()` or explicit parent/child declaration is required or desired.
+
+### Agreed intent and telemetry ownership
+
+- `Feature.Get(request)` **represents an intention** and produces a Flow without starting telemetry. The declaration itself need not produce an Activity.
+- **Executing** the Flow starts an **implicit span** for that actual Flow execution, within whatever ambient context exists. A repeated run is a new span, not a mutation of an earlier one.
+- **Logs are explicit** operations requested by a Feature, using .NET `ILogger` and inheriting correlation from the active Activity.
+- **Metrics are explicit** measurements requested by a Feature, using native `System.Diagnostics.Metrics` instruments. Framework should not silently emit business counters/histograms; the standard Flow trace is the automatic observation.
+- A single trace can contain **multiple spans**. “One trace per Flow” is imprecise: the agreed guarantee is **one implicit execution span per Flow run**, potentially part of an existing distributed trace.
+- Feature retains semantic identity, options, Request/Response and use-case meaning; Flow is the mechanism of execution/observation. No diagnostics methods must be added to each Feature.Algebra.
+
+### Nesting is implicit, including cross-server HTTP
+
+The execution tree is determined by **actual distributed tracing context**, not compile-time coupling, declared Feature parentage, or static service topology.
+
+```text
+ticket-support-product (ASP.NET Core inbound Activity)
+  -> Feature AttachFile (Flow execution span, Activity.Current child)
+     -> HttpClient outgoing HTTP client span
+        -> traceparent / tracestate propagation
+           -> ticket-service (ASP.NET Core inbound server span)
+              -> Feature StoreFile (Flow execution span, Activity.Current child)
+```
+
+The `ticket-service` Feature **need not know** `ticket-support-product` nor declare that it is nested beneath it. When correctly configured, outgoing HTTP instrumentation injects W3C Trace Context; inbound ASP.NET Core instrumentation extracts it. The receiving server's Activity and Flow Activity are correlated by the propagated context. No custom VSlices parent identifier or HTTP header format is warranted.
+
+### Engineering constraints to prove
+
+1. **Execution-time boundary:** start `ActivitySource.StartActivity(operationName, ActivityKind.Internal)` when Flow actually runs, using the ambient parent (`Activity.Current`); do not start at `Feature.Get` or while deriving/composing `Bind`/ `Map`.
+2. **Listener absence:** `StartActivity` can return `null`; Flow must still execute and complete. Do not reuse `LanguageExt.Sys.Diag.Activity.span` unchanged given its verified null-to-throw path.
+3. **Parent inheritance:** test in-process parent/child and detached execution. Parent span should be preserved/restored after nested completion.
+4. **HTTP propagation:** verify actual outgoing HttpClient headers and inbound ASP.NET Core correlation using two local hosts, with tracing configured. A bare HTTP call without appropriate .NET instrumentation/configuration must not be claimed to guarantee nesting.
+5. **Sampling:** absence of a recorded child span (due to sampling/listeners) does not mean the operation did not execute. Clarify whether a propagation-only Activity/current context exists for all configured cases.
+6. **Async/cancellation/retry:** verify `Activity.Current` across awaits and forked work, exceptional paths, cancellation, and completed/finalized resource scopes. Retry inside a logical Flow may produce one Flow span over several attempts; don't automatically create new Feature spans for `IO.Retry` iterations.
+7. **Structured logs and metrics:** confirm explicit logs correlate with Activity and explicit instruments remain low-cardinality and do not serialize request/response data automatically.
+8. **No extra public nesting API:** the mechanism should remain transparent to Feature declarations. Hosting owns transport instrumentation/exporter setup, while Framework owns Flow instrumentation availability by default.
+
+### Consequence for API design
+
+Do **not** design `FeatureA.Nest(FeatureB)`, `FeatureB.NestedIn<FeatureA>()`, or require parent identifiers in `FlowDescriptor`/Feature options. Use the framework's ActivitySource and conventional .NET / W3C propagation; use explicit Feature options only for *meaningful semantic or emission policy*, not for implicit trace hierarchy.
+
+The exact creation/execution method name, logger provisioning and instrumentation wiring are still research questions. This is a design agreement, not a claim that a Flow prototype, HTTP integration test or exporter configuration is already implemented.
