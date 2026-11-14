@@ -1,5 +1,8 @@
 # Work observability — research and executable-evidence plan
 
+> **Direction update (2026-11-14):** subsequent source research adopts **first-party built-in Flow observability** as the design hypothesis, rather than a separate optional NuGet package. Feature remains the semantic owner; prospective `Feature.Get` returns `Flow<ALG, RES>` (instead of `Eff<ALG, RES>`), and Flow only owns observable execution. See [LanguageExt Deriving / IO / Eff / Activity source review](language-ext-flow-feature-source-review.md). The four approaches below remain historical alternatives for comparison and are **not** the currently preferred optional-package direction.
+
+
 > Status: **investigation / proposal**, not an adopted public API, implementation, or VSlices Law.
 > Based on `master` at `a94717447aaf7388ae97da5add56e6dcc982dbf3` (2026-11-14).
 > This document separates verified existing code, platform facts, proposed directions, and evidence still missing.
