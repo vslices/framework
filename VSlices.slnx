@@ -42,6 +42,9 @@
     <Project Path="src/VSlices.Grounding.Authentication.AspNetCore/VSlices.Grounding.Authentication.AspNetCore.csproj" />
     <Project Path="src/VSlices/VSlices.csproj" />
   </Folder>
+  <Folder Name="/tests/experiments/">
+    <Project Path="tests/experiments/Maybe.Experimental.Tests/Maybe.Experimental.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests/VSlices.Grounding.EntityFrameworkCore.Functional.Tests.csproj" />
     <Project Path="tests/VSlices.Grounding.EntityFrameworkCore.Tests/VSlices.Grounding.EntityFrameworkCore.Tests.csproj" />
