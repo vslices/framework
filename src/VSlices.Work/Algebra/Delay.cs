@@ -1,4 +1,5 @@
-using VSlices.Spaces.Definitions;
+using VSlices.Spaces.Temporal;
+using VSlices.Spaces.Quantities;
 
 namespace VSlices.Work.Algebra;
 

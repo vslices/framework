@@ -1,9 +1,9 @@
+using VSlices.Spaces.Temporal;
+using VSlices.Spaces.Quantities;
 using VSlices.Work.Algebra;
 using System.Runtime.CompilerServices;
 using LanguageExt;
 using VSlices.Monads;
-using VSlices.Spaces.Definitions;
-using VSlices.Spaces.Definitions;
 using VSlices.Work;
 using Xunit;
 
