@@ -36,6 +36,9 @@
     <Project Path="src/VSlices.Spaces.Analyzers/VSlices.Spaces.Analyzers.csproj" />
     <Project Path="src/VSlices.Views.Abstract/VSlices.Views.Abstract.csproj" />
     <Project Path="src/VSlices.Work/VSlices.Work.csproj" />
+    <Project Path="src/VSlices.Spaces.Authentication/VSlices.Spaces.Authentication.csproj" />
+    <Project Path="src/VSlices.Work.Authentication/VSlices.Work.Authentication.csproj" />
+    <Project Path="src/VSlices.Grounding.Authentication.AspNetCore/VSlices.Grounding.Authentication.AspNetCore.csproj" />
     <Project Path="src/VSlices/VSlices.csproj" />
   </Folder>
   <Folder Name="/tests/">

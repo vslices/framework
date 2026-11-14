@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Pack all seven public libraries (no push)
+      - name: Pack all ten public libraries (no push)
         shell: bash
         run: |
           set -euo pipefail
@@ -31,7 +31,10 @@ jobs:
             VSlices.Grounding.EntityFrameworkCore.Functional \
             VSlices.Grounding \
             VSlices.Grounding.EntityFrameworkCore \
-            VSlices.Views.Abstract
+            VSlices.Views.Abstract \
+            VSlices.Spaces.Authentication \
+            VSlices.Work.Authentication \
+            VSlices.Grounding.Authentication.AspNetCore
           do
             dotnet pack "src/${project}/${project}.csproj" -c Release -o artifacts/nuget
           done
