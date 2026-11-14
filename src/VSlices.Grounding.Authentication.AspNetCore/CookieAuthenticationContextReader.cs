@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using VSlices.Spaces.Definitions;
 using VSlices.Work.Algebra;
 
-namespace VSlices.Grounding.Authentication.HttpCookie;
+namespace VSlices.Grounding.Authentication.AspNetCore;
 
 /// <summary>
 /// Cookie authentication observation shared across ASP.NET Core hosts.
