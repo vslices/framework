@@ -35,3 +35,29 @@ dotnet test tests/experiments/Maybe.Experimental.Tests/Maybe.Experimental.Tests.
 
 Implementation / build status: check the PR evidence; creating source files alone is not
 proof that the tests have been executed.
+
+## Explicit arithmetic experiment (without modifying V0)
+
+`Contracts/MaybeArithmeticContractTests.cs` defines the **same** tests for any future
+version that opts into the arithmetic experiment. It is parameterized both by the concrete
+Maybe representation and by a numeric type `T : INumber<T>`. V0 runs these tests for
+`int`, `long` and `decimal`, plus separate nonnumeric payload tests for `string`
+and a record.
+
+`Versions/MaybeV0Arithmetic.cs` is an **external test-side utility**, not a method of
+`MaybeV0`, and uses only plain C# pattern matching and `Func<T,T,T>`. It implements
+the proposed *all operands required* semantics: arithmetic over a nonempty list of
+Some operands returns Some; the first None anywhere propagates None. A fold is
+left-associative, so subtraction is order-sensitive.
+
+The empty-input case remains conceptually **unsettled**: sum could use Some(0),
+product could use Some(1), and subtraction needs a specific convention. The V0
+test utility currently requires one operand and throws ArgumentException for an
+empty input; **this is a helper precondition, not a universal Maybe law**.
+No assertion for empty input belongs in the stable semantic test contract yet.
+
+Other potential interpretations of absence (e.g. skip absent operands) are explicitly
+**not** adopted by Maybe; explore them separately.
+
+The existing `MaybeV0.cs` is unchanged. Additional versions can implement the
+same arithmetic contract with different internal capabilities.
